@@ -1,0 +1,1021 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Apply for {{ program.title }} - EcoHub{% endblock %}
+
+{% block extra_css %}
+<style>
+    .apply-header {
+        background: linear-gradient(135deg, #10b981 0%, #0d9488 100%);
+    }
+    
+    .application-step {
+        width: 36px;
+        height: 36px;
+        border: 3px solid #e5e7eb;
+        transition: all 0.3s ease;
+    }
+    
+    .application-step.active {
+        border-color: #10b981;
+        background: #10b981;
+        color: white;
+    }
+    
+    .application-step.completed {
+        border-color: #10b981;
+        background: #10b981;
+        color: white;
+    }
+    
+    .program-card {
+        border-left: 4px solid #10b981;
+    }
+    
+    .form-section {
+        transition: all 0.3s ease;
+    }
+    
+    .form-section.collapsed {
+        max-height: 60px;
+        overflow: hidden;
+    }
+    
+    .requirements-list li {
+        position: relative;
+        padding-left: 2rem;
+    }
+    
+    .requirements-list li::before {
+        content: '✓';
+        position: absolute;
+        left: 0;
+        color: #10b981;
+        font-weight: bold;
+    }
+    
+    .document-upload {
+        border: 2px dashed #d1d5db;
+        transition: all 0.3s ease;
+    }
+    
+    .document-upload:hover {
+        border-color: #10b981;
+        background-color: #f0fdf4;
+    }
+    
+    .document-upload.dragover {
+        border-color: #10b981;
+        background-color: #f0fdf4;
+    }
+    
+    .upload-preview {
+        transition: all 0.3s ease;
+    }
+    
+    .upload-preview:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gray-50">
+    <!-- Application Header -->
+    <div class="apply-header text-white">
+        <div class="container mx-auto px-4 py-12">
+            <div class="max-w-6xl mx-auto">
+                <!-- Breadcrumb -->
+                <nav class="mb-6">
+                    <ol class="flex items-center space-x-2 text-sm text-emerald-100">
+                        <li>
+                            <a href="{% url 'core:home' %}" class="hover:text-white">Home</a>
+                        </li>
+                        <li><i class="fas fa-chevron-right text-xs"></i></li>
+                        <li>
+                            <a href="{% url 'programs:list' %}" class="hover:text-white">Programs</a>
+                        </li>
+                        <li><i class="fas fa-chevron-right text-xs"></i></li>
+                        <li>
+                            <a href="{% url 'programs:detail' program.id %}" class="hover:text-white">
+                                {{ program.title|truncatechars:30 }}
+                            </a>
+                        </li>
+                        <li><i class="fas fa-chevron-right text-xs"></i></li>
+                        <li class="text-white font-medium">Application</li>
+                    </ol>
+                </nav>
+                
+                <div class="flex flex-col lg:flex-row items-start lg:items-center justify-between">
+                    <div class="mb-8 lg:mb-0">
+                        <h1 class="text-3xl md:text-4xl font-bold mb-4">Apply for {{ program.title }}</h1>
+                        <p class="text-xl text-emerald-100">Complete your application in a few simple steps</p>
+                    </div>
+                    
+                    <div class="text-right">
+                        <div class="text-sm text-emerald-100 mb-2">Application Deadline</div>
+                        <div class="text-2xl font-bold">{{ program.application_deadline|date:"F j, Y" }}</div>
+                        <div class="text-sm text-emerald-200">{{ program.application_deadline|timeuntil }} remaining</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Application Steps -->
+    <div class="container mx-auto px-4 py-8">
+        <div class="max-w-6xl mx-auto">
+            <!-- Progress Steps -->
+            <div class="bg-white rounded-2xl shadow-lg p-6 mb-8">
+                <div class="flex items-center justify-between mb-8">
+                    {% for step in steps %}
+                    <div class="flex items-center space-x-4">
+                        <div class="application-step rounded-full flex items-center justify-center font-bold 
+                            {% if step.completed %}completed{% elif step.active %}active{% endif %}">
+                            {% if step.completed %}
+                            <i class="fas fa-check text-xs"></i>
+                            {% else %}
+                            {{ step.number }}
+                            {% endif %}
+                        </div>
+                        <div class="hidden md:block">
+                            <h3 class="font-semibold {% if step.active %}text-emerald-600{% else %}text-gray-600{% endif %}">
+                                {{ step.title }}
+                            </h3>
+                            <p class="text-sm text-gray-500">{{ step.description }}</p>
+                        </div>
+                    </div>
+                    
+                    {% if not forloop.last %}
+                    <div class="hidden md:block flex-1 h-0.5 bg-gray-200 mx-4"></div>
+                    {% endif %}
+                    {% endfor %}
+                </div>
+                
+                <!-- Progress Bar -->
+                <div class="h-2 bg-gray-200 rounded-full overflow-hidden">
+                    <div class="h-full bg-emerald-600 rounded-full transition-all duration-300" 
+                         style="width: {{ progress_percentage }}%"></div>
+                </div>
+            </div>
+
+            <!-- Main Content -->
+            <div class="flex flex-col lg:flex-row gap-8">
+                <!-- Left Column - Application Form -->
+                <div class="lg:w-2/3">
+                    <!-- Program Summary -->
+                    <div class="program-card bg-white rounded-2xl shadow-lg p-6 mb-8">
+                        <div class="flex items-start justify-between mb-4">
+                            <div class="flex items-start space-x-4">
+                                <div class="w-20 h-20 rounded-lg overflow-hidden flex-shrink-0">
+                                    {% if program.image %}
+                                    <img src="{{ program.image.url }}" 
+                                         alt="{{ program.title }}" 
+                                         class="w-full h-full object-cover">
+                                    {% else %}
+                                    <div class="w-full h-full bg-gradient-to-r from-emerald-400 to-teal-500 flex items-center justify-center">
+                                        <i class="fas fa-leaf text-white text-2xl"></i>
+                                    </div>
+                                    {% endif %}
+                                </div>
+                                <div>
+                                    <h3 class="text-xl font-bold text-gray-800 mb-2">{{ program.title }}</h3>
+                                    <div class="flex items-center text-sm text-gray-600 mb-2">
+                                        <i class="fas fa-user-tie mr-2 text-emerald-500"></i>
+                                        <span class="mr-4">{{ program.instructor.name }}</span>
+                                        <i class="far fa-clock mr-2 text-emerald-500"></i>
+                                        <span>{{ program.duration }} weeks</span>
+                                    </div>
+                                    <p class="text-gray-600 text-sm">{{ program.short_description }}</p>
+                                </div>
+                            </div>
+                            
+                            <div class="text-right">
+                                {% if program.is_free %}
+                                <div class="text-2xl font-bold text-emerald-600">Free</div>
+                                {% else %}
+                                <div class="text-2xl font-bold text-gray-800">${{ program.price }}</div>
+                                <div class="text-sm text-gray-600">One-time payment</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Application Form -->
+                    <form id="applicationForm" class="space-y-8">
+                        {% csrf_token %}
+                        
+                        <!-- Personal Information -->
+                        <div class="form-section bg-white rounded-2xl shadow-lg p-8">
+                            <div class="flex items-center justify-between mb-6 cursor-pointer" onclick="toggleSection('personalInfo')">
+                                <div>
+                                    <h2 class="text-2xl font-bold text-gray-800">Personal Information</h2>
+                                    <p class="text-gray-600">Tell us about yourself</p>
+                                </div>
+                                <i class="fas fa-chevron-down text-gray-400 transition-transform duration-300" id="personalInfoIcon"></i>
+                            </div>
+                            
+                            <div id="personalInfoContent">
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-2">First Name *</label>
+                                        <input type="text" 
+                                               name="first_name"
+                                               required
+                                               class="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                                               value="{{ user.first_name|default:'' }}">
+                                    </div>
+                                    
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-2">Last Name *</label>
+                                        <input type="text" 
+                                               name="last_name"
+                                               required
+                                               class="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                                               value="{{ user.last_name|default:'' }}">
+                                    </div>
+                                    
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-2">Email Address *</label>
+                                        <input type="email" 
+                                               name="email"
+                                               required
+                                               class="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                                               value="{{ user.email|default:'' }}">
+                                    </div>
+                                    
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-2">Phone Number *</label>
+                                        <input type="tel" 
+                                               name="phone"
+                                               required
+                                               class="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent">
+                                    </div>
+                                    
+                                    <div class="md:col-span-2">
+                                        <label class="block text-sm font-medium text-gray-700 mb-2">Address *</label>
+                                        <input type="text" 
+                                               name="address"
+                                               required
+                                               class="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent">
+                                    </div>
+                                    
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-2">City *</label>
+                                        <input type="text" 
+                                               name="city"
+                                               required
+                                               class="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent">
+                                    </div>
+                                    
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-2">Country *</label>
+                                        <select name="country" 
+                                                required
+                                                class="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent">
+                                            <option value="">Select Country</option>
+                                            {% for country in countries %}
+                                            <option value="{{ country.code }}">{{ country.name }}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Educational Background -->
+                        <div class="form-section bg-white rounded-2xl shadow-lg p-8">
+                            <div class="flex items-center justify-between mb-6 cursor-pointer" onclick="toggleSection('educationInfo')">
+                                <div>
+                                    <h2 class="text-2xl font-bold text-gray-800">Educational Background</h2>
+                                    <p class="text-gray-600">Your academic qualifications</p>
+                                </div>
+                                <i class="fas fa-chevron-down text-gray-400 transition-transform duration-300" id="educationInfoIcon"></i>
+                            </div>
+                            
+                            <div id="educationInfoContent">
+                                <!-- Highest Education -->
+                                <div class="mb-6">
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Highest Education Level *</label>
+                                    <select name="education_level" 
+                                            required
+                                            class="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent">
+                                        <option value="">Select Education Level</option>
+                                        <option value="high_school">High School</option>
+                                        <option value="associate">Associate Degree</option>
+                                        <option value="bachelor">Bachelor's Degree</option>
+                                        <option value="master">Master's Degree</option>
+                                        <option value="phd">PhD</option>
+                                        <option value="other">Other</option>
+                                    </select>
+                                </div>
+                                
+                                <!-- Current Occupation -->
+                                <div class="mb-6">
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Current Occupation *</label>
+                                    <input type="text" 
+                                           name="occupation"
+                                           required
+                                           class="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                                           placeholder="e.g., Student, Researcher, Environmental Consultant">
+                                </div>
+                                
+                                <!-- Experience Level -->
+                                <div class="mb-6">
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Years of Experience in Environmental Field</label>
+                                    <select name="experience_years" 
+                                            class="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent">
+                                        <option value="">Select Experience Level</option>
+                                        <option value="0">No experience</option>
+                                        <option value="1-2">1-2 years</option>
+                                        <option value="3-5">3-5 years</option>
+                                        <option value="6-10">6-10 years</option>
+                                        <option value="10+">10+ years</option>
+                                    </select>
+                                </div>
+                                
+                                <!-- Add Education -->
+                                <div class="border-t border-gray-200 pt-6">
+                                    <h3 class="text-lg font-semibold text-gray-800 mb-4">Add Educational Details</h3>
+                                    <div class="space-y-4" id="educationEntries">
+                                        <div class="education-entry border border-gray-200 rounded-lg p-4">
+                                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                                <div>
+                                                    <label class="block text-sm font-medium text-gray-700 mb-2">Institution</label>
+                                                    <input type="text" 
+                                                           name="education_institution[]"
+                                                           class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent">
+                                                </div>
+                                                <div>
+                                                    <label class="block text-sm font-medium text-gray-700 mb-2">Degree</label>
+                                                    <input type="text" 
+                                                           name="education_degree[]"
+                                                           class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent">
+                                                </div>
+                                                <div>
+                                                    <label class="block text-sm font-medium text-gray-700 mb-2">Field of Study</label>
+                                                    <input type="text" 
+                                                           name="education_field[]"
+                                                           class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent">
+                                                </div>
+                                                <div>
+                                                    <label class="block text-sm font-medium text-gray-700 mb-2">Year of Completion</label>
+                                                    <input type="number" 
+                                                           min="1900" 
+                                                           max="2024"
+                                                           name="education_year[]"
+                                                           class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent">
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <button type="button" 
+                                            onclick="addEducationEntry()"
+                                            class="mt-4 flex items-center text-emerald-600 hover:text-emerald-700 font-medium">
+                                        <i class="fas fa-plus mr-2"></i>
+                                        Add Another Education
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Motivation Statement -->
+                        <div class="form-section bg-white rounded-2xl shadow-lg p-8">
+                            <div class="flex items-center justify-between mb-6 cursor-pointer" onclick="toggleSection('motivationInfo')">
+                                <div>
+                                    <h2 class="text-2xl font-bold text-gray-800">Motivation Statement</h2>
+                                    <p class="text-gray-600">Why do you want to join this program?</p>
+                                </div>
+                                <i class="fas fa-chevron-down text-gray-400 transition-transform duration-300" id="motivationInfoIcon"></i>
+                            </div>
+                            
+                            <div id="motivationInfoContent">
+                                <div class="mb-6">
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">What motivates you to apply for this program? *</label>
+                                    <textarea name="motivation" 
+                                              rows="4"
+                                              required
+                                              class="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                                              placeholder="Share your reasons for applying, your goals, and what you hope to achieve..."></textarea>
+                                    <div class="text-xs text-gray-500 mt-2">Minimum 200 characters</div>
+                                </div>
+                                
+                                <div class="mb-6">
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">How do you plan to apply the knowledge gained from this program? *</label>
+                                    <textarea name="application_plan" 
+                                              rows="4"
+                                              required
+                                              class="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                                              placeholder="Describe how you intend to use the skills and knowledge in your career or community..."></textarea>
+                                </div>
+                                
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Relevant Experience or Projects</label>
+                                    <textarea name="relevant_experience" 
+                                              rows="3"
+                                              class="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                                              placeholder="Describe any relevant projects, research, or work experience..."></textarea>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Document Upload -->
+                        <div class="form-section bg-white rounded-2xl shadow-lg p-8">
+                            <div class="flex items-center justify-between mb-6 cursor-pointer" onclick="toggleSection('documentsInfo')">
+                                <div>
+                                    <h2 class="text-2xl font-bold text-gray-800">Supporting Documents</h2>
+                                    <p class="text-gray-600">Upload required documents</p>
+                                </div>
+                                <i class="fas fa-chevron-down text-gray-400 transition-transform duration-300" id="documentsInfoIcon"></i>
+                            </div>
+                            
+                            <div id="documentsInfoContent">
+                                <!-- Resume/CV -->
+                                <div class="mb-8">
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Resume or CV *</label>
+                                    <div class="document-upload rounded-lg p-8 text-center cursor-pointer"
+                                         id="resumeUpload"
+                                         onclick="document.getElementById('resumeFile').click()">
+                                        <input type="file" 
+                                               id="resumeFile"
+                                               name="resume"
+                                               accept=".pdf,.doc,.docx"
+                                               class="hidden"
+                                               onchange="handleFileUpload(this, 'resumePreview')">
+                                        <i class="fas fa-file-pdf text-3xl text-red-500 mb-4"></i>
+                                        <p class="text-gray-700 font-medium mb-2">Upload your resume or CV</p>
+                                        <p class="text-gray-500 text-sm">PDF, DOC, DOCX (Max 5MB)</p>
+                                        <p class="text-gray-400 text-xs mt-4">Click to browse or drag and drop</p>
+                                    </div>
+                                    <div id="resumePreview" class="mt-4 hidden"></div>
+                                </div>
+                                
+                                <!-- Additional Documents -->
+                                <div>
+                                    <h3 class="text-lg font-semibold text-gray-800 mb-4">Additional Documents (Optional)</h3>
+                                    <div class="space-y-4">
+                                        <!-- Portfolio -->
+                                        <div>
+                                            <label class="block text-sm font-medium text-gray-700 mb-2">Portfolio or Work Samples</label>
+                                            <div class="document-upload rounded-lg p-4 cursor-pointer"
+                                                 onclick="document.getElementById('portfolioFile').click()">
+                                                <input type="file" 
+                                                       id="portfolioFile"
+                                                       name="portfolio"
+                                                       accept=".pdf,.zip"
+                                                       class="hidden"
+                                                       onchange="handleFileUpload(this, 'portfolioPreview')">
+                                                <div class="flex items-center">
+                                                    <i class="fas fa-folder-open text-xl text-amber-500 mr-3"></i>
+                                                    <div>
+                                                        <p class="text-gray-700">Upload portfolio or work samples</p>
+                                                        <p class="text-gray-500 text-sm">PDF or ZIP containing multiple files</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div id="portfolioPreview" class="mt-2 hidden"></div>
+                                        </div>
+                                        
+                                        <!-- Reference Letter -->
+                                        <div>
+                                            <label class="block text-sm font-medium text-gray-700 mb-2">Reference Letter</label>
+                                            <div class="document-upload rounded-lg p-4 cursor-pointer"
+                                                 onclick="document.getElementById('referenceFile').click()">
+                                                <input type="file" 
+                                                       id="referenceFile"
+                                                       name="reference"
+                                                       accept=".pdf,.doc,.docx"
+                                                       class="hidden"
+                                                       onchange="handleFileUpload(this, 'referencePreview')">
+                                                <div class="flex items-center">
+                                                    <i class="fas fa-envelope-open-text text-xl text-blue-500 mr-3"></i>
+                                                    <div>
+                                                        <p class="text-gray-700">Upload reference letter</p>
+                                                        <p class="text-gray-500 text-sm">Optional but recommended</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div id="referencePreview" class="mt-2 hidden"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Terms and Conditions -->
+                        <div class="bg-white rounded-2xl shadow-lg p-8">
+                            <h2 class="text-2xl font-bold text-gray-800 mb-6">Terms and Conditions</h2>
+                            
+                            <div class="bg-gray-50 rounded-lg p-6 mb-6 max-h-60 overflow-y-auto">
+                                <h3 class="font-bold text-gray-800 mb-4">Program Participation Agreement</h3>
+                                <div class="text-gray-600 text-sm space-y-3">
+                                    <p>By submitting this application, you agree to the following terms:</p>
+                                    <ol class="list-decimal pl-5 space-y-2">
+                                        <li>All information provided is accurate and complete to the best of your knowledge.</li>
+                                        <li>You commit to actively participate in the program and complete all requirements.</li>
+                                        <li>You understand that program fees are non-refundable after the cancellation period.</li>
+                                        <li>You agree to abide by the program's code of conduct and academic integrity policies.</li>
+                                        <li>You consent to the use of your data for program administration and improvement.</li>
+                                        <li>You acknowledge that program admission is competitive and not guaranteed.</li>
+                                        <li>You understand that the program may be recorded for educational purposes.</li>
+                                    </ol>
+                                </div>
+                            </div>
+                            
+                            <div class="space-y-4">
+                                <div class="flex items-start">
+                                    <input type="checkbox" 
+                                           id="terms_agreement"
+                                           name="terms_agreement"
+                                           required
+                                           class="mt-1 h-5 w-5 text-emerald-600">
+                                    <label for="terms_agreement" class="ml-3 text-gray-700">
+                                        I have read and agree to the Terms and Conditions and Program Participation Agreement
+                                    </label>
+                                </div>
+                                
+                                <div class="flex items-start">
+                                    <input type="checkbox" 
+                                           id="privacy_agreement"
+                                           name="privacy_agreement"
+                                           required
+                                           class="mt-1 h-5 w-5 text-emerald-600">
+                                    <label for="privacy_agreement" class="ml-3 text-gray-700">
+                                        I consent to the collection and processing of my personal data as described in the 
+                                        <a href="#" class="text-emerald-600 hover:text-emerald-700">Privacy Policy</a>
+                                    </label>
+                                </div>
+                                
+                                <div class="flex items-start">
+                                    <input type="checkbox" 
+                                           id="marketing_agreement"
+                                           name="marketing_agreement"
+                                           class="mt-1 h-5 w-5 text-emerald-600">
+                                    <label for="marketing_agreement" class="ml-3 text-gray-700">
+                                        I would like to receive updates about similar programs and educational opportunities
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Submit Buttons -->
+                        <div class="flex flex-col sm:flex-row gap-4">
+                            <button type="button" 
+                                    onclick="saveDraft()"
+                                    class="flex-1 btn btn-outline py-4">
+                                <i class="far fa-save mr-2"></i>
+                                Save as Draft
+                            </button>
+                            
+                            <button type="submit" 
+                                    class="flex-1 btn btn-primary py-4">
+                                <i class="fas fa-paper-plane mr-2"></i>
+                                Submit Application
+                            </button>
+                        </div>
+                        
+                        <p class="text-center text-gray-500 text-sm">
+                            You can save your progress and return later to complete the application.
+                        </p>
+                    </form>
+                </div>
+
+                <!-- Right Column - Sidebar -->
+                <div class="lg:w-1/3">
+                    <!-- Requirements -->
+                    <div class="bg-white rounded-2xl shadow-lg p-6 mb-6">
+                        <h3 class="font-bold text-gray-800 mb-4">Application Requirements</h3>
+                        <ul class="requirements-list space-y-3 text-gray-600">
+                            <li>Complete personal information</li>
+                            <li>Educational background details</li>
+                            <li>Motivation statement (200+ words)</li>
+                            <li>Resume or CV (PDF format)</li>
+                            <li>Valid email address</li>
+                            {% if not program.is_free %}
+                            <li>Payment information</li>
+                            {% endif %}
+                        </ul>
+                    </div>
+                    
+                    <!-- Timeline -->
+                    <div class="bg-white rounded-2xl shadow-lg p-6 mb-6">
+                        <h3 class="font-bold text-gray-800 mb-4">Application Timeline</h3>
+                        <div class="space-y-4">
+                            <div class="flex items-start">
+                                <div class="flex-shrink-0 w-8 h-8 bg-emerald-100 rounded-full flex items-center justify-center mr-3">
+                                    <i class="fas fa-calendar-check text-emerald-600 text-sm"></i>
+                                </div>
+                                <div>
+                                    <h4 class="font-medium text-gray-800">Application Deadline</h4>
+                                    <p class="text-sm text-gray-600">{{ program.application_deadline|date:"F j, Y" }}</p>
+                                </div>
+                            </div>
+                            
+                            <div class="flex items-start">
+                                <div class="flex-shrink-0 w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center mr-3">
+                                    <i class="fas fa-clock text-blue-600 text-sm"></i>
+                                </div>
+                                <div>
+                                    <h4 class="font-medium text-gray-800">Review Period</h4>
+                                    <p class="text-sm text-gray-600">2-3 weeks after deadline</p>
+                                </div>
+                            </div>
+                            
+                            <div class="flex items-start">
+                                <div class="flex-shrink-0 w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center mr-3">
+                                    <i class="fas fa-envelope text-purple-600 text-sm"></i>
+                                </div>
+                                <div>
+                                    <h4 class="font-medium text-gray-800">Decision Notification</h4>
+                                    <p class="text-sm text-gray-600">Within 4 weeks of application</p>
+                                </div>
+                            </div>
+                            
+                            <div class="flex items-start">
+                                <div class="flex-shrink-0 w-8 h-8 bg-amber-100 rounded-full flex items-center justify-center mr-3">
+                                    <i class="fas fa-play-circle text-amber-600 text-sm"></i>
+                                </div>
+                                <div>
+                                    <h4 class="font-medium text-gray-800">Program Start</h4>
+                                    <p class="text-sm text-gray-600">{{ program.start_date|date:"F j, Y" }}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Help Card -->
+                    <div class="bg-gradient-to-r from-emerald-500 to-teal-600 rounded-2xl p-6 text-white">
+                        <div class="text-center mb-4">
+                            <i class="fas fa-question-circle text-3xl mb-3"></i>
+                            <h3 class="text-xl font-bold mb-2">Need Help?</h3>
+                        </div>
+                        <p class="text-emerald-100 text-sm mb-4">
+                            Our admissions team is here to assist you with your application.
+                        </p>
+                        <div class="space-y-3">
+                            <a href="mailto:admissions@ecohub.org" 
+                               class="flex items-center text-emerald-100 hover:text-white">
+                                <i class="fas fa-envelope mr-3"></i>
+                                admissions@ecohub.org
+                            </a>
+                            <a href="tel:+11234567890" 
+                               class="flex items-center text-emerald-100 hover:text-white">
+                                <i class="fas fa-phone mr-3"></i>
+                                +1 (123) 456-7890
+                            </a>
+                        </div>
+                        <button class="w-full mt-4 btn bg-white text-emerald-600 hover:bg-gray-100">
+                            <i class="fas fa-comments mr-2"></i>
+                            Live Chat
+                        </button>
+                    </div>
+                    
+                    <!-- Checklist -->
+                    <div class="bg-white rounded-2xl shadow-lg p-6 mt-6">
+                        <h3 class="font-bold text-gray-800 mb-4">Application Checklist</h3>
+                        <div class="space-y-3">
+                            <div class="flex items-center">
+                                <input type="checkbox" 
+                                       id="check1" 
+                                       class="h-5 w-5 text-emerald-600 rounded">
+                                <label for="check1" class="ml-3 text-gray-700">Personal information complete</label>
+                            </div>
+                            <div class="flex items-center">
+                                <input type="checkbox" 
+                                       id="check2" 
+                                       class="h-5 w-5 text-emerald-600 rounded">
+                                <label for="check2" class="ml-3 text-gray-700">Educational background added</label>
+                            </div>
+                            <div class="flex items-center">
+                                <input type="checkbox" 
+                                       id="check3" 
+                                       class="h-5 w-5 text-emerald-600 rounded">
+                                <label for="check3" class="ml-3 text-gray-700">Motivation statement written</label>
+                            </div>
+                            <div class="flex items-center">
+                                <input type="checkbox" 
+                                       id="check4" 
+                                       class="h-5 w-5 text-emerald-600 rounded">
+                                <label for="check4" class="ml-3 text-gray-700">Resume uploaded</label>
+                            </div>
+                            <div class="flex items-center">
+                                <input type="checkbox" 
+                                       id="check5" 
+                                       class="h-5 w-5 text-emerald-600 rounded">
+                                <label for="check5" class="ml-3 text-gray-700">Terms agreed</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Confirmation Modal -->
+<div id="confirmationModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50 p-4">
+    <div class="bg-white rounded-2xl max-w-md w-full">
+        <div class="p-6">
+            <div class="text-center mb-6">
+                <div class="w-16 h-16 mx-auto mb-4 bg-emerald-100 rounded-full flex items-center justify-center">
+                    <i class="fas fa-check text-emerald-600 text-2xl"></i>
+                </div>
+                <h3 class="text-xl font-bold text-gray-800 mb-2">Application Submitted!</h3>
+                <p class="text-gray-600">
+                    Your application has been successfully submitted for review.
+                </p>
+            </div>
+            
+            <div class="bg-gray-50 rounded-lg p-4 mb-6">
+                <div class="flex items-center justify-between mb-2">
+                    <span class="text-gray-700">Application ID</span>
+                    <span class="font-mono font-bold text-emerald-600">APP-{{ "now"|date:"YmdHis" }}</span>
+                </div>
+                <div class="flex items-center justify-between">
+                    <span class="text-gray-700">Submitted On</span>
+                    <span class="font-medium">{{ "now"|date:"F j, Y" }}</span>
+                </div>
+            </div>
+            
+            <div class="text-sm text-gray-600 mb-6">
+                <p>You will receive a confirmation email shortly. We'll notify you of the decision within 4 weeks.</p>
+            </div>
+            
+            <div class="flex flex-col gap-3">
+                <a href="{% url 'users:dashboard:home' %}" class="btn btn-primary">
+                    Go to Dashboard
+                </a>
+                <a href="{% url 'programs:list' %}" class="btn btn-outline">
+                    Browse Other Programs
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Application form functionality
+    document.addEventListener('DOMContentLoaded', function() {
+        // Form section toggling
+        window.toggleSection = function(sectionId) {
+            const content = document.getElementById(`${sectionId}Content`);
+            const icon = document.getElementById(`${sectionId}Icon`);
+            const section = content.parentElement;
+            
+            section.classList.toggle('collapsed');
+            icon.classList.toggle('rotate-180');
+        };
+        
+        // Initialize sections as collapsed
+        const sections = ['personalInfo', 'educationInfo', 'motivationInfo', 'documentsInfo'];
+        sections.forEach(sectionId => {
+            const content = document.getElementById(`${sectionId}Content`);
+            const section = content.parentElement;
+            section.classList.add('collapsed');
+        });
+        
+        // Add education entry
+        window.addEducationEntry = function() {
+            const container = document.getElementById('educationEntries');
+            const entryCount = container.children.length;
+            
+            const newEntry = document.createElement('div');
+            newEntry.className = 'education-entry border border-gray-200 rounded-lg p-4';
+            newEntry.innerHTML = `
+                <div class="flex justify-between items-center mb-3">
+                    <span class="text-sm font-medium text-gray-700">Education #${entryCount + 1}</span>
+                    <button type="button" 
+                            onclick="removeEducationEntry(this)"
+                            class="text-red-500 hover:text-red-700">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Institution</label>
+                        <input type="text" 
+                               name="education_institution[]"
+                               class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Degree</label>
+                        <input type="text" 
+                               name="education_degree[]"
+                               class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Field of Study</label>
+                        <input type="text" 
+                               name="education_field[]"
+                               class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Year of Completion</label>
+                        <input type="number" 
+                               min="1900" 
+                               max="2024"
+                               name="education_year[]"
+                               class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent">
+                    </div>
+                </div>
+            `;
+            
+            container.appendChild(newEntry);
+        };
+        
+        // Remove education entry
+        window.removeEducationEntry = function(button) {
+            const entry = button.closest('.education-entry');
+            if (entry) {
+                entry.remove();
+                
+                // Update numbering
+                const container = document.getElementById('educationEntries');
+                const entries = container.querySelectorAll('.education-entry');
+                entries.forEach((entry, index) => {
+                    const title = entry.querySelector('.text-sm.font-medium');
+                    if (title) {
+                        title.textContent = `Education #${index + 1}`;
+                    }
+                });
+            }
+        };
+        
+        // File upload handling
+        window.handleFileUpload = function(input, previewId) {
+            const file = input.files[0];
+            if (!file) return;
+            
+            const preview = document.getElementById(previewId);
+            const fileSize = (file.size / 1024 / 1024).toFixed(2); // MB
+            
+            preview.innerHTML = `
+                <div class="upload-preview flex items-center justify-between bg-gray-50 rounded-lg p-4">
+                    <div class="flex items-center">
+                        <i class="fas fa-file ${getFileIcon(file.name)} text-xl mr-3"></i>
+                        <div>
+                            <div class="font-medium text-gray-800">${file.name}</div>
+                            <div class="text-sm text-gray-500">${fileSize} MB</div>
+                        </div>
+                    </div>
+                    <button type="button" 
+                            onclick="removeFile('${input.id}', '${previewId}')"
+                            class="text-red-500 hover:text-red-700">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+            `;
+            preview.classList.remove('hidden');
+            
+            // Highlight upload area
+            const uploadArea = input.previousElementSibling;
+            uploadArea.classList.remove('document-upload', 'dragover');
+            uploadArea.classList.add('hidden');
+        };
+        
+        // Get file icon based on extension
+        function getFileIcon(filename) {
+            const ext = filename.split('.').pop().toLowerCase();
+            if (ext === 'pdf') return 'text-red-500';
+            if (ext === 'doc' || ext === 'docx') return 'text-blue-500';
+            if (ext === 'zip' || ext === 'rar') return 'text-amber-500';
+            return 'text-gray-500';
+        }
+        
+        // Remove file
+        window.removeFile = function(inputId, previewId) {
+            const input = document.getElementById(inputId);
+            const preview = document.getElementById(previewId);
+            const uploadArea = input.previousElementSibling;
+            
+            input.value = '';
+            preview.innerHTML = '';
+            preview.classList.add('hidden');
+            uploadArea.classList.remove('hidden');
+            uploadArea.classList.add('document-upload');
+        };
+        
+        // Drag and drop functionality
+        const uploadAreas = document.querySelectorAll('.document-upload');
+        uploadAreas.forEach(area => {
+            area.addEventListener('dragover', function(e) {
+                e.preventDefault();
+                this.classList.add('dragover');
+            });
+            
+            area.addEventListener('dragleave', function(e) {
+                e.preventDefault();
+                this.classList.remove('dragover');
+            });
+            
+            area.addEventListener('drop', function(e) {
+                e.preventDefault();
+                this.classList.remove('dragover');
+                
+                const file = e.dataTransfer.files[0];
+                const input = this.nextElementSibling;
+                if (input && input.type === 'file') {
+                    input.files = e.dataTransfer.files;
+                    const event = new Event('change');
+                    input.dispatchEvent(event);
+                }
+            });
+        });
+        
+        // Save draft
+        window.saveDraft = function() {
+            // In a real app, this would save the form data
+            alert('Draft saved successfully!');
+            updateChecklist();
+        };
+        
+        // Update checklist
+        function updateChecklist() {
+            const checkboxes = document.querySelectorAll('#applicationForm input[required]');
+            const checklistItems = document.querySelectorAll('#applicationForm ~ div input[type="checkbox"]');
+            
+            let completed = 0;
+            checkboxes.forEach(cb => {
+                if (cb.type === 'checkbox') {
+                    if (cb.checked) completed++;
+                } else if (cb.value.trim() !== '') {
+                    completed++;
+                }
+            });
+            
+            // Update checklist UI
+            const progress = Math.round((completed / checkboxes.length) * 100);
+            const progressBar = document.querySelector('.bg-emerald-600');
+            if (progressBar) {
+                progressBar.style.width = `${progress}%`;
+            }
+        }
+        
+        // Form validation and submission
+        document.getElementById('applicationForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Validate required fields
+            const requiredFields = this.querySelectorAll('[required]');
+            let isValid = true;
+            let firstInvalidField = null;
+            
+            requiredFields.forEach(field => {
+                if (!field.value.trim()) {
+                    isValid = false;
+                    if (!firstInvalidField) {
+                        firstInvalidField = field;
+                    }
+                    field.classList.add('border-red-500');
+                } else {
+                    field.classList.remove('border-red-500');
+                }
+            });
+            
+            // Validate motivation statement length
+            const motivation = document.querySelector('textarea[name="motivation"]');
+            if (motivation && motivation.value.trim().length < 200) {
+                isValid = false;
+                motivation.classList.add('border-red-500');
+                alert('Motivation statement must be at least 200 characters.');
+                if (!firstInvalidField) firstInvalidField = motivation;
+            } else if (motivation) {
+                motivation.classList.remove('border-red-500');
+            }
+            
+            if (!isValid) {
+                if (firstInvalidField) {
+                    firstInvalidField.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    firstInvalidField.focus();
+                }
+                alert('Please fill in all required fields.');
+                return;
+            }
+            
+            // Show confirmation modal
+            const modal = document.getElementById('confirmationModal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        });
+        
+        // Real-time validation
+        const formInputs = document.querySelectorAll('#applicationForm input, #applicationForm textarea, #applicationForm select');
+        formInputs.forEach(input => {
+            input.addEventListener('input', function() {
+                this.classList.remove('border-red-500');
+                updateChecklist();
+            });
+            
+            input.addEventListener('change', function() {
+                this.classList.remove('border-red-500');
+                updateChecklist();
+            });
+        });
+        
+        // Initialize checklist
+        updateChecklist();
+    });
+</script>
+{% endblock %}

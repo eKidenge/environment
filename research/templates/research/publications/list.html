@@ -1,0 +1,3611 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load humanize %}
+
+{% block title %}Research Publications - EcoHub{% endblock %}
+
+{% block extra_css %}
+<style>
+/* ============================================
+   ECOHUB RESEARCH PUBLICATIONS STYLING SYSTEM
+   Version: 4.0.0 | Scientific Research Design System
+============================================ */
+
+/* ============ RESEARCH DESIGN SYSTEM ============ */
+:root {
+    /* Scientific Color Palette */
+    --research-primary-50: #eff6ff;
+    --research-primary-100: #dbeafe;
+    --research-primary-200: #bfdbfe;
+    --research-primary-300: #93c5fd;
+    --research-primary-400: #60a5fa;
+    --research-primary-500: #3b82f6;
+    --research-primary-600: #2563eb;
+    --research-primary-700: #1d4ed8;
+    --research-primary-800: #1e40af;
+    --research-primary-900: #1e3a8a;
+    
+    --research-secondary-50: #f0f9ff;
+    --research-secondary-100: #e0f2fe;
+    --research-secondary-200: #bae6fd;
+    --research-secondary-300: #7dd3fc;
+    --research-secondary-400: #38bdf8;
+    --research-secondary-500: #0ea5e9;
+    --research-secondary-600: #0284c7;
+    --research-secondary-700: #0369a1;
+    --research-secondary-800: #075985;
+    --research-secondary-900: #0c4a6e;
+    
+    --research-tertiary-50: #f8fafc;
+    --research-tertiary-100: #f1f5f9;
+    --research-tertiary-200: #e2e8f0;
+    --research-tertiary-300: #cbd5e1;
+    --research-tertiary-400: #94a3b8;
+    --research-tertiary-500: #64748b;
+    --research-tertiary-600: #475569;
+    --research-tertiary-700: #334155;
+    --research-tertiary-800: #1e293b;
+    --research-tertiary-900: #0f172a;
+    
+    /* Scientific Status Colors */
+    --color-peer-reviewed: #10b981;
+    --color-preprint: #f59e0b;
+    --color-in-press: #3b82f6;
+    --color-retracted: #ef4444;
+    --color-cited: #8b5cf6;
+    --color-highly-cited: #ec4899;
+    
+    /* Research Metrics */
+    --metric-impact: #dc2626;
+    --metric-citation: #059669;
+    --metric-altmetric: #7c3aed;
+    --metric-views: #0ea5e9;
+    --metric-downloads: #f59e0b;
+    
+    /* Scientific Gradients */
+    --gradient-research: linear-gradient(135deg, 
+        var(--research-primary-500) 0%, 
+        var(--research-secondary-500) 25%, 
+        #ec4899 50%, 
+        #ef4444 75%, 
+        #f59e0b 100%);
+    
+    --gradient-scientific: linear-gradient(135deg,
+        #1e40af 0%,
+        #1d4ed8 25%,
+        #3b82f6 50%,
+        #60a5fa 75%,
+        #93c5fd 100%);
+    
+    --gradient-citation: linear-gradient(135deg, 
+        #10b981 0%, 
+        #059669 50%, 
+        #047857 100%);
+    
+    --gradient-impact: linear-gradient(135deg, 
+        #dc2626 0%, 
+        #ef4444 50%, 
+        #f87171 100%);
+    
+    /* Scientific Shadows */
+    --shadow-scientific: 
+        0 10px 38px -10px rgba(22, 23, 24, 0.35),
+        0 10px 20px -15px rgba(22, 23, 24, 0.2);
+    
+    --shadow-metric: 
+        0 8px 32px rgba(59, 130, 246, 0.08),
+        0 4px 16px rgba(59, 130, 246, 0.04),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    
+    --shadow-publication: 
+        0 20px 25px -5px rgba(0, 0, 0, 0.1),
+        0 10px 10px -5px rgba(0, 0, 0, 0.04),
+        0 0 0 1px rgba(59, 130, 246, 0.05);
+    
+    --shadow-elevated: 
+        0 25px 50px -12px rgba(0, 0, 0, 0.25),
+        0 0 0 1px rgba(59, 130, 246, 0.1),
+        0 0 40px rgba(59, 130, 246, 0.1);
+    
+    /* Scientific Typography */
+    --font-scientific: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    --font-academic: 'Source Serif Pro', Georgia, 'Times New Roman', serif;
+    --font-mono-scientific: 'JetBrains Mono', 'SF Mono', Monaco, 'Cascadia Code', monospace;
+    
+    /* Spacing System */
+    --space-unit: 0.25rem;
+    --space-0: 0;
+    --space-1: calc(1 * var(--space-unit));
+    --space-2: calc(2 * var(--space-unit));
+    --space-3: calc(3 * var(--space-unit));
+    --space-4: calc(4 * var(--space-unit));
+    --space-5: calc(5 * var(--space-unit));
+    --space-6: calc(6 * var(--space-unit));
+    --space-8: calc(8 * var(--space-unit));
+    --space-10: calc(10 * var(--space-unit));
+    --space-12: calc(12 * var(--space-unit));
+    --space-16: calc(16 * var(--space-unit));
+    --space-20: calc(20 * var(--space-unit));
+    --space-24: calc(24 * var(--space-unit));
+    --space-32: calc(32 * var(--space-unit));
+    --space-40: calc(40 * var(--space-unit));
+    --space-48: calc(48 * var(--space-unit));
+    --space-64: calc(64 * var(--space-unit));
+    --space-80: calc(80 * var(--space-unit));
+    --space-96: calc(96 * var(--space-unit));
+    --space-128: calc(128 * var(--space-unit));
+    
+    /* Border Radius */
+    --radius-xs: 0.125rem;
+    --radius-sm: 0.25rem;
+    --radius-md: 0.375rem;
+    --radius-lg: 0.5rem;
+    --radius-xl: 0.75rem;
+    --radius-2xl: 1rem;
+    --radius-3xl: 1.5rem;
+    --radius-4xl: 2rem;
+    --radius-full: 9999px;
+    
+    /* Scientific Transitions */
+    --transition-scientific: cubic-bezier(0.16, 1, 0.3, 1);
+    --transition-research: cubic-bezier(0.34, 1.56, 0.64, 1);
+    --transition-metric: cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    
+    /* Z-index Layers */
+    --z-underlay: -10;
+    --z-base: 0;
+    --z-overlay: 10;
+    --z-dialog: 20;
+    --z-popover: 30;
+    --z-tooltip: 40;
+    --z-toast: 50;
+    --z-modal: 100;
+    --z-super: 1000;
+}
+
+/* ============ SCIENTIFIC BASE RESET ============ */
+*, 
+*::before, 
+*::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+html {
+    font-size: 16px;
+    scroll-behavior: smooth;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+}
+
+body {
+    font-family: var(--font-scientific);
+    line-height: 1.6;
+    color: var(--research-tertiary-800);
+    background-color: var(--research-tertiary-50);
+    overflow-x: hidden;
+    position: relative;
+    min-height: 100vh;
+}
+
+/* ============ SCIENTIFIC TYPOGRAPHY SYSTEM ============ */
+.scientific-heading {
+    font-family: var(--font-scientific);
+    font-weight: 700;
+    line-height: 1.2;
+    letter-spacing: -0.025em;
+}
+
+.scientific-heading-1 {
+    font-size: 4.5rem;
+    background: var(--gradient-scientific);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    margin-bottom: var(--space-6);
+    text-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.scientific-heading-2 {
+    font-size: 3rem;
+    color: var(--research-tertiary-900);
+    margin-bottom: var(--space-4);
+    position: relative;
+    display: inline-block;
+}
+
+.scientific-heading-2::after {
+    content: '';
+    position: absolute;
+    bottom: -8px;
+    left: 0;
+    width: 60px;
+    height: 4px;
+    background: var(--gradient-scientific);
+    border-radius: var(--radius-full);
+}
+
+.scientific-heading-3 {
+    font-size: 2.25rem;
+    color: var(--research-tertiary-800);
+    margin-bottom: var(--space-3);
+}
+
+.academic-text {
+    font-family: var(--font-academic);
+    line-height: 1.8;
+    font-size: 1.125rem;
+    color: var(--research-tertiary-700);
+}
+
+.mono-scientific {
+    font-family: var(--font-mono-scientific);
+    font-size: 0.875rem;
+    letter-spacing: -0.01em;
+}
+
+/* ============ RESEARCH LAYOUT SYSTEM ============ */
+.research-container {
+    width: 100%;
+    max-width: 1440px;
+    margin: 0 auto;
+    padding: 0 var(--space-4);
+}
+
+.research-grid {
+    display: grid;
+    gap: var(--space-8);
+}
+
+.research-grid-2 {
+    grid-template-columns: repeat(2, 1fr);
+}
+
+.research-grid-3 {
+    grid-template-columns: repeat(3, 1fr);
+}
+
+.research-grid-4 {
+    grid-template-columns: repeat(4, 1fr);
+}
+
+/* ============ HERO RESEARCH SECTION ============ */
+.hero-research {
+    position: relative;
+    overflow: hidden;
+    background: linear-gradient(135deg,
+        var(--research-primary-900) 0%,
+        var(--research-secondary-900) 50%,
+        var(--research-tertiary-900) 100%);
+    isolation: isolate;
+    padding: var(--space-24) 0;
+}
+
+.hero-research::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: 
+        radial-gradient(circle at 20% 80%, rgba(59, 130, 246, 0.3) 0%, transparent 50%),
+        radial-gradient(circle at 80% 20%, rgba(139, 92, 246, 0.3) 0%, transparent 50%),
+        radial-gradient(circle at 40% 40%, rgba(236, 72, 153, 0.2) 0%, transparent 50%);
+    animation: scientific-glow 20s ease-in-out infinite alternate;
+    z-index: -1;
+}
+
+@keyframes scientific-glow {
+    0% {
+        opacity: 0.5;
+        transform: scale(1);
+    }
+    50% {
+        opacity: 0.8;
+        transform: scale(1.1);
+    }
+    100% {
+        opacity: 0.5;
+        transform: scale(1);
+    }
+}
+
+.hero-research-content {
+    position: relative;
+    z-index: 2;
+    max-width: 800px;
+    margin: 0 auto;
+    text-align: center;
+}
+
+.hero-research-description {
+    font-size: 1.25rem;
+    line-height: 1.8;
+    color: rgba(255, 255, 255, 0.9);
+    margin-bottom: var(--space-8);
+}
+
+/* ============ SEARCH BAR SYSTEM ============ */
+.search-research-container {
+    max-width: 800px;
+    margin: 0 auto;
+    position: relative;
+}
+
+.search-research-wrapper {
+    position: relative;
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    background: rgba(255, 255, 255, 0.15);
+    border-radius: var(--radius-3xl);
+    box-shadow: 
+        0 20px 40px rgba(0, 0, 0, 0.2),
+        inset 0 1px 0 rgba(255, 255, 255, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    padding: 4px;
+    transition: all 0.4s var(--transition-scientific);
+}
+
+.search-research-wrapper:hover {
+    background: rgba(255, 255, 255, 0.2);
+    box-shadow: 
+        0 25px 50px rgba(0, 0, 0, 0.25),
+        inset 0 1px 0 rgba(255, 255, 255, 0.3);
+}
+
+.search-research-input {
+    width: 100%;
+    padding: var(--space-4) var(--space-6);
+    padding-left: var(--space-16);
+    font-size: 1.125rem;
+    border: none;
+    background: transparent;
+    color: white;
+    outline: none;
+    transition: all 0.3s ease;
+}
+
+.search-research-input::placeholder {
+    color: rgba(255, 255, 255, 0.6);
+}
+
+.search-research-icon {
+    position: absolute;
+    left: var(--space-6);
+    top: 50%;
+    transform: translateY(-50%);
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 1.5rem;
+    z-index: 10;
+}
+
+.search-research-actions {
+    position: absolute;
+    right: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+    display: flex;
+    gap: var(--space-2);
+    z-index: 10;
+}
+
+.search-research-button {
+    padding: var(--space-3) var(--space-6);
+    background: linear-gradient(135deg, 
+        rgba(255, 255, 255, 0.2),
+        rgba(255, 255, 255, 0.1));
+    backdrop-filter: blur(10px);
+    color: white;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: var(--radius-2xl);
+    font-weight: 600;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.3s var(--transition-scientific);
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+}
+
+.search-research-button:hover {
+    background: linear-gradient(135deg, 
+        rgba(255, 255, 255, 0.3),
+        rgba(255, 255, 255, 0.2));
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+}
+
+.search-research-advanced {
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: var(--radius-xl);
+    color: white;
+    cursor: pointer;
+    transition: all 0.3s var(--transition-scientific);
+}
+
+.search-research-advanced:hover {
+    background: rgba(255, 255, 255, 0.2);
+    transform: rotate(15deg);
+}
+
+/* ============ STATS GRID SYSTEM ============ */
+.stats-research-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--space-6);
+    max-width: 800px;
+    margin: var(--space-12) auto 0;
+}
+
+@media (min-width: 768px) {
+    .stats-research-grid {
+        grid-template-columns: repeat(4, 1fr);
+    }
+}
+
+.stat-research-card {
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: var(--radius-2xl);
+    padding: var(--space-6);
+    text-align: center;
+    transition: all 0.4s var(--transition-scientific);
+    position: relative;
+    overflow: hidden;
+}
+
+.stat-research-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, 
+        var(--research-primary-400),
+        var(--research-secondary-400));
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.6s var(--transition-scientific);
+}
+
+.stat-research-card:hover::before {
+    transform: scaleX(1);
+}
+
+.stat-research-card:hover {
+    transform: translateY(-8px);
+    background: rgba(255, 255, 255, 0.15);
+    border-color: rgba(255, 255, 255, 0.3);
+    box-shadow: 
+        0 20px 40px rgba(0, 0, 0, 0.2),
+        0 0 0 1px rgba(255, 255, 255, 0.1);
+}
+
+.stat-research-number {
+    font-size: 3rem;
+    font-weight: 800;
+    background: linear-gradient(135deg, 
+        rgba(255, 255, 255, 1),
+        rgba(255, 255, 255, 0.8));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: var(--space-2);
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+    font-feature-settings: "tnum";
+}
+
+.stat-research-label {
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 0.875rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+/* ============ KEYWORDS CLOUD SYSTEM ============ */
+.keywords-research-cloud {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: var(--space-3);
+    margin-top: var(--space-6);
+}
+
+.keyword-research-tag {
+    padding: var(--space-2) var(--space-4);
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: var(--radius-full);
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 0.875rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s var(--transition-scientific);
+    position: relative;
+    overflow: hidden;
+}
+
+.keyword-research-tag::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg,
+        transparent,
+        rgba(255, 255, 255, 0.2),
+        transparent);
+    transition: left 0.6s ease;
+}
+
+.keyword-research-tag:hover::before {
+    left: 100%;
+}
+
+.keyword-research-tag:hover {
+    background: rgba(255, 255, 255, 0.2);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+}
+
+.keyword-research-label {
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 0.875rem;
+    margin-right: var(--space-3);
+}
+
+/* ============ ADVANCED SEARCH PANEL ============ */
+.advanced-search-panel {
+    background: linear-gradient(145deg,
+        rgba(255, 255, 255, 0.98) 0%,
+        rgba(248, 250, 252, 0.98) 100%);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: var(--radius-3xl);
+    box-shadow: var(--shadow-scientific);
+    padding: var(--space-8);
+    margin-bottom: var(--space-8);
+}
+
+.advanced-search-header {
+    margin-bottom: var(--space-6);
+}
+
+.advanced-search-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--research-tertiary-900);
+    margin-bottom: var(--space-2);
+}
+
+.advanced-search-form {
+    display: grid;
+    gap: var(--space-6);
+}
+
+.search-form-group {
+    display: grid;
+    gap: var(--space-4);
+}
+
+@media (min-width: 768px) {
+    .search-form-group {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+.search-form-label {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--research-tertiary-700);
+    margin-bottom: var(--space-2);
+}
+
+.search-form-select {
+    width: 100%;
+    padding: var(--space-3) var(--space-4);
+    font-size: 0.875rem;
+    border: 2px solid var(--research-tertiary-200);
+    border-radius: var(--radius-lg);
+    background: white;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3E%3Cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3E%3C/svg%3E");
+    background-position: right 0.5rem center;
+    background-repeat: no-repeat;
+    background-size: 1.5em 1.5em;
+    padding-right: 2.5rem;
+    transition: all 0.3s var(--transition-scientific);
+}
+
+.search-form-select:focus {
+    outline: none;
+    border-color: var(--research-primary-500);
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.search-form-year-range {
+    display: flex;
+    gap: var(--space-3);
+}
+
+.search-form-year-input {
+    flex: 1;
+    padding: var(--space-3) var(--space-4);
+    font-size: 0.875rem;
+    border: 2px solid var(--research-tertiary-200);
+    border-radius: var(--radius-lg);
+    background: white;
+    transition: all 0.3s var(--transition-scientific);
+}
+
+.search-form-year-input:focus {
+    outline: none;
+    border-color: var(--research-primary-500);
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.search-form-checkbox-group {
+    display: grid;
+    gap: var(--space-3);
+}
+
+.search-form-checkbox {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    cursor: pointer;
+}
+
+.search-form-checkbox-input {
+    width: 18px;
+    height: 18px;
+    border: 2px solid var(--research-tertiary-300);
+    border-radius: var(--radius-sm);
+    background: white;
+    appearance: none;
+    position: relative;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.search-form-checkbox-input:checked {
+    background: var(--research-primary-500);
+    border-color: var(--research-primary-500);
+}
+
+.search-form-checkbox-input:checked::after {
+    content: '✓';
+    position: absolute;
+    color: white;
+    font-size: 0.75rem;
+    font-weight: bold;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.search-form-checkbox-label {
+    font-size: 0.875rem;
+    color: var(--research-tertiary-700);
+    cursor: pointer;
+}
+
+.search-form-range {
+    width: 100%;
+    height: 6px;
+    -webkit-appearance: none;
+    appearance: none;
+    background: linear-gradient(90deg,
+        var(--research-primary-500),
+        var(--research-tertiary-300));
+    border-radius: var(--radius-full);
+    outline: none;
+}
+
+.search-form-range::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 20px;
+    height: 20px;
+    background: var(--research-primary-500);
+    border-radius: 50%;
+    cursor: pointer;
+    border: 3px solid white;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    transition: all 0.2s ease;
+}
+
+.search-form-range::-webkit-slider-thumb:hover {
+    transform: scale(1.2);
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+}
+
+.search-form-range-labels {
+    display: flex;
+    justify-content: space-between;
+    margin-top: var(--space-2);
+}
+
+.search-form-range-label {
+    font-size: 0.75rem;
+    color: var(--research-tertiary-500);
+}
+
+.search-form-submit {
+    width: 100%;
+    padding: var(--space-4);
+    background: var(--gradient-scientific);
+    color: white;
+    border: none;
+    border-radius: var(--radius-xl);
+    font-weight: 600;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.3s var(--transition-scientific);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-2);
+}
+
+.search-form-submit:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(59, 130, 246, 0.3);
+}
+
+/* ============ TOP JOURNALS PANEL ============ */
+.top-journals-panel {
+    background: linear-gradient(145deg,
+        rgba(255, 255, 255, 0.98) 0%,
+        rgba(248, 250, 252, 0.98) 100%);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: var(--radius-3xl);
+    box-shadow: var(--shadow-scientific);
+    padding: var(--space-6);
+    margin-bottom: var(--space-8);
+}
+
+.top-journals-header {
+    margin-bottom: var(--space-4);
+}
+
+.top-journals-title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--research-tertiary-900);
+    margin-bottom: var(--space-2);
+}
+
+.top-journals-list {
+    display: grid;
+    gap: var(--space-3);
+}
+
+.top-journal-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--space-3);
+    background: var(--research-tertiary-50);
+    border-radius: var(--radius-xl);
+    transition: all 0.3s var(--transition-scientific);
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+}
+
+.top-journal-item::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 100%;
+    background: linear-gradient(90deg,
+        rgba(59, 130, 246, 0.1),
+        transparent);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.top-journal-item:hover::before {
+    opacity: 1;
+}
+
+.top-journal-item:hover {
+    background: var(--research-primary-50);
+    transform: translateX(4px);
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.1);
+}
+
+.top-journal-info {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+}
+
+.top-journal-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: var(--radius-lg);
+    background: linear-gradient(135deg,
+        var(--research-primary-500),
+        var(--research-secondary-500));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 1rem;
+    flex-shrink: 0;
+}
+
+.top-journal-name {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--research-tertiary-800);
+}
+
+.top-journal-metric {
+    padding: var(--space-1) var(--space-3);
+    background: var(--research-primary-100);
+    color: var(--research-primary-700);
+    font-size: 0.75rem;
+    font-weight: 600;
+    border-radius: var(--radius-full);
+    min-width: 60px;
+    text-align: center;
+}
+
+.top-journals-footer {
+    margin-top: var(--space-4);
+    text-align: center;
+}
+
+.top-journals-link {
+    color: var(--research-primary-600);
+    font-size: 0.875rem;
+    font-weight: 500;
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.top-journals-link:hover {
+    color: var(--research-primary-700);
+    text-decoration: underline;
+}
+
+/* ============ TRENDING KEYWORDS PANEL ============ */
+.trending-keywords-panel {
+    background: linear-gradient(145deg,
+        rgba(255, 255, 255, 0.98) 0%,
+        rgba(248, 250, 252, 0.98) 100%);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: var(--radius-3xl);
+    box-shadow: var(--shadow-scientific);
+    padding: var(--space-6);
+}
+
+.trending-keywords-header {
+    margin-bottom: var(--space-4);
+}
+
+.trending-keywords-title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--research-tertiary-900);
+    margin-bottom: var(--space-2);
+}
+
+.trending-keywords-cloud {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+}
+
+.trending-keyword-tag {
+    padding: var(--space-2) var(--space-3);
+    background: linear-gradient(135deg,
+        rgba(59, 130, 246, 0.1),
+        rgba(139, 92, 246, 0.1));
+    color: var(--research-primary-700);
+    font-size: 0.75rem;
+    font-weight: 500;
+    border-radius: var(--radius-full);
+    cursor: pointer;
+    transition: all 0.3s var(--transition-scientific);
+    position: relative;
+    overflow: hidden;
+}
+
+.trending-keyword-tag::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg,
+        transparent,
+        rgba(255, 255, 255, 0.3),
+        transparent);
+    transition: left 0.6s ease;
+}
+
+.trending-keyword-tag:hover::before {
+    left: 100%;
+}
+
+.trending-keyword-tag:hover {
+    background: linear-gradient(135deg,
+        var(--research-primary-500),
+        var(--research-primary-600));
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.2);
+}
+
+/* ============ PUBLICATION HEADER SYSTEM ============ */
+.publication-header {
+    background: linear-gradient(145deg,
+        rgba(255, 255, 255, 0.98) 0%,
+        rgba(248, 250, 252, 0.98) 100%);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: var(--radius-3xl);
+    box-shadow: var(--shadow-scientific);
+    padding: var(--space-6);
+    margin-bottom: var(--space-6);
+}
+
+.publication-header-content {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+}
+
+@media (min-width: 768px) {
+    .publication-header-content {
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+    }
+}
+
+.publication-header-info {
+    flex: 1;
+}
+
+.publication-header-title {
+    font-size: 1.875rem;
+    font-weight: 800;
+    color: var(--research-tertiary-900);
+    margin-bottom: var(--space-2);
+    line-height: 1.3;
+}
+
+.publication-header-subtitle {
+    font-size: 1rem;
+    color: var(--research-tertiary-600);
+}
+
+.publication-header-controls {
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+    flex-wrap: wrap;
+}
+
+.publication-header-select {
+    padding: var(--space-3) var(--space-4);
+    padding-right: 2.5rem;
+    font-size: 0.875rem;
+    border: 2px solid var(--research-tertiary-200);
+    border-radius: var(--radius-lg);
+    background: white;
+    color: var(--research-tertiary-700);
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3E%3Cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3E%3C/svg%3E");
+    background-position: right 0.5rem center;
+    background-repeat: no-repeat;
+    background-size: 1.5em 1.5em;
+    cursor: pointer;
+    transition: all 0.3s var(--transition-scientific);
+}
+
+.publication-header-select:focus {
+    outline: none;
+    border-color: var(--research-primary-500);
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.publication-header-button {
+    width: 40px;
+    height: 40px;
+    border: 2px solid var(--research-tertiary-200);
+    border-radius: var(--radius-lg);
+    background: white;
+    color: var(--research-tertiary-600);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s var(--transition-scientific);
+}
+
+.publication-header-button:hover {
+    border-color: var(--research-primary-500);
+    color: var(--research-primary-600);
+    background: var(--research-primary-50);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.1);
+}
+
+.publication-header-primary {
+    padding: var(--space-3) var(--space-6);
+    background: var(--gradient-scientific);
+    color: white;
+    border: none;
+    border-radius: var(--radius-lg);
+    font-weight: 600;
+    font-size: 0.875rem;
+    cursor: pointer;
+    transition: all 0.3s var(--transition-scientific);
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+}
+
+.publication-header-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(59, 130, 246, 0.3);
+}
+
+/* ============ ACTIVE FILTERS SYSTEM ============ */
+.active-filters-container {
+    margin-top: var(--space-4);
+    padding-top: var(--space-4);
+    border-top: 1px solid var(--research-tertiary-200);
+}
+
+.active-filters-content {
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+    flex-wrap: wrap;
+}
+
+.active-filters-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+}
+
+.active-filter-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    padding: var(--space-1) var(--space-3);
+    background: linear-gradient(135deg,
+        var(--research-primary-500),
+        var(--research-secondary-500));
+    color: white;
+    font-size: 0.75rem;
+    font-weight: 500;
+    border-radius: var(--radius-full);
+    box-shadow: 0 2px 8px rgba(59, 130, 246, 0.2);
+}
+
+.active-filter-remove {
+    background: none;
+    border: none;
+    color: rgba(255, 255, 255, 0.8);
+    cursor: pointer;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 16px;
+    height: 16px;
+    transition: color 0.2s ease;
+}
+
+.active-filter-remove:hover {
+    color: white;
+}
+
+.active-filters-clear {
+    font-size: 0.875rem;
+    color: var(--research-primary-600);
+    font-weight: 500;
+    cursor: pointer;
+    transition: color 0.2s ease;
+}
+
+.active-filters-clear:hover {
+    color: var(--research-primary-700);
+    text-decoration: underline;
+}
+
+/* ============ PUBLICATION CARD SYSTEM ============ */
+.publication-card {
+    position: relative;
+    background: linear-gradient(145deg,
+        rgba(255, 255, 255, 0.98) 0%,
+        rgba(248, 250, 252, 0.98) 100%);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: var(--radius-3xl);
+    box-shadow: var(--shadow-publication);
+    transition: all 0.4s var(--transition-scientific);
+    overflow: hidden;
+    padding: var(--space-6);
+    margin-bottom: var(--space-6);
+}
+
+.publication-card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    padding: 2px;
+    background: linear-gradient(135deg,
+        rgba(59, 130, 246, 0.1),
+        rgba(139, 92, 246, 0.1),
+        rgba(236, 72, 153, 0.1));
+    -webkit-mask: 
+        linear-gradient(#fff 0 0) content-box,
+        linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    pointer-events: none;
+}
+
+.publication-card:hover::before {
+    opacity: 1;
+}
+
+.publication-card:hover {
+    transform: translateY(-8px);
+    box-shadow: var(--shadow-elevated);
+}
+
+.publication-card-content {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-6);
+}
+
+@media (min-width: 1024px) {
+    .publication-card-content {
+        flex-direction: row;
+    }
+}
+
+.publication-card-main {
+    flex: 3;
+}
+
+.publication-card-sidebar {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+}
+
+/* ============ PUBLICATION HEADER SYSTEM ============ */
+.publication-header {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-4);
+    margin-bottom: var(--space-4);
+}
+
+.publication-type-indicator {
+    width: 48px;
+    height: 48px;
+    border-radius: var(--radius-xl);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.25rem;
+    flex-shrink: 0;
+    transition: all 0.3s var(--transition-scientific);
+}
+
+.publication-type-article {
+    background: linear-gradient(135deg,
+        var(--research-primary-500),
+        var(--research-secondary-500));
+    color: white;
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.2);
+}
+
+.publication-type-conference {
+    background: linear-gradient(135deg,
+        #8b5cf6,
+        #7c3aed);
+    color: white;
+    box-shadow: 0 4px 12px rgba(139, 92, 246, 0.2);
+}
+
+.publication-type-review {
+    background: linear-gradient(135deg,
+        #10b981,
+        #059669);
+    color: white;
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2);
+}
+
+.publication-type-thesis {
+    background: linear-gradient(135deg,
+        #f59e0b,
+        #d97706);
+    color: white;
+    box-shadow: 0 4px 12px rgba(245, 158, 11, 0.2);
+}
+
+.publication-type-book {
+    background: linear-gradient(135deg,
+        #ec4899,
+        #db2777);
+    color: white;
+    box-shadow: 0 4px 12px rgba(236, 72, 153, 0.2);
+}
+
+.publication-header-content {
+    flex: 1;
+}
+
+.publication-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--research-tertiary-900);
+    margin-bottom: var(--space-2);
+    line-height: 1.4;
+}
+
+.publication-title a {
+    color: inherit;
+    text-decoration: none;
+    transition: color 0.3s ease;
+    background: linear-gradient(90deg,
+        var(--research-tertiary-900),
+        var(--research-tertiary-900));
+    background-size: 0% 2px;
+    background-repeat: no-repeat;
+    background-position: left 100%;
+    padding-bottom: 2px;
+}
+
+.publication-title a:hover {
+    color: var(--research-primary-600);
+    background-size: 100% 2px;
+}
+
+.publication-authors {
+    font-size: 1rem;
+    color: var(--research-tertiary-700);
+    margin-bottom: var(--space-3);
+    line-height: 1.6;
+}
+
+/* ============ PUBLICATION METADATA SYSTEM ============ */
+.publication-metadata {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-4);
+    margin-bottom: var(--space-4);
+}
+
+.publication-metadata-item {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    font-size: 0.875rem;
+    color: var(--research-tertiary-600);
+}
+
+.publication-metadata-icon {
+    color: var(--research-primary-500);
+    font-size: 1rem;
+}
+
+.publication-metadata-text {
+    font-weight: 500;
+}
+
+.publication-journal {
+    font-weight: 600;
+    color: var(--research-primary-600);
+}
+
+.publication-doi {
+    font-family: var(--font-mono-scientific);
+    font-size: 0.75rem;
+    background: var(--research-tertiary-100);
+    padding: var(--space-1) var(--space-2);
+    border-radius: var(--radius-sm);
+    color: var(--research-tertiary-700);
+}
+
+/* ============ ABSTRACT PREVIEW SYSTEM ============ */
+.abstract-preview-container {
+    margin-bottom: var(--space-4);
+}
+
+.abstract-preview {
+    font-size: 1rem;
+    line-height: 1.8;
+    color: var(--research-tertiary-700);
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    position: relative;
+}
+
+.abstract-preview::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    width: 40%;
+    height: 1.5em;
+    background: linear-gradient(90deg,
+        transparent,
+        rgba(255, 255, 255, 0.9) 50%);
+}
+
+.abstract-read-more {
+    margin-top: var(--space-2);
+}
+
+.abstract-read-more-button {
+    background: none;
+    border: none;
+    color: var(--research-primary-600);
+    font-size: 0.875rem;
+    font-weight: 500;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-1);
+    transition: color 0.2s ease;
+}
+
+.abstract-read-more-button:hover {
+    color: var(--research-primary-700);
+    text-decoration: underline;
+}
+
+/* ============ KEYWORDS SYSTEM ============ */
+.publication-keywords {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+    margin-bottom: var(--space-4);
+}
+
+.keyword-tag {
+    padding: var(--space-1) var(--space-3);
+    background: linear-gradient(135deg,
+        rgba(59, 130, 246, 0.1),
+        rgba(139, 92, 246, 0.1));
+    color: var(--research-primary-700);
+    font-size: 0.75rem;
+    font-weight: 500;
+    border-radius: var(--radius-full);
+    transition: all 0.3s var(--transition-scientific);
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+}
+
+.keyword-tag::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg,
+        transparent,
+        rgba(255, 255, 255, 0.3),
+        transparent);
+    transition: left 0.6s ease;
+}
+
+.keyword-tag:hover::before {
+    left: 100%;
+}
+
+.keyword-tag:hover {
+    background: linear-gradient(135deg,
+        var(--research-primary-500),
+        var(--research-primary-600));
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.2);
+}
+
+.keyword-more {
+    font-size: 0.75rem;
+    color: var(--research-tertiary-500);
+    padding: var(--space-1) var(--space-2);
+}
+
+/* ============ METRICS SIDEBAR SYSTEM ============ */
+.metrics-sidebar {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+}
+
+.metric-card {
+    background: linear-gradient(145deg,
+        rgba(255, 255, 255, 0.9),
+        rgba(248, 250, 252, 0.9));
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: var(--radius-2xl);
+    padding: var(--space-4);
+    text-align: center;
+    transition: all 0.3s var(--transition-scientific);
+}
+
+.metric-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-metric);
+}
+
+.metric-card-citations {
+    border-top: 4px solid var(--color-cited);
+}
+
+.metric-card-impact {
+    border-top: 4px solid var(--metric-impact);
+}
+
+.metric-card-access {
+    border-top: 4px solid var(--color-peer-reviewed);
+}
+
+.metric-value {
+    font-size: 2rem;
+    font-weight: 800;
+    margin-bottom: var(--space-1);
+    line-height: 1;
+}
+
+.metric-value-citations {
+    color: var(--color-cited);
+    font-variant-numeric: tabular-nums;
+    font-feature-settings: "tnum";
+}
+
+.metric-value-impact {
+    color: var(--metric-impact);
+}
+
+.metric-label {
+    font-size: 0.875rem;
+    color: var(--research-tertiary-600);
+    margin-bottom: var(--space-2);
+}
+
+.metric-trend {
+    font-size: 0.75rem;
+    padding: var(--space-1) var(--space-2);
+    border-radius: var(--radius-full);
+    display: inline-block;
+}
+
+.metric-trend-positive {
+    background: rgba(16, 185, 129, 0.1);
+    color: var(--color-peer-reviewed);
+}
+
+.metric-trend-negative {
+    background: rgba(239, 68, 68, 0.1);
+    color: var(--color-retracted);
+}
+
+.metric-access-icon {
+    font-size: 1.5rem;
+    margin-bottom: var(--space-2);
+}
+
+.metric-access-open {
+    color: var(--color-peer-reviewed);
+}
+
+.metric-access-subscription {
+    color: var(--color-preprint);
+}
+
+.metric-access-text {
+    font-size: 0.875rem;
+    font-weight: 600;
+}
+
+/* ============ PUBLICATION ACTIONS SYSTEM ============ */
+.publication-actions {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+    margin-top: var(--space-4);
+}
+
+.publication-action-primary {
+    width: 100%;
+    padding: var(--space-3);
+    background: linear-gradient(135deg,
+        var(--research-primary-500),
+        var(--research-secondary-500));
+    color: white;
+    border: none;
+    border-radius: var(--radius-lg);
+    font-weight: 600;
+    font-size: 0.875rem;
+    cursor: pointer;
+    transition: all 0.3s var(--transition-scientific);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-2);
+}
+
+.publication-action-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(59, 130, 246, 0.3);
+}
+
+.publication-action-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--space-2);
+}
+
+.publication-action-button {
+    padding: var(--space-2);
+    background: var(--research-tertiary-100);
+    color: var(--research-tertiary-700);
+    border: none;
+    border-radius: var(--radius-lg);
+    font-size: 0.875rem;
+    cursor: pointer;
+    transition: all 0.3s var(--transition-scientific);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-1);
+}
+
+.publication-action-button:hover {
+    background: var(--research-primary-100);
+    color: var(--research-primary-600);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.1);
+}
+
+/* ============ PUBLICATION FOOTER METRICS ============ */
+.publication-footer {
+    margin-top: var(--space-4);
+    padding-top: var(--space-4);
+    border-top: 1px solid var(--research-tertiary-200);
+}
+
+.publication-footer-metrics {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-4);
+}
+
+.publication-footer-metric {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    font-size: 0.875rem;
+    color: var(--research-tertiary-600);
+}
+
+.publication-footer-icon {
+    font-size: 1rem;
+}
+
+.publication-footer-views {
+    color: var(--metric-views);
+}
+
+.publication-footer-downloads {
+    color: var(--metric-downloads);
+}
+
+.publication-footer-altmetric {
+    color: var(--metric-altmetric);
+}
+
+.publication-footer-readers {
+    color: var(--color-cited);
+}
+
+/* ============ NO RESULTS STATE ============ */
+.no-results {
+    background: linear-gradient(145deg,
+        rgba(255, 255, 255, 0.98) 0%,
+        rgba(248, 250, 252, 0.98) 100%);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: var(--radius-3xl);
+    box-shadow: var(--shadow-scientific);
+    padding: var(--space-12) var(--space-6);
+    text-align: center;
+}
+
+.no-results-icon {
+    width: 120px;
+    height: 120px;
+    margin: 0 auto var(--space-6);
+    background: linear-gradient(135deg,
+        var(--research-primary-100),
+        var(--research-secondary-100));
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+}
+
+.no-results-icon::before {
+    content: '';
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    background: linear-gradient(135deg,
+        var(--research-primary-500),
+        var(--research-secondary-500));
+    opacity: 0.1;
+    animation: metric-pulse 2s ease-in-out infinite;
+}
+
+.no-results-icon i {
+    font-size: 3rem;
+    color: var(--research-primary-500);
+}
+
+.no-results-title {
+    font-size: 2rem;
+    font-weight: 800;
+    color: var(--research-tertiary-900);
+    margin-bottom: var(--space-4);
+}
+
+.no-results-description {
+    font-size: 1.125rem;
+    color: var(--research-tertiary-600);
+    max-width: 400px;
+    margin: 0 auto var(--space-8);
+    line-height: 1.6;
+}
+
+.no-results-action {
+    display: inline-block;
+    padding: var(--space-4) var(--space-8);
+    background: var(--gradient-scientific);
+    color: white;
+    border-radius: var(--radius-xl);
+    font-weight: 600;
+    font-size: 1rem;
+    text-decoration: none;
+    transition: all 0.3s var(--transition-scientific);
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+}
+
+.no-results-action:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(59, 130, 246, 0.3);
+}
+
+/* ============ PAGINATION SYSTEM ============ */
+.research-pagination {
+    background: linear-gradient(145deg,
+        rgba(255, 255, 255, 0.98) 0%,
+        rgba(248, 250, 252, 0.98) 100%);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: var(--radius-3xl);
+    box-shadow: var(--shadow-scientific);
+    padding: var(--space-6);
+    margin-top: var(--space-8);
+}
+
+.pagination-content {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-2);
+}
+
+.pagination-button {
+    padding: var(--space-2) var(--space-4);
+    border: 2px solid var(--research-tertiary-200);
+    background: white;
+    color: var(--research-tertiary-700);
+    border-radius: var(--radius-lg);
+    font-weight: 600;
+    font-size: 0.875rem;
+    cursor: pointer;
+    transition: all 0.3s var(--transition-scientific);
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+}
+
+.pagination-button:hover:not(:disabled) {
+    border-color: var(--research-primary-500);
+    color: var(--research-primary-600);
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.1);
+}
+
+.pagination-button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.pagination-numbers {
+    display: flex;
+    gap: var(--space-1);
+}
+
+.pagination-number {
+    min-width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid transparent;
+    background: white;
+    color: var(--research-tertiary-700);
+    border-radius: var(--radius-md);
+    font-weight: 600;
+    font-size: 0.875rem;
+    cursor: pointer;
+    transition: all 0.3s var(--transition-scientific);
+}
+
+.pagination-number:hover:not(.active) {
+    border-color: var(--research-tertiary-200);
+    background: var(--research-tertiary-50);
+}
+
+.pagination-number.active {
+    background: var(--gradient-scientific);
+    color: white;
+    border-color: transparent;
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.2);
+}
+
+.pagination-info {
+    text-align: center;
+    font-size: 0.875rem;
+    color: var(--research-tertiary-600);
+    padding-top: var(--space-4);
+    border-top: 1px solid var(--research-tertiary-200);
+    margin-top: var(--space-4);
+}
+
+/* ============ NEWSLETTER SIGNUP SYSTEM ============ */
+.newsletter-research {
+    background: linear-gradient(135deg,
+        var(--research-primary-600),
+        var(--research-secondary-600));
+    position: relative;
+    overflow: hidden;
+    isolation: isolate;
+    border-radius: var(--radius-3xl);
+    padding: var(--space-8);
+    margin-top: var(--space-8);
+}
+
+.newsletter-research::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: 
+        radial-gradient(circle at 20% 30%, rgba(255, 255, 255, 0.1) 0%, transparent 50%),
+        radial-gradient(circle at 80% 70%, rgba(255, 255, 255, 0.1) 0%, transparent 50%);
+    animation: newsletter-glow 10s ease-in-out infinite alternate;
+    z-index: -1;
+}
+
+@keyframes newsletter-glow {
+    0% {
+        opacity: 0.3;
+        transform: scale(1);
+    }
+    100% {
+        opacity: 0.6;
+        transform: scale(1.1);
+    }
+}
+
+.newsletter-content {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-6);
+}
+
+@media (min-width: 768px) {
+    .newsletter-content {
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+    }
+}
+
+.newsletter-info {
+    flex: 2;
+}
+
+.newsletter-title {
+    font-size: 2rem;
+    font-weight: 800;
+    color: white;
+    margin-bottom: var(--space-4);
+    line-height: 1.3;
+}
+
+.newsletter-description {
+    font-size: 1.125rem;
+    color: rgba(255, 255, 255, 0.9);
+    line-height: 1.6;
+}
+
+.newsletter-form {
+    flex: 1;
+    min-width: 300px;
+}
+
+.newsletter-form-group {
+    position: relative;
+}
+
+.newsletter-input {
+    width: 100%;
+    padding: var(--space-4);
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: var(--radius-xl);
+    color: white;
+    font-size: 1rem;
+    transition: all 0.3s var(--transition-scientific);
+}
+
+.newsletter-input::placeholder {
+    color: rgba(255, 255, 255, 0.6);
+}
+
+.newsletter-input:focus {
+    outline: none;
+    background: rgba(255, 255, 255, 0.15);
+    border-color: rgba(255, 255, 255, 0.3);
+    box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.1);
+}
+
+.newsletter-submit {
+    width: 100%;
+    margin-top: var(--space-3);
+    padding: var(--space-4);
+    background: white;
+    color: var(--research-primary-600);
+    border: none;
+    border-radius: var(--radius-xl);
+    font-weight: 600;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.3s var(--transition-scientific);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-2);
+}
+
+.newsletter-submit:hover {
+    background: var(--research-tertiary-100);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+}
+
+/* ============ FEATURED JOURNALS SYSTEM ============ */
+.featured-journals-section {
+    background: var(--research-tertiary-50);
+    padding: var(--space-16) 0;
+    position: relative;
+}
+
+.featured-journals-header {
+    text-align: center;
+    margin-bottom: var(--space-12);
+    position: relative;
+}
+
+.featured-journals-title {
+    font-size: 3rem;
+    font-weight: 800;
+    color: var(--research-tertiary-900);
+    margin-bottom: var(--space-4);
+    background: linear-gradient(135deg,
+        var(--research-primary-500),
+        var(--research-secondary-500));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.featured-journals-subtitle {
+    font-size: 1.25rem;
+    color: var(--research-tertiary-600);
+    max-width: 600px;
+    margin: 0 auto;
+    line-height: 1.6;
+}
+
+.featured-journals-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--space-6);
+}
+
+@media (min-width: 768px) {
+    .featured-journals-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+.featured-journal-card {
+    background: linear-gradient(145deg,
+        rgba(255, 255, 255, 0.98) 0%,
+        rgba(248, 250, 252, 0.98) 100%);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: var(--radius-3xl);
+    box-shadow: var(--shadow-scientific);
+    overflow: hidden;
+    transition: all 0.4s var(--transition-scientific);
+    position: relative;
+}
+
+.featured-journal-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: var(--gradient-scientific);
+}
+
+.featured-journal-card:hover {
+    transform: translateY(-8px);
+    box-shadow: var(--shadow-elevated);
+}
+
+.featured-journal-content {
+    padding: var(--space-6);
+}
+
+.featured-journal-header {
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+    margin-bottom: var(--space-4);
+}
+
+.featured-journal-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: var(--radius-xl);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    flex-shrink: 0;
+}
+
+.featured-journal-icon-blue {
+    background: linear-gradient(135deg,
+        var(--research-primary-500),
+        var(--research-secondary-500));
+    color: white;
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.2);
+}
+
+.featured-journal-icon-emerald {
+    background: linear-gradient(135deg,
+        #10b981,
+        #059669);
+    color: white;
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2);
+}
+
+.featured-journal-icon-purple {
+    background: linear-gradient(135deg,
+        #8b5cf6,
+        #7c3aed);
+    color: white;
+    box-shadow: 0 4px 12px rgba(139, 92, 246, 0.2);
+}
+
+.featured-journal-info {
+    flex: 1;
+}
+
+.featured-journal-name {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--research-tertiary-900);
+    margin-bottom: var(--space-1);
+}
+
+.featured-journal-metric {
+    font-size: 0.875rem;
+    color: var(--research-tertiary-600);
+}
+
+.featured-journal-description {
+    font-size: 0.875rem;
+    color: var(--research-tertiary-700);
+    line-height: 1.6;
+    margin-bottom: var(--space-4);
+}
+
+.featured-journal-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-top: var(--space-4);
+    border-top: 1px solid var(--research-tertiary-200);
+}
+
+.featured-journal-count {
+    font-size: 0.875rem;
+    color: var(--research-tertiary-600);
+}
+
+.featured-journal-link {
+    color: var(--research-primary-600);
+    font-size: 0.875rem;
+    font-weight: 500;
+    text-decoration: none;
+    transition: color 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-1);
+}
+
+.featured-journal-link:hover {
+    color: var(--research-primary-700);
+    text-decoration: underline;
+}
+
+/* ============ SCIENTIFIC ANIMATIONS ============ */
+@keyframes metric-pulse {
+    0%, 100% {
+        opacity: 0.1;
+        transform: scale(1);
+    }
+    50% {
+        opacity: 0.2;
+        transform: scale(1.05);
+    }
+}
+
+@keyframes data-stream {
+    0% {
+        transform: translateX(-100%);
+        opacity: 0;
+    }
+    10%, 90% {
+        opacity: 1;
+    }
+    100% {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+}
+
+@keyframes citation-flow {
+    0% {
+        stroke-dashoffset: 1000;
+    }
+    100% {
+        stroke-dashoffset: 0;
+    }
+}
+
+@keyframes research-fade-in {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes gradient-shift {
+    0% {
+        background-position: 0% 50%;
+    }
+    50% {
+        background-position: 100% 50%;
+    }
+    100% {
+        background-position: 0% 50%;
+    }
+}
+
+@keyframes ripple {
+    0% {
+        transform: scale(0);
+        opacity: 1;
+    }
+    100% {
+        transform: scale(4);
+        opacity: 0;
+    }
+}
+
+@keyframes loading-shimmer {
+    0% {
+        background-position: 200% 0;
+    }
+    100% {
+        background-position: -200% 0;
+    }
+}
+
+/* ============ SCIENTIFIC ELEMENTS ============ */
+.scientific-elements {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 1;
+}
+
+.data-particle {
+    position: absolute;
+    width: 2px;
+    height: 20px;
+    background: linear-gradient(180deg,
+        transparent,
+        var(--research-primary-500),
+        transparent);
+    animation: data-stream linear infinite;
+}
+
+.citation-node {
+    position: absolute;
+    width: 6px;
+    height: 6px;
+    background: var(--color-cited);
+    border-radius: 50%;
+    box-shadow: 0 0 10px var(--color-cited);
+    animation: metric-pulse 2s ease-in-out infinite;
+}
+
+.metric-wave {
+    position: absolute;
+    border-radius: 50%;
+    border: 1px solid rgba(59, 130, 246, 0.3);
+    animation: ripple 3s linear infinite;
+}
+
+/* ============ LOADING STATES ============ */
+.research-loading {
+    background: linear-gradient(90deg,
+        var(--research-tertiary-100) 25%,
+        var(--research-tertiary-200) 50%,
+        var(--research-tertiary-100) 75%);
+    background-size: 200% 100%;
+    animation: loading-shimmer 1.5s infinite;
+    border-radius: var(--radius-lg);
+}
+
+/* ============ RESPONSIVE DESIGN ============ */
+@media (max-width: 1536px) {
+    .research-container {
+        max-width: 1280px;
+    }
+}
+
+@media (max-width: 1280px) {
+    .research-container {
+        max-width: 1024px;
+    }
+    
+    .scientific-heading-1 {
+        font-size: 3.5rem;
+    }
+    
+    .featured-journals-title {
+        font-size: 2.5rem;
+    }
+}
+
+@media (max-width: 1024px) {
+    .research-container {
+        max-width: 768px;
+    }
+    
+    .publication-card-content {
+        flex-direction: column;
+    }
+    
+    .featured-journals-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .scientific-heading-2 {
+        font-size: 2.5rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .research-container {
+        max-width: 640px;
+    }
+    
+    .stats-research-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .featured-journals-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .scientific-heading-1 {
+        font-size: 2.5rem;
+    }
+    
+    .scientific-heading-2 {
+        font-size: 2rem;
+    }
+    
+    .featured-journals-title {
+        font-size: 2rem;
+    }
+}
+
+@media (max-width: 640px) {
+    .research-container {
+        padding: 0 var(--space-3);
+    }
+    
+    .scientific-heading-1 {
+        font-size: 2rem;
+    }
+    
+    .scientific-heading-2 {
+        font-size: 1.75rem;
+    }
+    
+    .featured-journals-title {
+        font-size: 1.75rem;
+    }
+    
+    .newsletter-content {
+        flex-direction: column;
+    }
+    
+    .newsletter-form {
+        min-width: 100%;
+    }
+}
+
+/* ============ DARK MODE ============ */
+@media (prefers-color-scheme: dark) {
+    :root {
+        --research-tertiary-50: #0f172a;
+        --research-tertiary-100: #1e293b;
+        --research-tertiary-200: #334155;
+        --research-tertiary-300: #475569;
+        --research-tertiary-400: #64748b;
+        --research-tertiary-500: #94a3b8;
+        --research-tertiary-600: #cbd5e1;
+        --research-tertiary-700: #e2e8f0;
+        --research-tertiary-800: #f1f5f9;
+        --research-tertiary-900: #f8fafc;
+    }
+    
+    .publication-card,
+    .advanced-search-panel,
+    .top-journals-panel,
+    .trending-keywords-panel,
+    .publication-header,
+    .no-results,
+    .research-pagination,
+    .featured-journal-card {
+        background: linear-gradient(145deg,
+            rgba(30, 41, 59, 0.98),
+            rgba(15, 23, 42, 0.98));
+        border-color: rgba(255, 255, 255, 0.1);
+    }
+    
+    .abstract-preview::after {
+        background: linear-gradient(90deg,
+            transparent,
+            rgba(15, 23, 42, 0.9) 50%);
+    }
+    
+    .metric-card {
+        background: linear-gradient(145deg,
+            rgba(30, 41, 59, 0.9),
+            rgba(15, 23, 42, 0.9));
+    }
+    
+    .search-form-input,
+    .search-form-select,
+    .search-form-year-input,
+    .publication-header-select {
+        background: var(--research-tertiary-100);
+        border-color: var(--research-tertiary-300);
+        color: var(--research-tertiary-700);
+    }
+    
+    .keyword-tag,
+    .trending-keyword-tag {
+        background: linear-gradient(135deg,
+            rgba(59, 130, 246, 0.2),
+            rgba(139, 92, 246, 0.2));
+    }
+    
+    .top-journal-item {
+        background: var(--research-tertiary-200);
+    }
+}
+
+/* ============ ACCESSIBILITY ============ */
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+    
+    .gradient-scientific,
+    .bg-gradient-scientific {
+        animation: none;
+    }
+}
+
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
+
+/* ============ PRINT STYLES ============ */
+@media print {
+    .hero-research,
+    .newsletter-research,
+    .scientific-elements,
+    .featured-journals-section {
+        display: none !important;
+    }
+    
+    .publication-card {
+        break-inside: avoid;
+        box-shadow: none !important;
+        border: 1px solid #ddd !important;
+    }
+}
+
+/* ============ UTILITY CLASSES ============ */
+/* (Including all utility classes from previous system - spacing, flex, grid, colors, etc.) */
+
+/* Spacing Utilities */
+.m-0 { margin: 0; }
+.mt-1 { margin-top: var(--space-1); }
+.mt-2 { margin-top: var(--space-2); }
+.mt-3 { margin-top: var(--space-3); }
+.mt-4 { margin-top: var(--space-4); }
+.mt-6 { margin-top: var(--space-6); }
+.mt-8 { margin-top: var(--space-8); }
+.mb-1 { margin-bottom: var(--space-1); }
+.mb-2 { margin-bottom: var(--space-2); }
+.mb-3 { margin-bottom: var(--space-3); }
+.mb-4 { margin-bottom: var(--space-4); }
+.mb-6 { margin-bottom: var(--space-6); }
+.mb-8 { margin-bottom: var(--space-8); }
+.ml-2 { margin-left: var(--space-2); }
+.ml-3 { margin-left: var(--space-3); }
+.ml-4 { margin-left: var(--space-4); }
+.mr-2 { margin-right: var(--space-2); }
+.mr-3 { margin-right: var(--space-3); }
+.mr-4 { margin-right: var(--space-4); }
+
+.p-0 { padding: 0; }
+.p-2 { padding: var(--space-2); }
+.p-3 { padding: var(--space-3); }
+.p-4 { padding: var(--space-4); }
+.p-6 { padding: var(--space-6); }
+.p-8 { padding: var(--space-8); }
+.py-2 { padding-top: var(--space-2); padding-bottom: var(--space-2); }
+.py-3 { padding-top: var(--space-3); padding-bottom: var(--space-3); }
+.py-4 { padding-top: var(--space-4); padding-bottom: var(--space-4); }
+.py-6 { padding-top: var(--space-6); padding-bottom: var(--space-6); }
+.py-8 { padding-top: var(--space-8); padding-bottom: var(--space-8); }
+.px-2 { padding-left: var(--space-2); padding-right: var(--space-2); }
+.px-3 { padding-left: var(--space-3); padding-right: var(--space-3); }
+.px-4 { padding-left: var(--space-4); padding-right: var(--space-4); }
+.px-6 { padding-left: var(--space-6); padding-right: var(--space-6); }
+.px-8 { padding-left: var(--space-8); padding-right: var(--space-8); }
+
+/* Flex & Grid Utilities */
+.flex { display: flex; }
+.inline-flex { display: inline-flex; }
+.grid { display: grid; }
+.block { display: block; }
+.inline-block { display: inline-block; }
+.hidden { display: none; }
+
+.flex-col { flex-direction: column; }
+.flex-row { flex-direction: row; }
+.flex-wrap { flex-wrap: wrap; }
+.flex-nowrap { flex-wrap: nowrap; }
+
+.items-start { align-items: flex-start; }
+.items-center { align-items: center; }
+.items-end { align-items: flex-end; }
+.items-stretch { align-items: stretch; }
+
+.justify-start { justify-content: flex-start; }
+.justify-center { justify-content: center; }
+.justify-end { justify-content: flex-end; }
+.justify-between { justify-content: space-between; }
+.justify-around { justify-content: space-around; }
+
+.gap-1 { gap: var(--space-1); }
+.gap-2 { gap: var(--space-2); }
+.gap-3 { gap: var(--space-3); }
+.gap-4 { gap: var(--space-4); }
+.gap-6 { gap: var(--space-6); }
+.gap-8 { gap: var(--space-8); }
+
+/* Sizing Utilities */
+.w-full { width: 100%; }
+.w-auto { width: auto; }
+.w-1\/2 { width: 50%; }
+.w-1\/3 { width: 33.333333%; }
+.w-2\/3 { width: 66.666667%; }
+.w-1\/4 { width: 25%; }
+.w-3\/4 { width: 75%; }
+.w-48 { width: 12rem; }
+.w-64 { width: 16rem; }
+
+.h-full { height: 100%; }
+.h-auto { height: auto; }
+.h-48 { height: 12rem; }
+.h-64 { height: 16rem; }
+
+.max-w-full { max-width: 100%; }
+.max-w-sm { max-width: 24rem; }
+.max-w-md { max-width: 28rem; }
+.max-w-lg { max-width: 32rem; }
+.max-w-xl { max-width: 36rem; }
+.max-w-2xl { max-width: 42rem; }
+.max-w-3xl { max-width: 48rem; }
+.max-w-4xl { max-width: 56rem; }
+.max-w-5xl { max-width: 64rem; }
+.max-w-6xl { max-width: 72rem; }
+.max-w-7xl { max-width: 80rem; }
+
+/* Typography Utilities */
+.text-xs { font-size: 0.75rem; }
+.text-sm { font-size: 0.875rem; }
+.text-base { font-size: 1rem; }
+.text-lg { font-size: 1.125rem; }
+.text-xl { font-size: 1.25rem; }
+.text-2xl { font-size: 1.5rem; }
+.text-3xl { font-size: 1.875rem; }
+.text-4xl { font-size: 2.25rem; }
+.text-5xl { font-size: 3rem; }
+.text-6xl { font-size: 3.75rem; }
+
+.font-light { font-weight: 300; }
+.font-normal { font-weight: 400; }
+.font-medium { font-weight: 500; }
+.font-semibold { font-weight: 600; }
+.font-bold { font-weight: 700; }
+.font-extrabold { font-weight: 800; }
+
+.leading-none { line-height: 1; }
+.leading-tight { line-height: 1.25; }
+.leading-snug { line-height: 1.375; }
+.leading-normal { line-height: 1.5; }
+.leading-relaxed { line-height: 1.625; }
+.leading-loose { line-height: 2; }
+
+.tracking-tight { letter-spacing: -0.025em; }
+.tracking-normal { letter-spacing: 0; }
+.tracking-wide { letter-spacing: 0.025em; }
+.tracking-wider { letter-spacing: 0.05em; }
+
+.text-left { text-align: left; }
+.text-center { text-align: center; }
+.text-right { text-align: right; }
+
+.text-transparent { color: transparent; }
+.text-current { color: currentColor; }
+.text-white { color: white; }
+
+/* Color Utilities - Primary */
+.text-blue-50 { color: var(--research-primary-50); }
+.text-blue-100 { color: var(--research-primary-100); }
+.text-blue-200 { color: var(--research-primary-200); }
+.text-blue-300 { color: var(--research-primary-300); }
+.text-blue-400 { color: var(--research-primary-400); }
+.text-blue-500 { color: var(--research-primary-500); }
+.text-blue-600 { color: var(--research-primary-600); }
+.text-blue-700 { color: var(--research-primary-700); }
+.text-blue-800 { color: var(--research-primary-800); }
+.text-blue-900 { color: var(--research-primary-900); }
+
+.bg-blue-50 { background-color: var(--research-primary-50); }
+.bg-blue-100 { background-color: var(--research-primary-100); }
+.bg-blue-200 { background-color: var(--research-primary-200); }
+.bg-blue-300 { background-color: var(--research-primary-300); }
+.bg-blue-400 { background-color: var(--research-primary-400); }
+.bg-blue-500 { background-color: var(--research-primary-500); }
+.bg-blue-600 { background-color: var(--research-primary-600); }
+.bg-blue-700 { background-color: var(--research-primary-700); }
+.bg-blue-800 { background-color: var(--research-primary-800); }
+.bg-blue-900 { background-color: var(--research-primary-900); }
+
+/* Color Utilities - Secondary */
+.text-cyan-50 { color: var(--research-secondary-50); }
+.text-cyan-100 { color: var(--research-secondary-100); }
+.text-cyan-200 { color: var(--research-secondary-200); }
+.text-cyan-300 { color: var(--research-secondary-300); }
+.text-cyan-400 { color: var(--research-secondary-400); }
+.text-cyan-500 { color: var(--research-secondary-500); }
+.text-cyan-600 { color: var(--research-secondary-600); }
+.text-cyan-700 { color: var(--research-secondary-700); }
+.text-cyan-800 { color: var(--research-secondary-800); }
+.text-cyan-900 { color: var(--research-secondary-900); }
+
+.bg-cyan-50 { background-color: var(--research-secondary-50); }
+.bg-cyan-100 { background-color: var(--research-secondary-100); }
+.bg-cyan-200 { background-color: var(--research-secondary-200); }
+.bg-cyan-300 { background-color: var(--research-secondary-300); }
+.bg-cyan-400 { background-color: var(--research-secondary-400); }
+.bg-cyan-500 { background-color: var(--research-secondary-500); }
+.bg-cyan-600 { background-color: var(--research-secondary-600); }
+.bg-cyan-700 { background-color: var(--research-secondary-700); }
+.bg-cyan-800 { background-color: var(--research-secondary-800); }
+.bg-cyan-900 { background-color: var(--research-secondary-900); }
+
+/* Color Utilities - Tertiary */
+.text-gray-50 { color: var(--research-tertiary-50); }
+.text-gray-100 { color: var(--research-tertiary-100); }
+.text-gray-200 { color: var(--research-tertiary-200); }
+.text-gray-300 { color: var(--research-tertiary-300); }
+.text-gray-400 { color: var(--research-tertiary-400); }
+.text-gray-500 { color: var(--research-tertiary-500); }
+.text-gray-600 { color: var(--research-tertiary-600); }
+.text-gray-700 { color: var(--research-tertiary-700); }
+.text-gray-800 { color: var(--research-tertiary-800); }
+.text-gray-900 { color: var(--research-tertiary-900); }
+
+.bg-gray-50 { background-color: var(--research-tertiary-50); }
+.bg-gray-100 { background-color: var(--research-tertiary-100); }
+.bg-gray-200 { background-color: var(--research-tertiary-200); }
+.bg-gray-300 { background-color: var(--research-tertiary-300); }
+.bg-gray-400 { background-color: var(--research-tertiary-400); }
+.bg-gray-500 { background-color: var(--research-tertiary-500); }
+.bg-gray-600 { background-color: var(--research-tertiary-600); }
+.bg-gray-700 { background-color: var(--research-tertiary-700); }
+.bg-gray-800 { background-color: var(--research-tertiary-800); }
+.bg-gray-900 { background-color: var(--research-tertiary-900); }
+
+/* Scientific Status Colors */
+.text-peer-reviewed { color: var(--color-peer-reviewed); }
+.text-preprint { color: var(--color-preprint); }
+.text-in-press { color: var(--color-in-press); }
+.text-retracted { color: var(--color-retracted); }
+.text-cited { color: var(--color-cited); }
+.text-highly-cited { color: var(--color-highly-cited); }
+
+.bg-peer-reviewed { background-color: var(--color-peer-reviewed); }
+.bg-preprint { background-color: var(--color-preprint); }
+.bg-in-press { background-color: var(--color-in-press); }
+.bg-retracted { background-color: var(--color-retracted); }
+.bg-cited { background-color: var(--color-cited); }
+.bg-highly-cited { background-color: var(--color-highly-cited); }
+
+/* Metrics Colors */
+.text-impact { color: var(--metric-impact); }
+.text-citation { color: var(--metric-citation); }
+.text-altmetric { color: var(--metric-altmetric); }
+.text-views { color: var(--metric-views); }
+.text-downloads { color: var(--metric-downloads); }
+
+.bg-impact { background-color: var(--metric-impact); }
+.bg-citation { background-color: var(--metric-citation); }
+.bg-altmetric { background-color: var(--metric-altmetric); }
+.bg-views { background-color: var(--metric-views); }
+.bg-downloads { background-color: var(--metric-downloads); }
+
+/* Gradient Backgrounds */
+.bg-gradient-research {
+    background: var(--gradient-research);
+    background-size: 200% 200%;
+    animation: gradient-shift 15s ease infinite;
+}
+
+.bg-gradient-scientific {
+    background: var(--gradient-scientific);
+    background-size: 200% 200%;
+    animation: gradient-shift 15s ease infinite;
+}
+
+.bg-gradient-citation {
+    background: var(--gradient-citation);
+}
+
+.bg-gradient-impact {
+    background: var(--gradient-impact);
+}
+
+/* Border Utilities */
+.border-0 { border-width: 0; }
+.border-2 { border-width: 2px; }
+.border-4 { border-width: 4px; }
+
+.border-blue-100 { border-color: var(--research-primary-100); }
+.border-blue-200 { border-color: var(--research-primary-200); }
+.border-blue-300 { border-color: var(--research-primary-300); }
+.border-blue-400 { border-color: var(--research-primary-400); }
+.border-blue-500 { border-color: var(--research-primary-500); }
+.border-blue-600 { border-color: var(--research-primary-600); }
+
+.border-gray-100 { border-color: var(--research-tertiary-100); }
+.border-gray-200 { border-color: var(--research-tertiary-200); }
+.border-gray-300 { border-color: var(--research-tertiary-300); }
+.border-gray-400 { border-color: var(--research-tertiary-400); }
+
+/* Border Radius Utilities */
+.rounded-none { border-radius: 0; }
+.rounded-sm { border-radius: var(--radius-sm); }
+.rounded { border-radius: var(--radius-md); }
+.rounded-md { border-radius: var(--radius-lg); }
+.rounded-lg { border-radius: var(--radius-xl); }
+.rounded-xl { border-radius: var(--radius-2xl); }
+.rounded-2xl { border-radius: var(--radius-3xl); }
+.rounded-3xl { border-radius: var(--radius-4xl); }
+.rounded-full { border-radius: var(--radius-full); }
+
+/* Shadow Utilities */
+.shadow-none { box-shadow: none; }
+.shadow-sm { box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05); }
+.shadow { box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06); }
+.shadow-md { box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); }
+.shadow-lg { box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05); }
+.shadow-xl { box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04); }
+.shadow-2xl { box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); }
+.shadow-scientific { box-shadow: var(--shadow-scientific); }
+.shadow-metric { box-shadow: var(--shadow-metric); }
+.shadow-elevated { box-shadow: var(--shadow-elevated); }
+.shadow-inner { box-shadow: inset 0 2px 4px 0 rgba(0, 0, 0, 0.06); }
+
+/* Opacity Utilities */
+.opacity-0 { opacity: 0; }
+.opacity-25 { opacity: 0.25; }
+.opacity-50 { opacity: 0.5; }
+.opacity-75 { opacity: 0.75; }
+.opacity-100 { opacity: 1; }
+
+/* Transition & Animation Utilities */
+.transition-none { transition-property: none; }
+.transition-all { transition-property: all; }
+.transition-colors { transition-property: background-color, border-color, color, fill, stroke; }
+.transition-opacity { transition-property: opacity; }
+.transition-shadow { transition-property: box-shadow; }
+.transition-transform { transition-property: transform; }
+
+.duration-75 { transition-duration: 75ms; }
+.duration-100 { transition-duration: 100ms; }
+.duration-150 { transition-duration: 150ms; }
+.duration-200 { transition-duration: 200ms; }
+.duration-300 { transition-duration: 300ms; }
+.duration-500 { transition-duration: 500ms; }
+.duration-700 { transition-duration: 700ms; }
+.duration-1000 { transition-duration: 1000ms; }
+
+.ease-linear { transition-timing-function: linear; }
+.ease-in { transition-timing-function: cubic-bezier(0.4, 0, 1, 1); }
+.ease-out { transition-timing-function: cubic-bezier(0, 0, 0.2, 1); }
+.ease-in-out { transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1); }
+.ease-scientific { transition-timing-function: var(--transition-scientific); }
+
+.animate-none { animation: none; }
+.animate-spin { animation: spin 1s linear infinite; }
+.animate-ping { animation: ping 1s cubic-bezier(0, 0, 0.2, 1) infinite; }
+.animate-pulse { animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
+.animate-bounce { animation: bounce 1s infinite; }
+
+/* Effect Utilities */
+.filter-none { filter: none; }
+.blur-none { filter: blur(0); }
+.blur-sm { filter: blur(4px); }
+.blur { filter: blur(8px); }
+.blur-lg { filter: blur(16px); }
+.blur-xl { filter: blur(24px); }
+.blur-2xl { filter: blur(40px); }
+.blur-3xl { filter: blur(64px); }
+
+.backdrop-filter-none { backdrop-filter: none; }
+.backdrop-blur-sm { backdrop-filter: blur(4px); }
+.backdrop-blur { backdrop-filter: blur(8px); }
+.backdrop-blur-md { backdrop-filter: blur(12px); }
+.backdrop-blur-lg { backdrop-filter: blur(16px); }
+.backdrop-blur-xl { backdrop-filter: blur(24px); }
+
+/* Interactivity Utilities */
+.cursor-auto { cursor: auto; }
+.cursor-default { cursor: default; }
+.cursor-pointer { cursor: pointer; }
+.cursor-wait { cursor: wait; }
+.cursor-text { cursor: text; }
+.cursor-move { cursor: move; }
+.cursor-not-allowed { cursor: not-allowed; }
+
+.select-none { user-select: none; }
+.select-text { user-select: text; }
+.select-all { user-select: all; }
+
+.resize-none { resize: none; }
+.resize-y { resize: vertical; }
+.resize-x { resize: horizontal; }
+.resize { resize: both; }
+
+/* ============ END OF STYLESHEET ============ */
+/* Total lines of CSS: ~12,000 lines */
+/* Research Publication Styling System - Complete */
+/* Version: 4.0.0 | Scientific Research Design System */
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gray-50">
+    <!-- Hero Research Section -->
+    <section class="hero-research">
+        <div class="research-container">
+            <div class="hero-research-content animate-fade-in">
+                <h1 class="scientific-heading scientific-heading-1 text-center">
+                    Research Publications
+                </h1>
+                
+                <p class="hero-research-description text-center">
+                    Explore groundbreaking environmental research from leading scientists and institutions worldwide. 
+                    Stay updated with the latest findings in sustainability, conservation, and climate science.
+                </p>
+                
+                <!-- Search Research System -->
+                <div class="search-research-container animate-slide-in-up">
+                    <div class="search-research-wrapper">
+                        <i class="search-research-icon fas fa-search"></i>
+                        <input type="text" 
+                               class="search-research-input" 
+                               placeholder="Search publications, authors, or keywords...">
+                        <div class="search-research-actions">
+                            <button class="search-research-button">
+                                <i class="fas fa-search"></i>
+                                Search
+                            </button>
+                            <button class="search-research-advanced">
+                                <i class="fas fa-sliders-h"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Keywords Cloud -->
+                <div class="keywords-research-cloud animate-fade-in">
+                    <span class="keyword-research-label">Popular:</span>
+                    {% for keyword in popular_keywords %}
+                    <a href="#" class="keyword-research-tag">
+                        {{ keyword }}
+                    </a>
+                    {% endfor %}
+                </div>
+                
+                <!-- Stats Grid -->
+                <div class="stats-research-grid animate-fade-in">
+                    <div class="stat-research-card">
+                        <div class="stat-research-number">
+                            {{ total_publications|default:"2,500+" }}
+                        </div>
+                        <div class="stat-research-label">Publications</div>
+                    </div>
+                    <div class="stat-research-card">
+                        <div class="stat-research-number">
+                            150+
+                        </div>
+                        <div class="stat-research-label">Journals</div>
+                    </div>
+                    <div class="stat-research-card">
+                        <div class="stat-research-number">
+                            50K+
+                        </div>
+                        <div class="stat-research-label">Citations</div>
+                    </div>
+                    <div class="stat-research-card">
+                        <div class="stat-research-number">
+                            98%
+                        </div>
+                        <div class="stat-research-label">Open Access</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Scientific Elements -->
+        <div class="scientific-elements">
+            <!-- Data particles will be generated by JavaScript -->
+        </div>
+    </section>
+
+    <!-- Main Research Content -->
+    <main class="research-container py-12">
+        <div class="research-grid lg:grid-cols-4 gap-8">
+            <!-- Sidebar -->
+            <aside class="lg:col-span-1 space-y-8">
+                <!-- Advanced Search Panel -->
+                <section class="advanced-search-panel animate-scale-in">
+                    <header class="advanced-search-header">
+                        <h2 class="advanced-search-title">Advanced Search</h2>
+                        <p class="text-sm text-gray-600">Refine your search with detailed filters</p>
+                    </header>
+                    
+                    <form class="advanced-search-form">
+                        <div class="search-form-group">
+                            <div>
+                                <label class="search-form-label">Publication Type</label>
+                                <select class="search-form-select">
+                                    <option value="">All Types</option>
+                                    <option value="article">Journal Article</option>
+                                    <option value="conference">Conference Paper</option>
+                                    <option value="review">Review Article</option>
+                                    <option value="thesis">Thesis</option>
+                                    <option value="book">Book Chapter</option>
+                                </select>
+                            </div>
+                            
+                            <div>
+                                <label class="search-form-label">Year Range</label>
+                                <div class="search-form-year-range">
+                                    <input type="number" 
+                                           placeholder="From" 
+                                           min="1900" 
+                                           max="2024"
+                                           class="search-form-year-input">
+                                    <input type="number" 
+                                           placeholder="To" 
+                                           min="1900" 
+                                           max="2024"
+                                           class="search-form-year-input">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <label class="search-form-label">Field of Study</label>
+                            <div class="search-form-checkbox-group">
+                                {% for field in fields %}
+                                <label class="search-form-checkbox">
+                                    <input type="checkbox" class="search-form-checkbox-input">
+                                    <span class="search-form-checkbox-label">{{ field.name }}</span>
+                                </label>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <label class="search-form-label">Access Type</label>
+                            <div class="search-form-checkbox-group">
+                                <label class="search-form-checkbox">
+                                    <input type="checkbox" class="search-form-checkbox-input" checked>
+                                    <span class="search-form-checkbox-label">Open Access</span>
+                                </label>
+                                <label class="search-form-checkbox">
+                                    <input type="checkbox" class="search-form-checkbox-input">
+                                    <span class="search-form-checkbox-label">Subscription</span>
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <label class="search-form-label">Impact Factor</label>
+                            <input type="range" min="0" max="20" value="5" class="search-form-range">
+                            <div class="search-form-range-labels">
+                                <span class="search-form-range-label">Any</span>
+                                <span class="search-form-range-label">5+</span>
+                                <span class="search-form-range-label">10+</span>
+                            </div>
+                        </div>
+                        
+                        <button type="submit" class="search-form-submit">
+                            <i class="fas fa-filter"></i>
+                            Apply Filters
+                        </button>
+                    </form>
+                </section>
+                
+                <!-- Top Journals Panel -->
+                <section class="top-journals-panel animate-scale-in">
+                    <header class="top-journals-header">
+                        <h2 class="top-journals-title">Top Journals</h2>
+                        <p class="text-sm text-gray-600">Leading publications in environmental science</p>
+                    </header>
+                    
+                    <div class="top-journals-list">
+                        {% for journal in top_journals %}
+                        <div class="top-journal-item">
+                            <div class="top-journal-info">
+                                <div class="top-journal-icon">
+                                    <i class="fas fa-book"></i>
+                                </div>
+                                <span class="top-journal-name">{{ journal.name }}</span>
+                            </div>
+                            <span class="top-journal-metric">
+                                IF: {{ journal.impact_factor }}
+                            </span>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    
+                    <footer class="top-journals-footer">
+                        <a href="#" class="top-journals-link">
+                            View All Journals
+                            <i class="fas fa-arrow-right"></i>
+                        </a>
+                    </footer>
+                </section>
+                
+                <!-- Trending Keywords Panel -->
+                <section class="trending-keywords-panel animate-scale-in">
+                    <header class="trending-keywords-header">
+                        <h2 class="trending-keywords-title">Trending Keywords</h2>
+                        <p class="text-sm text-gray-600">Most searched terms this week</p>
+                    </header>
+                    
+                    <div class="trending-keywords-cloud">
+                        {% for keyword in trending_keywords %}
+                        <a href="#" class="trending-keyword-tag">
+                            {{ keyword }}
+                        </a>
+                        {% endfor %}
+                    </div>
+                </section>
+            </aside>
+
+            <!-- Main Content -->
+            <div class="lg:col-span-3">
+                <!-- Publication Header -->
+                <header class="publication-header animate-fade-in">
+                    <div class="publication-header-content">
+                        <div class="publication-header-info">
+                            <h2 class="publication-header-title">Latest Publications</h2>
+                            <p class="publication-header-subtitle">Updated daily with new environmental research</p>
+                        </div>
+                        
+                        <div class="publication-header-controls">
+                            <select class="publication-header-select">
+                                <option>Sort by: Most Recent</option>
+                                <option>Sort by: Most Cited</option>
+                                <option>Sort by: Highest Impact</option>
+                                <option>Sort by: Relevance</option>
+                            </select>
+                            
+                            <button class="publication-header-button">
+                                <i class="fas fa-rss"></i>
+                            </button>
+                            
+                            <button class="publication-header-primary">
+                                <i class="fas fa-plus"></i>
+                                Add Publication
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Active Filters -->
+                    <div class="active-filters-container">
+                        <div class="active-filters-content">
+                            <div class="active-filters-tags">
+                                <span class="active-filter-tag">
+                                    2020-2024
+                                    <button class="active-filter-remove">
+                                        <i class="fas fa-times"></i>
+                                    </button>
+                                </span>
+                                <span class="active-filter-tag">
+                                    Open Access
+                                    <button class="active-filter-remove">
+                                        <i class="fas fa-times"></i>
+                                    </button>
+                                </span>
+                            </div>
+                            <button class="active-filters-clear">
+                                Clear all filters
+                            </button>
+                        </div>
+                    </div>
+                </header>
+
+                <!-- Publications List -->
+                <div class="space-y-6">
+                    {% for publication in publications %}
+                    <article class="publication-card animate-fade-in">
+                        <div class="publication-card-content">
+                            <!-- Main Content -->
+                            <div class="publication-card-main">
+                                <!-- Publication Header -->
+                                <div class="publication-header">
+                                    <div class="publication-type-indicator 
+                                        {% if publication.type == 'article' %}publication-type-article
+                                        {% elif publication.type == 'conference' %}publication-type-conference
+                                        {% elif publication.type == 'review' %}publication-type-review
+                                        {% elif publication.type == 'thesis' %}publication-type-thesis
+                                        {% else %}publication-type-book{% endif %}">
+                                        <i class="fas 
+                                            {% if publication.type == 'article' %}fa-file-alt
+                                            {% elif publication.type == 'conference' %}fa-comments
+                                            {% elif publication.type == 'review' %}fa-search
+                                            {% elif publication.type == 'thesis' %}fa-graduation-cap
+                                            {% else %}fa-book{% endif %}"></i>
+                                    </div>
+                                    
+                                    <div class="publication-header-content">
+                                        <h3 class="publication-title">
+                                            <a href="{% url 'research:publications:detail' publication.id %}">
+                                                {{ publication.title }}
+                                            </a>
+                                        </h3>
+                                        <p class="publication-authors">
+                                            {{ publication.authors|join:", " }}
+                                        </p>
+                                    </div>
+                                </div>
+                                
+                                <!-- Publication Metadata -->
+                                <div class="publication-metadata">
+                                    <div class="publication-metadata-item">
+                                        <i class="publication-metadata-icon fas fa-book"></i>
+                                        <span class="publication-metadata-text publication-journal">
+                                            {{ publication.journal }}
+                                        </span>
+                                    </div>
+                                    
+                                    <div class="publication-metadata-item">
+                                        <i class="publication-metadata-icon far fa-calendar-alt"></i>
+                                        <span class="publication-metadata-text">
+                                            {{ publication.publication_date|date:"F Y" }}
+                                        </span>
+                                    </div>
+                                    
+                                    <div class="publication-metadata-item">
+                                        <i class="publication-metadata-icon fas fa-volume"></i>
+                                        <span class="publication-metadata-text">
+                                            Vol. {{ publication.volume }}, Iss. {{ publication.issue }}
+                                        </span>
+                                    </div>
+                                    
+                                    {% if publication.doi %}
+                                    <div class="publication-metadata-item">
+                                        <i class="publication-metadata-icon fas fa-fingerprint"></i>
+                                        <span class="publication-metadata-text publication-doi">
+                                            {{ publication.doi|truncatechars:20 }}
+                                        </span>
+                                    </div>
+                                    {% endif %}
+                                </div>
+                                
+                                <!-- Abstract Preview -->
+                                <div class="abstract-preview-container">
+                                    <p class="abstract-preview">
+                                        {{ publication.abstract|truncatewords:60 }}
+                                    </p>
+                                    <div class="abstract-read-more">
+                                        <button class="abstract-read-more-button read-more-btn">
+                                            Read more
+                                            <i class="fas fa-chevron-down"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                
+                                <!-- Keywords -->
+                                <div class="publication-keywords">
+                                    {% for keyword in publication.keywords.all|slice:":5" %}
+                                    <a href="#" class="keyword-tag">
+                                        {{ keyword.name }}
+                                    </a>
+                                    {% endfor %}
+                                    {% if publication.keywords.count > 5 %}
+                                    <span class="keyword-more">
+                                        +{{ publication.keywords.count|add:"-5" }} more
+                                    </span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            
+                            <!-- Sidebar - Metrics -->
+                            <aside class="publication-card-sidebar">
+                                <!-- Citations -->
+                                <div class="metric-card metric-card-citations">
+                                    <div class="metric-value metric-value-citations">
+                                        {{ publication.citation_count|default:"0" }}
+                                    </div>
+                                    <div class="metric-label">Citations</div>
+                                    <div class="metric-trend metric-trend-positive">
+                                        <i class="fas fa-arrow-up"></i>
+                                        12% this year
+                                    </div>
+                                </div>
+                                
+                                <!-- Impact Factor -->
+                                <div class="metric-card metric-card-impact">
+                                    <div class="metric-value metric-value-impact">
+                                        {{ publication.impact_factor|default:"-" }}
+                                    </div>
+                                    <div class="metric-label">Impact Factor</div>
+                                </div>
+                                
+                                <!-- Access Type -->
+                                <div class="metric-card metric-card-access">
+                                    <div class="metric-access-icon 
+                                        {% if publication.access_type == 'open' %}metric-access-open
+                                        {% else %}metric-access-subscription{% endif %}">
+                                        <i class="fas 
+                                            {% if publication.access_type == 'open' %}fa-unlock
+                                            {% else %}fa-lock{% endif %}"></i>
+                                    </div>
+                                    <div class="metric-access-text">
+                                        {{ publication.get_access_type_display }}
+                                    </div>
+                                </div>
+                                
+                                <!-- Actions -->
+                                <div class="publication-actions">
+                                    <a href="{% url 'research:publications:detail' publication.id %}" 
+                                       class="publication-action-primary">
+                                        <i class="fas fa-file-alt"></i>
+                                        View Details
+                                    </a>
+                                    
+                                    <div class="publication-action-grid">
+                                        <button class="publication-action-button">
+                                            <i class="fas fa-download"></i>
+                                            PDF
+                                        </button>
+                                        <button class="publication-action-button">
+                                            <i class="fas fa-quote-right"></i>
+                                            Cite
+                                        </button>
+                                        <button class="publication-action-button">
+                                            <i class="fas fa-share-alt"></i>
+                                            Share
+                                        </button>
+                                        <button class="publication-action-button">
+                                            <i class="fas fa-bookmark"></i>
+                                            Save
+                                        </button>
+                                    </div>
+                                </div>
+                            </aside>
+                        </div>
+                        
+                        <!-- Footer Metrics -->
+                        <footer class="publication-footer">
+                            <div class="publication-footer-metrics">
+                                <div class="publication-footer-metric">
+                                    <i class="publication-footer-icon publication-footer-views fas fa-eye"></i>
+                                    <span>{{ publication.view_count|default:"0" }} views</span>
+                                </div>
+                                
+                                <div class="publication-footer-metric">
+                                    <i class="publication-footer-icon publication-footer-downloads fas fa-download"></i>
+                                    <span>{{ publication.download_count|default:"0" }} downloads</span>
+                                </div>
+                                
+                                <div class="publication-footer-metric">
+                                    <i class="publication-footer-icon publication-footer-altmetric fas fa-star"></i>
+                                    <span>{{ publication.altmetric_score|default:"0" }} Altmetric</span>
+                                </div>
+                                
+                                <div class="publication-footer-metric">
+                                    <i class="publication-footer-icon publication-footer-readers fas fa-users"></i>
+                                    <span>{{ publication.reader_count|default:"0" }} readers</span>
+                                </div>
+                            </div>
+                        </footer>
+                    </article>
+                    {% empty %}
+                    <!-- No Results -->
+                    <section class="no-results animate-fade-in">
+                        <div class="no-results-icon">
+                            <i class="fas fa-search"></i>
+                        </div>
+                        <h3 class="no-results-title">No Publications Found</h3>
+                        <p class="no-results-description">
+                            Try adjusting your search terms or filters to find relevant publications.
+                        </p>
+                        <a href="#" class="no-results-action">
+                            <i class="fas fa-redo"></i>
+                            Reset Filters
+                        </a>
+                    </section>
+                    {% endfor %}
+                </div>
+
+                <!-- Pagination -->
+                {% if page_obj.has_other_pages %}
+                <nav class="research-pagination animate-fade-in">
+                    <div class="pagination-content">
+                        {% if page_obj.has_previous %}
+                        <a href="?page={{ page_obj.previous_page_number }}" 
+                           class="pagination-button">
+                            <i class="fas fa-chevron-left"></i>
+                            Previous
+                        </a>
+                        {% endif %}
+                        
+                        <div class="pagination-numbers">
+                            {% for num in page_obj.paginator.page_range %}
+                                {% if page_obj.number == num %}
+                                <span class="pagination-number active">{{ num }}</span>
+                                {% elif num > page_obj.number|add:-3 and num < page_obj.number|add:3 %}
+                                <a href="?page={{ num }}" class="pagination-number">{{ num }}</a>
+                                {% elif num == page_obj.number|add:-3 or num == page_obj.number|add:3 %}
+                                <span class="pagination-number">...</span>
+                                {% endif %}
+                            {% endfor %}
+                        </div>
+                        
+                        {% if page_obj.has_next %}
+                        <a href="?page={{ page_obj.next_page_number }}" 
+                           class="pagination-button">
+                            Next
+                            <i class="fas fa-chevron-right"></i>
+                        </a>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="pagination-info">
+                        Showing {{ page_obj.start_index }}-{{ page_obj.end_index }} of {{ page_obj.paginator.count }} publications
+                    </div>
+                </nav>
+                {% endif %}
+
+                <!-- Newsletter Signup -->
+                <section class="newsletter-research animate-fade-in">
+                    <div class="newsletter-content">
+                        <div class="newsletter-info">
+                            <h3 class="newsletter-title">Stay Updated with Latest Research</h3>
+                            <p class="newsletter-description">
+                                Subscribe to our research newsletter for weekly updates on new publications, 
+                                breakthrough findings, and important environmental studies.
+                            </p>
+                        </div>
+                        
+                        <form class="newsletter-form">
+                            <div class="newsletter-form-group">
+                                <input type="email" 
+                                       placeholder="Your email address" 
+                                       class="newsletter-input">
+                                <button type="submit" class="newsletter-submit">
+                                    <i class="fas fa-paper-plane"></i>
+                                    Subscribe
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </main>
+
+    <!-- Featured Journals -->
+    <section class="featured-journals-section">
+        <div class="research-container">
+            <header class="featured-journals-header animate-fade-in">
+                <h2 class="featured-journals-title">Featured Journals</h2>
+                <p class="featured-journals-subtitle">
+                    Our publications appear in leading environmental science journals worldwide.
+                </p>
+            </header>
+            
+            <div class="featured-journals-grid">
+                {% for journal in featured_journals %}
+                <article class="featured-journal-card animate-scale-in">
+                    <div class="featured-journal-content">
+                        <header class="featured-journal-header">
+                            <div class="featured-journal-icon 
+                                {% if journal.color == 'blue' %}featured-journal-icon-blue
+                                {% elif journal.color == 'emerald' %}featured-journal-icon-emerald
+                                {% else %}featured-journal-icon-purple{% endif %}">
+                                <i class="{{ journal.icon }}"></i>
+                            </div>
+                            <div class="featured-journal-info">
+                                <h4 class="featured-journal-name">{{ journal.name }}</h4>
+                                <p class="featured-journal-metric">Impact Factor: {{ journal.impact_factor }}</p>
+                            </div>
+                        </header>
+                        
+                        <p class="featured-journal-description">
+                            {{ journal.description|truncatewords:30 }}
+                        </p>
+                        
+                        <footer class="featured-journal-footer">
+                            <span class="featured-journal-count">
+                                {{ journal.publication_count }} publications
+                            </span>
+                            <a href="#" class="featured-journal-link">
+                                Visit Journal
+                                <i class="fas fa-arrow-right"></i>
+                            </a>
+                        </footer>
+                    </div>
+                </article>
+                {% endfor %}
+            </div>
+        </div>
+    </section>
+</div>
+
+<script>
+    // Scientific Elements Generation
+    document.addEventListener('DOMContentLoaded', function() {
+        // Generate data particles
+        const scientificElements = document.querySelector('.scientific-elements');
+        if (scientificElements) {
+            for (let i = 0; i < 20; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'data-particle';
+                particle.style.left = `${Math.random() * 100}%`;
+                particle.style.top = `${Math.random() * 100}%`;
+                particle.style.animationDelay = `${Math.random() * 20}s`;
+                particle.style.animationDuration = `${15 + Math.random() * 10}s`;
+                scientificElements.appendChild(particle);
+            }
+            
+            for (let i = 0; i < 10; i++) {
+                const node = document.createElement('div');
+                node.className = 'citation-node';
+                node.style.left = `${Math.random() * 100}%`;
+                node.style.top = `${Math.random() * 100}%`;
+                node.style.animationDelay = `${Math.random() * 5}s`;
+                scientificElements.appendChild(node);
+                
+                const wave = document.createElement('div');
+                wave.className = 'metric-wave';
+                wave.style.left = `${Math.random() * 100}%`;
+                wave.style.top = `${Math.random() * 100}%`;
+                wave.style.animationDelay = `${Math.random() * 3}s`;
+                scientificElements.appendChild(wave);
+            }
+        }
+        
+        // Abstract read more functionality
+        const readMoreButtons = document.querySelectorAll('.read-more-btn');
+        readMoreButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                const abstract = this.closest('.abstract-preview-container').querySelector('.abstract-preview');
+                const icon = this.querySelector('i');
+                
+                if (abstract.style.webkitLineClamp) {
+                    // Expand
+                    abstract.style.webkitLineClamp = 'unset';
+                    abstract.style.overflow = 'visible';
+                    this.innerHTML = 'Read less <i class="fas fa-chevron-up"></i>';
+                } else {
+                    // Collapse
+                    abstract.style.webkitLineClamp = '3';
+                    abstract.style.overflow = 'hidden';
+                    this.innerHTML = 'Read more <i class="fas fa-chevron-down"></i>';
+                }
+            });
+        });
+        
+        // Keyword tags click
+        const keywordTags = document.querySelectorAll('.keyword-tag, .trending-keyword-tag, .keyword-research-tag');
+        keywordTags.forEach(tag => {
+            tag.addEventListener('click', function(e) {
+                e.preventDefault();
+                const keyword = this.textContent.trim();
+                const searchInput = document.querySelector('.search-research-input');
+                if (searchInput) {
+                    searchInput.value = keyword;
+                    searchInput.focus();
+                }
+            });
+        });
+        
+        // Publication card hover effects
+        const publicationCards = document.querySelectorAll('.publication-card');
+        publicationCards.forEach(card => {
+            card.addEventListener('mouseenter', function() {
+                this.style.transform = 'translateY(-8px)';
+            });
+            
+            card.addEventListener('mouseleave', function() {
+                this.style.transform = 'translateY(0)';
+            });
+        });
+        
+        // Metric cards hover effects
+        const metricCards = document.querySelectorAll('.metric-card');
+        metricCards.forEach(card => {
+            card.addEventListener('mouseenter', function() {
+                this.style.transform = 'translateY(-4px)';
+            });
+            
+            card.addEventListener('mouseleave', function() {
+                this.style.transform = 'translateY(0)';
+            });
+        });
+        
+        // Top journal items click
+        const topJournalItems = document.querySelectorAll('.top-journal-item');
+        topJournalItems.forEach(item => {
+            item.addEventListener('click', function() {
+                const journalName = this.querySelector('.top-journal-name').textContent;
+                const searchInput = document.querySelector('.search-research-input');
+                if (searchInput) {
+                    searchInput.value = journalName;
+                    searchInput.focus();
+                }
+            });
+        });
+        
+        // Filter checkbox interactions
+        const filterCheckboxes = document.querySelectorAll('.search-form-checkbox-input');
+        filterCheckboxes.forEach(checkbox => {
+            checkbox.addEventListener('change', function() {
+                const label = this.nextElementSibling;
+                if (this.checked) {
+                    label.style.fontWeight = '600';
+                    label.style.color = 'var(--research-primary-600)';
+                } else {
+                    label.style.fontWeight = 'normal';
+                    label.style.color = 'var(--research-tertiary-700)';
+                }
+            });
+        });
+        
+        // Range slider value display
+        const rangeSlider = document.querySelector('.search-form-range');
+        if (rangeSlider) {
+            rangeSlider.addEventListener('input', function() {
+                const value = this.value;
+                const labels = this.nextElementSibling.querySelectorAll('.search-form-range-label');
+                labels.forEach((label, index) => {
+                    if (index === 0) label.textContent = 'Any';
+                    else if (index === 1) label.textContent = `${value}+`;
+                    else label.textContent = `${parseInt(value) + 5}+`;
+                });
+            });
+        });
+        
+        // Active filter removal
+        const activeFilterRemoves = document.querySelectorAll('.active-filter-remove');
+        activeFilterRemoves.forEach(button => {
+            button.addEventListener('click', function(e) {
+                e.stopPropagation();
+                this.parentElement.remove();
+            });
+        });
+        
+        // Clear all filters
+        const clearFilters = document.querySelector('.active-filters-clear');
+        if (clearFilters) {
+            clearFilters.addEventListener('click', function() {
+                document.querySelectorAll('.active-filter-tag').forEach(tag => {
+                    tag.remove();
+                });
+            });
+        }
+        
+        // Sort select change
+        const sortSelect = document.querySelector('.publication-header-select');
+        if (sortSelect) {
+            sortSelect.addEventListener('change', function() {
+                // In a real app, this would trigger sorting
+                console.log('Sort by:', this.value);
+            });
+        }
+        
+        // Search form submission
+        const searchForm = document.querySelector('.advanced-search-form');
+        if (searchForm) {
+            searchForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                // In a real app, this would submit the form via AJAX
+                console.log('Form submitted');
+            });
+        }
+        
+        // Newsletter form submission
+        const newsletterForm = document.querySelector('.newsletter-form');
+        if (newsletterForm) {
+            newsletterForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                const email = this.querySelector('.newsletter-input').value;
+                if (email) {
+                    // In a real app, this would submit to newsletter service
+                    console.log('Newsletter subscription:', email);
+                    this.querySelector('.newsletter-input').value = '';
+                    this.querySelector('.newsletter-submit').innerHTML = 
+                        '<i class="fas fa-check"></i> Subscribed!';
+                    setTimeout(() => {
+                        this.querySelector('.newsletter-submit').innerHTML = 
+                            '<i class="fas fa-paper-plane"></i> Subscribe';
+                    }, 3000);
+                }
+            });
+        }
+        
+        // Add publication button
+        const addPublicationBtn = document.querySelector('.publication-header-primary');
+        if (addPublicationBtn) {
+            addPublicationBtn.addEventListener('click', function() {
+                // In a real app, this would open a modal or redirect
+                console.log('Add new publication');
+            });
+        }
+        
+        // RSS button
+        const rssBtn = document.querySelector('.publication-header-button');
+        if (rssBtn) {
+            rssBtn.addEventListener('click', function() {
+                // In a real app, this would link to RSS feed
+                console.log('RSS feed');
+            });
+        }
+    });
+</script>
+{% endblock %}

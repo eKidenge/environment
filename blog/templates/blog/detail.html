@@ -1,0 +1,862 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ post.title }} - EcoHub Blog{% endblock %}
+
+{% block extra_css %}
+<style>
+    .article-header {
+        background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+    }
+    
+    .article-content {
+        font-size: 1.125rem;
+        line-height: 1.8;
+    }
+    
+    .article-content h2 {
+        font-size: 1.75rem;
+        font-weight: 700;
+        margin-top: 2.5rem;
+        margin-bottom: 1rem;
+        color: #1f2937;
+    }
+    
+    .article-content h3 {
+        font-size: 1.5rem;
+        font-weight: 600;
+        margin-top: 2rem;
+        margin-bottom: 1rem;
+        color: #374151;
+    }
+    
+    .article-content p {
+        margin-bottom: 1.5rem;
+    }
+    
+    .article-content blockquote {
+        border-left: 4px solid #8b5cf6;
+        padding-left: 1.5rem;
+        margin: 2rem 0;
+        font-style: italic;
+        color: #4b5563;
+    }
+    
+    .article-content ul, .article-content ol {
+        margin: 1.5rem 0;
+        padding-left: 2rem;
+    }
+    
+    .article-content li {
+        margin-bottom: 0.5rem;
+    }
+    
+    .article-content img {
+        border-radius: 0.75rem;
+        margin: 2rem 0;
+        box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+    }
+    
+    .article-content code {
+        background-color: #f3f4f6;
+        padding: 0.25rem 0.5rem;
+        border-radius: 0.25rem;
+        font-family: 'Monaco', 'Courier New', monospace;
+        font-size: 0.875em;
+    }
+    
+    .article-content pre {
+        background-color: #1f2937;
+        color: #f9fafb;
+        padding: 1rem;
+        border-radius: 0.5rem;
+        overflow-x: auto;
+        margin: 2rem 0;
+    }
+    
+    .share-btn {
+        transition: all 0.2s ease;
+    }
+    
+    .share-btn:hover {
+        transform: translateY(-2px);
+    }
+    
+    .author-avatar {
+        width: 80px;
+        height: 80px;
+        border: 4px solid white;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    }
+    
+    .comment-avatar {
+        width: 48px;
+        height: 48px;
+        border: 3px solid #f3f4f6;
+    }
+    
+    .reading-progress {
+        height: 4px;
+        background: linear-gradient(to right, #8b5cf6, #7c3aed);
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 0%;
+        z-index: 50;
+        transition: width 0.1s ease;
+    }
+    
+    .table-of-contents {
+        position: sticky;
+        top: 100px;
+        max-height: calc(100vh - 120px);
+        overflow-y: auto;
+    }
+    
+    .toc-link {
+        transition: all 0.2s ease;
+        padding-left: 1rem;
+        border-left: 3px solid transparent;
+    }
+    
+    .toc-link:hover {
+        border-left-color: #8b5cf6;
+        color: #8b5cf6;
+    }
+    
+    .toc-link.active {
+        border-left-color: #8b5cf6;
+        color: #8b5cf6;
+        font-weight: 600;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Reading Progress Bar -->
+<div class="reading-progress"></div>
+
+<!-- Article Header -->
+<div class="article-header text-white">
+    <div class="container mx-auto px-4 py-16">
+        <div class="max-w-4xl mx-auto">
+            <!-- Breadcrumb -->
+            <nav class="mb-6">
+                <ol class="flex items-center space-x-2 text-sm text-purple-100">
+                    <li>
+                        <a href="{% url 'core:home' %}" class="hover:text-white">Home</a>
+                    </li>
+                    <li><i class="fas fa-chevron-right text-xs"></i></li>
+                    <li>
+                        <a href="{% url 'blog:list' %}" class="hover:text-white">Blog</a>
+                    </li>
+                    <li><i class="fas fa-chevron-right text-xs"></i></li>
+                    <li>
+                        <a href="{% url 'blog:categories:detail' post.category.slug %}" class="hover:text-white">
+                            {{ post.category.name }}
+                        </a>
+                    </li>
+                    <li><i class="fas fa-chevron-right text-xs"></i></li>
+                    <li class="text-white font-medium">{{ post.title|truncatechars:50 }}</li>
+                </ol>
+            </nav>
+            
+            <!-- Category & Date -->
+            <div class="flex items-center space-x-4 mb-6">
+                <a href="{% url 'blog:categories:detail' post.category.slug %}" 
+                   class="px-4 py-2 bg-white/20 backdrop-blur-sm rounded-full text-sm font-medium hover:bg-white/30">
+                    {{ post.category.name }}
+                </a>
+                <span class="text-purple-100">
+                    <i class="far fa-clock mr-2"></i>
+                    {{ post.read_time }} min read
+                </span>
+                {% if post.is_trending %}
+                <span class="px-3 py-1 bg-amber-500 text-white text-xs font-medium rounded-full">
+                    <i class="fas fa-fire mr-1"></i>
+                    Trending
+                </span>
+                {% endif %}
+            </div>
+            
+            <!-- Title -->
+            <h1 class="text-4xl md:text-5xl font-bold mb-6 leading-tight">{{ post.title }}</h1>
+            
+            <!-- Excerpt -->
+            <p class="text-xl text-purple-100 mb-8">{{ post.excerpt }}</p>
+            
+            <!-- Author & Meta -->
+            <div class="flex flex-col md:flex-row md:items-center justify-between">
+                <div class="flex items-center mb-4 md:mb-0">
+                    <div class="author-avatar rounded-full overflow-hidden mr-4">
+                        {% if post.author.avatar %}
+                        <img src="{{ post.author.avatar.url }}" 
+                             alt="{{ post.author.get_full_name }}" 
+                             class="w-full h-full object-cover">
+                        {% else %}
+                        <div class="w-full h-full bg-gradient-to-r from-purple-400 to-indigo-500 flex items-center justify-center">
+                            <span class="text-2xl font-bold text-white">{{ post.author.get_full_name|first|upper }}</span>
+                        </div>
+                        {% endif %}
+                    </div>
+                    <div>
+                        <div class="font-bold text-lg">{{ post.author.get_full_name }}</div>
+                        <div class="text-purple-100">
+                            {{ post.author.title|default:"Environmental Writer" }}
+                            <span class="mx-2">•</span>
+                            {{ post.published_date|date:"F j, Y" }}
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Stats -->
+                <div class="flex items-center space-x-6">
+                    <div class="text-center">
+                        <div class="text-2xl font-bold">{{ post.view_count|default:"0" }}</div>
+                        <div class="text-sm text-purple-100">Views</div>
+                    </div>
+                    <div class="text-center">
+                        <div class="text-2xl font-bold">{{ post.comment_count|default:"0" }}</div>
+                        <div class="text-sm text-purple-100">Comments</div>
+                    </div>
+                    <div class="text-center">
+                        <div class="text-2xl font-bold">{{ post.like_count|default:"0" }}</div>
+                        <div class="text-sm text-purple-100">Likes</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Main Content -->
+<div class="container mx-auto px-4 py-12">
+    <div class="max-w-6xl mx-auto">
+        <div class="flex flex-col lg:flex-row gap-8">
+            <!-- Table of Contents -->
+            <div class="lg:w-1/4">
+                <div class="table-of-contents bg-white rounded-2xl shadow-lg p-6 mb-6">
+                    <h3 class="font-bold text-gray-800 mb-4">Table of Contents</h3>
+                    <nav class="space-y-2" id="toc">
+                        <!-- Table of contents will be generated by JavaScript -->
+                    </nav>
+                </div>
+                
+                <!-- Share Widget -->
+                <div class="bg-white rounded-2xl shadow-lg p-6 mb-6">
+                    <h3 class="font-bold text-gray-800 mb-4">Share This Article</h3>
+                    <div class="grid grid-cols-4 gap-3">
+                        <button class="share-btn p-3 bg-blue-50 text-blue-600 rounded-xl hover:bg-blue-100">
+                            <i class="fab fa-twitter text-lg"></i>
+                        </button>
+                        <button class="share-btn p-3 bg-blue-800 text-white rounded-xl hover:bg-blue-900">
+                            <i class="fab fa-linkedin-in text-lg"></i>
+                        </button>
+                        <button class="share-btn p-3 bg-blue-600 text-white rounded-xl hover:bg-blue-700">
+                            <i class="fab fa-facebook-f text-lg"></i>
+                        </button>
+                        <button class="share-btn p-3 bg-red-50 text-red-600 rounded-xl hover:bg-red-100">
+                            <i class="far fa-bookmark text-lg"></i>
+                        </button>
+                        <button class="share-btn p-3 bg-green-50 text-green-600 rounded-xl hover:bg-green-100">
+                            <i class="fab fa-whatsapp text-lg"></i>
+                        </button>
+                        <button class="share-btn p-3 bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200">
+                            <i class="fas fa-link text-lg"></i>
+                        </button>
+                        <button class="share-btn p-3 bg-amber-50 text-amber-600 rounded-xl hover:bg-amber-100">
+                            <i class="fas fa-envelope text-lg"></i>
+                        </button>
+                        <button class="share-btn p-3 bg-purple-50 text-purple-600 rounded-xl hover:bg-purple-100">
+                            <i class="fas fa-print text-lg"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Author Bio -->
+                <div class="bg-white rounded-2xl shadow-lg p-6">
+                    <h3 class="font-bold text-gray-800 mb-4">About the Author</h3>
+                    <div class="flex items-start space-x-4">
+                        <div class="w-16 h-16 rounded-full overflow-hidden flex-shrink-0">
+                            {% if post.author.avatar %}
+                            <img src="{{ post.author.avatar.url }}" 
+                                 alt="{{ post.author.get_full_name }}" 
+                                 class="w-full h-full object-cover">
+                            {% else %}
+                            <div class="w-full h-full bg-gradient-to-r from-purple-400 to-indigo-500 flex items-center justify-center">
+                                <i class="fas fa-user text-white"></i>
+                            </div>
+                            {% endif %}
+                        </div>
+                        <div>
+                            <h4 class="font-bold text-gray-800">{{ post.author.get_full_name }}</h4>
+                            <p class="text-sm text-gray-600 mb-2">{{ post.author.title|default:"Environmental Writer" }}</p>
+                            <p class="text-sm text-gray-600 line-clamp-2">{{ post.author.bio|truncatewords:20 }}</p>
+                            <a href="{% url 'blog:authors:detail' post.author.username %}" 
+                               class="inline-block mt-2 text-sm text-purple-600 hover:text-purple-700 font-medium">
+                                View Profile →
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Article Content -->
+            <div class="lg:w-2/3">
+                <!-- Featured Image -->
+                {% if post.featured_image %}
+                <div class="rounded-2xl overflow-hidden mb-8">
+                    <img src="{{ post.featured_image.url }}" 
+                         alt="{{ post.title }}" 
+                         class="w-full h-auto max-h-[500px] object-cover">
+                </div>
+                {% endif %}
+                
+                <!-- Article Content -->
+                <article class="article-content bg-white rounded-2xl shadow-lg p-8 mb-8">
+                    {{ post.content|safe }}
+                </article>
+                
+                <!-- Tags -->
+                {% if post.tags.exists %}
+                <div class="bg-white rounded-2xl shadow-lg p-6 mb-8">
+                    <h3 class="font-bold text-gray-800 mb-4">Tags</h3>
+                    <div class="flex flex-wrap gap-2">
+                        {% for tag in post.tags.all %}
+                        <a href="{% url 'blog:list' %}?tag={{ tag.slug }}" 
+                           class="px-4 py-2 bg-gray-100 hover:bg-purple-100 text-gray-700 hover:text-purple-700 rounded-lg font-medium">
+                            {{ tag.name }}
+                        </a>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
+                
+                <!-- Article Actions -->
+                <div class="bg-white rounded-2xl shadow-lg p-6 mb-8">
+                    <div class="flex flex-col sm:flex-row items-center justify-between space-y-4 sm:space-y-0">
+                        <!-- Like Button -->
+                        <button class="like-btn flex items-center px-6 py-3 bg-gray-100 hover:bg-red-50 text-gray-700 hover:text-red-600 rounded-xl font-medium transition-colors">
+                            <i class="far fa-heart mr-2"></i>
+                            <span>Like</span>
+                            <span class="ml-2 bg-white px-2 py-1 rounded-full text-sm">{{ post.like_count|default:"0" }}</span>
+                        </button>
+                        
+                        <!-- Share Options -->
+                        <div class="flex items-center space-x-4">
+                            <span class="text-gray-600">Share:</span>
+                            <div class="flex space-x-2">
+                                <button class="p-2 bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-100">
+                                    <i class="fab fa-twitter"></i>
+                                </button>
+                                <button class="p-2 bg-blue-800 text-white rounded-lg hover:bg-blue-900">
+                                    <i class="fab fa-linkedin-in"></i>
+                                </button>
+                                <button class="p-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+                                    <i class="fab fa-facebook-f"></i>
+                                </button>
+                                <button class="p-2 bg-red-50 text-red-600 rounded-lg hover:bg-red-100">
+                                    <i class="fas fa-link"></i>
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <!-- Print Button -->
+                        <button class="print-btn flex items-center px-6 py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-xl font-medium">
+                            <i class="fas fa-print mr-2"></i>
+                            Print Article
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Author Promotion -->
+                <div class="bg-gradient-to-r from-purple-50 to-indigo-50 rounded-2xl p-6 mb-8">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center space-x-4">
+                            <div class="w-16 h-16 rounded-full overflow-hidden">
+                                {% if post.author.avatar %}
+                                <img src="{{ post.author.avatar.url }}" 
+                                     alt="{{ post.author.get_full_name }}" 
+                                     class="w-full h-full object-cover">
+                                {% else %}
+                                <div class="w-full h-full bg-gradient-to-r from-purple-400 to-indigo-500 flex items-center justify-center">
+                                    <i class="fas fa-user text-white"></i>
+                                </div>
+                                {% endif %}
+                            </div>
+                            <div>
+                                <h3 class="font-bold text-gray-800">Written by {{ post.author.get_full_name }}</h3>
+                                <p class="text-gray-600 text-sm">{{ post.author.title|default:"Environmental Writer" }}</p>
+                            </div>
+                        </div>
+                        <a href="{% url 'blog:authors:detail' post.author.username %}" 
+                           class="btn btn-primary">
+                            View Profile
+                        </a>
+                    </div>
+                </div>
+                
+                <!-- Comments Section -->
+                <div class="bg-white rounded-2xl shadow-lg p-8 mb-8">
+                    <div class="flex justify-between items-center mb-8">
+                        <h2 class="text-2xl font-bold text-gray-800">Comments ({{ post.comment_count|default:"0" }})</h2>
+                        <button class="btn btn-primary" id="showCommentForm">
+                            <i class="fas fa-plus mr-2"></i>
+                            Add Comment
+                        </button>
+                    </div>
+                    
+                    <!-- Comment Form -->
+                    <div id="commentForm" class="mb-8 hidden">
+                        <form class="space-y-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Your Comment</label>
+                                <textarea rows="4" 
+                                          class="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                                          placeholder="Share your thoughts..."></textarea>
+                            </div>
+                            
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center">
+                                    <input type="checkbox" id="notify" class="h-4 w-4 text-purple-600">
+                                    <label for="notify" class="ml-2 text-sm text-gray-600">
+                                        Notify me of replies
+                                    </label>
+                                </div>
+                                <div class="flex space-x-3">
+                                    <button type="button" class="btn btn-outline" id="cancelComment">
+                                        Cancel
+                                    </button>
+                                    <button type="submit" class="btn btn-primary">
+                                        Post Comment
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                    
+                    <!-- Comments List -->
+                    <div class="space-y-6">
+                        {% for comment in post.comments.all %}
+                        <div class="border-b border-gray-200 pb-6 last:border-0 last:pb-0">
+                            <div class="flex items-start space-x-4 mb-4">
+                                <div class="comment-avatar rounded-full overflow-hidden flex-shrink-0">
+                                    {% if comment.user.avatar %}
+                                    <img src="{{ comment.user.avatar.url }}" 
+                                         alt="{{ comment.user.get_full_name }}" 
+                                         class="w-full h-full object-cover">
+                                    {% else %}
+                                    <div class="w-full h-full bg-gradient-to-r from-purple-400 to-indigo-500 flex items-center justify-center">
+                                        <i class="fas fa-user text-white"></i>
+                                    </div>
+                                    {% endif %}
+                                </div>
+                                <div class="flex-1">
+                                    <div class="flex items-center justify-between mb-2">
+                                        <div>
+                                            <h4 class="font-bold text-gray-800">{{ comment.user.get_full_name }}</h4>
+                                            <div class="flex items-center text-sm text-gray-500">
+                                                <span>{{ comment.created_at|date:"F j, Y" }}</span>
+                                                {% if comment.user == post.author %}
+                                                <span class="mx-2 px-2 py-1 bg-purple-100 text-purple-700 text-xs rounded">
+                                                    Author
+                                                </span>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="flex items-center space-x-2">
+                                            <button class="text-gray-400 hover:text-purple-600">
+                                                <i class="far fa-flag"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                    
+                                    <p class="text-gray-700 mb-4">{{ comment.content }}</p>
+                                    
+                                    <div class="flex items-center space-x-4">
+                                        <button class="like-comment-btn flex items-center text-sm text-gray-500 hover:text-purple-600">
+                                            <i class="far fa-thumbs-up mr-1"></i>
+                                            <span>{{ comment.likes_count|default:"0" }}</span>
+                                        </button>
+                                        <button class="reply-btn text-sm text-gray-500 hover:text-purple-600">
+                                            <i class="fas fa-reply mr-1"></i>
+                                            Reply
+                                        </button>
+                                    </div>
+                                    
+                                    <!-- Replies -->
+                                    {% if comment.replies.exists %}
+                                    <div class="mt-6 ml-12 space-y-4">
+                                        {% for reply in comment.replies.all %}
+                                        <div class="border-l-2 border-purple-200 pl-4">
+                                            <div class="flex items-start space-x-3 mb-2">
+                                                <div class="w-8 h-8 rounded-full overflow-hidden">
+                                                    {% if reply.user.avatar %}
+                                                    <img src="{{ reply.user.avatar.url }}" 
+                                                         alt="{{ reply.user.get_full_name }}" 
+                                                         class="w-full h-full object-cover">
+                                                    {% else %}
+                                                    <div class="w-full h-full bg-gradient-to-r from-purple-400 to-indigo-500 flex items-center justify-center">
+                                                        <i class="fas fa-user text-white"></i>
+                                                    </div>
+                                                    {% endif %}
+                                                </div>
+                                                <div>
+                                                    <h5 class="font-medium text-gray-800">{{ reply.user.get_full_name }}</h5>
+                                                    <div class="text-xs text-gray-500">{{ reply.created_at|date:"M j, Y" }}</div>
+                                                </div>
+                                            </div>
+                                            <p class="text-gray-600 text-sm">{{ reply.content }}</p>
+                                        </div>
+                                        {% endfor %}
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        {% empty %}
+                        <!-- No Comments -->
+                        <div class="text-center py-8">
+                            <i class="fas fa-comments text-3xl text-gray-300 mb-4"></i>
+                            <h3 class="text-lg font-medium text-gray-600 mb-2">No comments yet</h3>
+                            <p class="text-gray-500">Be the first to share your thoughts!</p>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                
+                <!-- Related Articles -->
+                <div class="bg-white rounded-2xl shadow-lg p-8">
+                    <h2 class="text-2xl font-bold text-gray-800 mb-6">Related Articles</h2>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        {% for related in related_posts %}
+                        <a href="{% url 'blog:detail' related.slug %}" class="group">
+                            <div class="flex flex-col h-full border border-gray-200 rounded-xl overflow-hidden hover:border-purple-300 transition-colors">
+                                <!-- Image -->
+                                <div class="h-40 overflow-hidden">
+                                    {% if related.featured_image %}
+                                    <img src="{{ related.featured_image.url }}" 
+                                         alt="{{ related.title }}" 
+                                         class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300">
+                                    {% else %}
+                                    <div class="w-full h-full bg-gradient-to-r from-purple-400 to-indigo-500 flex items-center justify-center">
+                                        <i class="fas fa-leaf text-white text-3xl"></i>
+                                    </div>
+                                    {% endif %}
+                                </div>
+                                
+                                <!-- Content -->
+                                <div class="p-6 flex-1">
+                                    <div class="flex items-center text-sm text-gray-500 mb-3">
+                                        <span class="px-3 py-1 bg-gray-100 rounded-full">{{ related.category.name }}</span>
+                                        <span class="mx-2">•</span>
+                                        <span>{{ related.read_time }} min read</span>
+                                    </div>
+                                    <h3 class="text-lg font-bold text-gray-800 mb-2 group-hover:text-purple-600">{{ related.title }}</h3>
+                                    <p class="text-gray-600 text-sm mb-4">{{ related.excerpt|truncatewords:15 }}</p>
+                                    <div class="flex items-center text-sm text-gray-500">
+                                        <span>{{ related.published_date|date:"M j, Y" }}</span>
+                                        <span class="mx-2">•</span>
+                                        <span>{{ related.comment_count }} comments</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </a>
+                        {% endfor %}
+                    </div>
+                    
+                    <div class="mt-8 text-center">
+                        <a href="{% url 'blog:list' %}" class="btn btn-outline">
+                            <i class="fas fa-newspaper mr-2"></i>
+                            View All Articles
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Newsletter Subscription -->
+<div class="bg-gradient-to-r from-purple-600 to-indigo-600 py-12">
+    <div class="container mx-auto px-4">
+        <div class="max-w-4xl mx-auto text-center text-white">
+            <h2 class="text-3xl font-bold mb-4">Never Miss an Update</h2>
+            <p class="text-purple-100 mb-8 max-w-2xl mx-auto">
+                Subscribe to our newsletter for the latest environmental insights, research breakthroughs, 
+                and sustainability tips delivered to your inbox.
+            </p>
+            
+            <form class="max-w-md mx-auto">
+                <div class="flex flex-col sm:flex-row gap-3">
+                    <input type="email" 
+                           placeholder="Your email address" 
+                           class="flex-1 px-6 py-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-white">
+                    <button type="submit" class="btn bg-white text-purple-600 hover:bg-gray-100">
+                        <i class="fas fa-paper-plane mr-2"></i>
+                        Subscribe
+                    </button>
+                </div>
+                <p class="text-xs text-purple-200 mt-3">
+                    We respect your privacy. Unsubscribe at any time.
+                </p>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Blog detail page functionality
+    document.addEventListener('DOMContentLoaded', function() {
+        // Reading progress bar
+        const readingProgress = document.querySelector('.reading-progress');
+        
+        function updateReadingProgress() {
+            const windowHeight = window.innerHeight;
+            const documentHeight = document.documentElement.scrollHeight - windowHeight;
+            const scrolled = window.scrollY;
+            const progress = (scrolled / documentHeight) * 100;
+            
+            readingProgress.style.width = `${progress}%`;
+        }
+        
+        window.addEventListener('scroll', updateReadingProgress);
+        updateReadingProgress();
+        
+        // Generate table of contents
+        function generateTOC() {
+            const headings = document.querySelectorAll('.article-content h2, .article-content h3');
+            const toc = document.getElementById('toc');
+            
+            if (headings.length > 0) {
+                headings.forEach((heading, index) => {
+                    // Add ID if not present
+                    if (!heading.id) {
+                        heading.id = `section-${index}`;
+                    }
+                    
+                    // Create TOC item
+                    const tocItem = document.createElement('a');
+                    tocItem.href = `#${heading.id}`;
+                    tocItem.className = 'toc-link block py-2 text-gray-600 hover:text-purple-600';
+                    tocItem.textContent = heading.textContent;
+                    
+                    // Add indentation for h3
+                    if (heading.tagName === 'H3') {
+                        tocItem.classList.add('ml-4');
+                    }
+                    
+                    toc.appendChild(tocItem);
+                });
+                
+                // Update active TOC item on scroll
+                function updateActiveTOC() {
+                    const scrollPos = window.scrollY + 100;
+                    
+                    headings.forEach((heading, index) => {
+                        const headingTop = heading.offsetTop;
+                        const headingHeight = heading.offsetHeight;
+                        const tocItem = toc.children[index];
+                        
+                        if (scrollPos >= headingTop && scrollPos < headingTop + headingHeight) {
+                            document.querySelectorAll('.toc-link').forEach(item => {
+                                item.classList.remove('active');
+                            });
+                            tocItem.classList.add('active');
+                        }
+                    });
+                }
+                
+                window.addEventListener('scroll', updateActiveTOC);
+                updateActiveTOC();
+                
+                // Smooth scroll for TOC links
+                document.querySelectorAll('.toc-link').forEach(link => {
+                    link.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        const targetId = this.getAttribute('href');
+                        const targetSection = document.querySelector(targetId);
+                        
+                        if (targetSection) {
+                            window.scrollTo({
+                                top: targetSection.offsetTop - 80,
+                                behavior: 'smooth'
+                            });
+                        }
+                    });
+                });
+            }
+        }
+        
+        generateTOC();
+        
+        // Comment form toggle
+        const showCommentFormBtn = document.getElementById('showCommentForm');
+        const commentForm = document.getElementById('commentForm');
+        const cancelCommentBtn = document.getElementById('cancelComment');
+        
+        if (showCommentFormBtn && commentForm) {
+            showCommentFormBtn.addEventListener('click', function() {
+                commentForm.classList.remove('hidden');
+                this.style.display = 'none';
+            });
+            
+            cancelCommentBtn.addEventListener('click', function() {
+                commentForm.classList.add('hidden');
+                showCommentFormBtn.style.display = 'block';
+            });
+        }
+        
+        // Like button functionality
+        const likeBtn = document.querySelector('.like-btn');
+        if (likeBtn) {
+            likeBtn.addEventListener('click', function() {
+                const icon = this.querySelector('i');
+                const countSpan = this.querySelector('span:last-child');
+                
+                if (icon.classList.contains('far')) {
+                    icon.classList.remove('far');
+                    icon.classList.add('fas');
+                    this.classList.remove('bg-gray-100', 'text-gray-700');
+                    this.classList.add('bg-red-50', 'text-red-600');
+                    countSpan.textContent = parseInt(countSpan.textContent) + 1;
+                } else {
+                    icon.classList.remove('fas');
+                    icon.classList.add('far');
+                    this.classList.remove('bg-red-50', 'text-red-600');
+                    this.classList.add('bg-gray-100', 'text-gray-700');
+                    countSpan.textContent = parseInt(countSpan.textContent) - 1;
+                }
+            });
+        }
+        
+        // Comment like buttons
+        const commentLikeBtns = document.querySelectorAll('.like-comment-btn');
+        commentLikeBtns.forEach(btn => {
+            btn.addEventListener('click', function() {
+                const icon = this.querySelector('i');
+                const countSpan = this.querySelector('span');
+                
+                if (icon.classList.contains('far')) {
+                    icon.classList.remove('far');
+                    icon.classList.add('fas');
+                    this.classList.add('text-purple-600');
+                    countSpan.textContent = parseInt(countSpan.textContent) + 1;
+                } else {
+                    icon.classList.remove('fas');
+                    icon.classList.add('far');
+                    this.classList.remove('text-purple-600');
+                    countSpan.textContent = parseInt(countSpan.textContent) - 1;
+                }
+            });
+        });
+        
+        // Print functionality
+        const printBtn = document.querySelector('.print-btn');
+        if (printBtn) {
+            printBtn.addEventListener('click', function() {
+                window.print();
+            });
+        }
+        
+        // Share buttons
+        const shareButtons = document.querySelectorAll('.share-btn');
+        shareButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                const icon = this.querySelector('i').className;
+                let platform = 'link';
+                
+                if (icon.includes('twitter')) platform = 'twitter';
+                else if (icon.includes('linkedin')) platform = 'linkedin';
+                else if (icon.includes('facebook')) platform = 'facebook';
+                else if (icon.includes('whatsapp')) platform = 'whatsapp';
+                else if (icon.includes('envelope')) platform = 'email';
+                else if (icon.includes('print')) platform = 'print';
+                
+                shareArticle(platform);
+            });
+        });
+        
+        function shareArticle(platform) {
+            const title = encodeURIComponent('{{ post.title }}');
+            const url = encodeURIComponent(window.location.href);
+            
+            let shareUrl = '';
+            
+            switch (platform) {
+                case 'twitter':
+                    shareUrl = `https://twitter.com/intent/tweet?text=${title}&url=${url}`;
+                    break;
+                case 'linkedin':
+                    shareUrl = `https://www.linkedin.com/shareArticle?mini=true&url=${url}&title=${title}`;
+                    break;
+                case 'facebook':
+                    shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${url}`;
+                    break;
+                case 'whatsapp':
+                    shareUrl = `https://wa.me/?text=${title}%20${url}`;
+                    break;
+                case 'email':
+                    shareUrl = `mailto:?subject=${title}&body=Check out this article: ${url}`;
+                    break;
+                case 'link':
+                    navigator.clipboard.writeText(window.location.href)
+                        .then(() => alert('Link copied to clipboard!'));
+                    return;
+                case 'print':
+                    window.print();
+                    return;
+            }
+            
+            if (shareUrl && platform !== 'print') {
+                window.open(shareUrl, '_blank', 'width=600,height=400');
+            }
+        }
+        
+        // Add reply functionality
+        const replyBtns = document.querySelectorAll('.reply-btn');
+        replyBtns.forEach(btn => {
+            btn.addEventListener('click', function() {
+                const commentDiv = this.closest('.border-b');
+                const replyForm = commentDiv.querySelector('.reply-form');
+                
+                if (replyForm) {
+                    replyForm.classList.toggle('hidden');
+                } else {
+                    // Create reply form
+                    const form = document.createElement('div');
+                    form.className = 'reply-form mt-4 ml-12';
+                    form.innerHTML = `
+                        <form class="space-y-3">
+                            <textarea rows="2" 
+                                      class="w-full border border-gray-300 rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
+                                      placeholder="Write a reply..."></textarea>
+                            <div class="flex justify-end space-x-2">
+                                <button type="button" class="cancel-reply btn btn-outline btn-sm">Cancel</button>
+                                <button type="submit" class="btn btn-primary btn-sm">Post Reply</button>
+                            </div>
+                        </form>
+                    `;
+                    
+                    commentDiv.querySelector('.flex-1').appendChild(form);
+                    
+                    // Add event listeners to new form
+                    form.querySelector('.cancel-reply').addEventListener('click', function() {
+                        form.remove();
+                    });
+                    
+                    form.querySelector('form').addEventListener('submit', function(e) {
+                        e.preventDefault();
+                        const textarea = this.querySelector('textarea');
+                        // In a real app, submit reply via AJAX
+                        console.log('Posting reply:', textarea.value);
+                        form.remove();
+                    });
+                }
+            });
+        });
+    });
+</script>
+{% endblock %}

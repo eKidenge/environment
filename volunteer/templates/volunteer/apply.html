@@ -1,0 +1,960 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Apply for {{ opportunity.title }} - EcoHub Volunteer{% endblock %}
+
+{% block extra_css %}
+<style>
+    .apply-header {
+        background: linear-gradient(135deg, #10b981 0%, #0d9488 100%);
+    }
+    
+    .volunteer-card {
+        border-left: 4px solid #10b981;
+    }
+    
+    .availability-day {
+        width: 44px;
+        height: 44px;
+        border-radius: 10px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+    
+    .availability-day:hover {
+        transform: scale(1.05);
+    }
+    
+    .availability-day.selected {
+        background-color: #10b981;
+        color: white;
+    }
+    
+    .time-slot {
+        transition: all 0.2s ease;
+    }
+    
+    .time-slot:hover {
+        transform: translateY(-2px);
+    }
+    
+    .time-slot.selected {
+        background-color: #10b981;
+        color: white;
+        border-color: #10b981;
+    }
+    
+    .skill-badge {
+        font-size: 0.875rem;
+        padding: 0.5rem 1rem;
+    }
+    
+    .skill-badge.selected {
+        background-color: #10b981;
+        color: white;
+    }
+    
+    .emergency-contact {
+        transition: all 0.3s ease;
+    }
+    
+    .emergency-contact:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+    
+    .motivation-counter {
+        font-variant-numeric: tabular-nums;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gray-50">
+    <!-- Application Header -->
+    <div class="apply-header text-white">
+        <div class="container mx-auto px-4 py-12">
+            <div class="max-w-6xl mx-auto">
+                <!-- Breadcrumb -->
+                <nav class="mb-6">
+                    <ol class="flex items-center space-x-2 text-sm text-emerald-100">
+                        <li>
+                            <a href="{% url 'core:home' %}" class="hover:text-white">Home</a>
+                        </li>
+                        <li><i class="fas fa-chevron-right text-xs"></i></li>
+                        <li>
+                            <a href="{% url 'volunteer:opportunities:list' %}" class="hover:text-white">Volunteer</a>
+                        </li>
+                        <li><i class="fas fa-chevron-right text-xs"></i></li>
+                        <li>
+                            <a href="{% url 'volunteer:opportunities:detail' opportunity.id %}" class="hover:text-white">
+                                {{ opportunity.title|truncatechars:30 }}
+                            </a>
+                        </li>
+                        <li><i class="fas fa-chevron-right text-xs"></i></li>
+                        <li class="text-white font-medium">Apply</li>
+                    </ol>
+                </nav>
+                
+                <div class="flex flex-col lg:flex-row items-start lg:items-center justify-between">
+                    <div class="mb-8 lg:mb-0">
+                        <h1 class="text-3xl md:text-4xl font-bold mb-4">Volunteer Application</h1>
+                        <p class="text-xl text-emerald-100">Join us in making a difference</p>
+                    </div>
+                    
+                    <div class="text-right">
+                        <div class="text-sm text-emerald-100 mb-2">Application Deadline</div>
+                        <div class="text-2xl font-bold">{{ opportunity.deadline|date:"F j, Y" }}</div>
+                        <div class="text-sm text-emerald-200">{{ opportunity.deadline|timeuntil }} remaining</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="container mx-auto px-4 py-8">
+        <div class="max-w-6xl mx-auto">
+            <div class="flex flex-col lg:flex-row gap-8">
+                <!-- Left Column - Application Form -->
+                <div class="lg:w-2/3">
+                    <!-- Opportunity Summary -->
+                    <div class="volunteer-card bg-white rounded-2xl shadow-lg p-6 mb-8">
+                        <div class="flex items-start justify-between mb-4">
+                            <div>
+                                <h2 class="text-2xl font-bold text-gray-800 mb-2">{{ opportunity.title }}</h2>
+                                <div class="flex items-center text-gray-600 mb-3">
+                                    <i class="fas fa-map-marker-alt text-emerald-500 mr-2"></i>
+                                    <span class="mr-4">{{ opportunity.location }}</span>
+                                    <i class="fas fa-clock text-emerald-500 mr-2"></i>
+                                    <span>{{ opportunity.get_commitment_display }}</span>
+                                </div>
+                                <p class="text-gray-700">{{ opportunity.short_description }}</p>
+                            </div>
+                            
+                            <div class="text-right">
+                                <div class="text-sm text-gray-600 mb-1">Volunteers Needed</div>
+                                <div class="text-2xl font-bold text-emerald-600">{{ opportunity.volunteers_needed }}</div>
+                            </div>
+                        </div>
+                        
+                        <!-- Impact Stats -->
+                        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6">
+                            <div class="text-center p-3 bg-emerald-50 rounded-lg">
+                                <div class="text-lg font-bold text-emerald-700">{{ opportunity.duration }}</div>
+                                <div class="text-sm text-emerald-600">Duration</div>
+                            </div>
+                            <div class="text-center p-3 bg-blue-50 rounded-lg">
+                                <div class="text-lg font-bold text-blue-700">{{ opportunity.impact_score }}/10</div>
+                                <div class="text-sm text-blue-600">Impact Score</div>
+                            </div>
+                            <div class="text-center p-3 bg-purple-50 rounded-lg">
+                                <div class="text-lg font-bold text-purple-700">{{ opportunity.applications_count }}</div>
+                                <div class="text-sm text-purple-600">Applications</div>
+                            </div>
+                            <div class="text-center p-3 bg-amber-50 rounded-lg">
+                                <div class="text-lg font-bold text-amber-700">Urgent</div>
+                                <div class="text-sm text-amber-600">Priority</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Application Form -->
+                    <form id="volunteerApplicationForm" class="space-y-8">
+                        {% csrf_token %}
+                        
+                        <!-- Personal Information -->
+                        <div class="bg-white rounded-2xl shadow-lg p-8">
+                            <h2 class="text-2xl font-bold text-gray-800 mb-6">Personal Information</h2>
+                            
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Full Name *</label>
+                                    <input type="text" 
+                                           name="full_name"
+                                           required
+                                           class="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                                           value="{{ user.get_full_name|default:'' }}">
+                                </div>
+                                
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Email Address *</label>
+                                    <input type="email" 
+                                           name="email"
+                                           required
+                                           class="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                                           value="{{ user.email|default:'' }}">
+                                </div>
+                                
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Phone Number *</label>
+                                    <input type="tel" 
+                                           name="phone"
+                                           required
+                                           class="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent">
+                                </div>
+                                
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Date of Birth *</label>
+                                    <input type="date" 
+                                           name="date_of_birth"
+                                           required
+                                           class="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent">
+                                </div>
+                                
+                                <div class="md:col-span-2">
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Address *</label>
+                                    <input type="text" 
+                                           name="address"
+                                           required
+                                           class="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Availability -->
+                        <div class="bg-white rounded-2xl shadow-lg p-8">
+                            <h2 class="text-2xl font-bold text-gray-800 mb-6">Availability</h2>
+                            
+                            <!-- Days of Week -->
+                            <div class="mb-8">
+                                <label class="block text-sm font-medium text-gray-700 mb-4">Preferred Days *</label>
+                                <div class="grid grid-cols-7 gap-2">
+                                    {% for day in days_of_week %}
+                                    <div class="availability-day text-center"
+                                         onclick="toggleDaySelection(this)">
+                                        <div class="text-xs font-medium">{{ day.short }}</div>
+                                        <div class="text-lg font-bold">{{ day.initial }}</div>
+                                        <input type="checkbox" 
+                                               name="available_days"
+                                               value="{{ day.name }}"
+                                               class="hidden">
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            
+                            <!-- Time Slots -->
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-4">Preferred Time Slots *</label>
+                                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
+                                    {% for slot in time_slots %}
+                                    <div class="time-slot border-2 border-gray-200 rounded-lg p-4 text-center cursor-pointer"
+                                         onclick="toggleTimeSlot(this)">
+                                        <div class="font-medium text-gray-800">{{ slot.time }}</div>
+                                        <div class="text-sm text-gray-600">{{ slot.label }}</div>
+                                        <input type="checkbox" 
+                                               name="time_slots"
+                                               value="{{ slot.value }}"
+                                               class="hidden">
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            
+                            <!-- Start Date -->
+                            <div class="mt-8">
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Earliest Start Date *</label>
+                                <input type="date" 
+                                       name="start_date"
+                                       required
+                                       min="{{ "now"|date:"Y-m-d" }}"
+                                       class="w-full md:w-auto border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent">
+                            </div>
+                        </div>
+                        
+                        <!-- Skills and Experience -->
+                        <div class="bg-white rounded-2xl shadow-lg p-8">
+                            <h2 class="text-2xl font-bold text-gray-800 mb-6">Skills and Experience</h2>
+                            
+                            <!-- Required Skills -->
+                            <div class="mb-8">
+                                <label class="block text-sm font-medium text-gray-700 mb-4">Relevant Skills *</label>
+                                <p class="text-gray-600 text-sm mb-4">Select skills that match this opportunity</p>
+                                
+                                <div class="flex flex-wrap gap-3">
+                                    {% for skill in opportunity.skills.all %}
+                                    <div class="skill-badge bg-gray-100 text-gray-700 rounded-full cursor-pointer"
+                                         onclick="toggleSkillSelection(this)">
+                                        {{ skill.name }}
+                                        <input type="checkbox" 
+                                               name="skills"
+                                               value="{{ skill.id }}"
+                                               class="hidden">
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            
+                            <!-- Additional Skills -->
+                            <div class="mb-6">
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Additional Skills</label>
+                                <div class="flex flex-wrap gap-3 mb-4" id="additionalSkills">
+                                    <!-- Additional skills will be added here -->
+                                </div>
+                                <div class="flex gap-3">
+                                    <input type="text" 
+                                           id="newSkillInput"
+                                           placeholder="Add a skill..."
+                                           class="flex-1 border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent">
+                                    <button type="button" 
+                                            onclick="addSkill()"
+                                            class="btn btn-outline">
+                                        Add Skill
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <!-- Experience -->
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Previous Volunteer Experience</label>
+                                <textarea name="experience" 
+                                          rows="4"
+                                          class="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                                          placeholder="Describe any previous volunteer work or relevant experience..."></textarea>
+                            </div>
+                        </div>
+                        
+                        <!-- Motivation Statement -->
+                        <div class="bg-white rounded-2xl shadow-lg p-8">
+                            <h2 class="text-2xl font-bold text-gray-800 mb-6">Motivation Statement</h2>
+                            
+                            <div class="mb-6">
+                                <label class="block text-sm font-medium text-gray-700 mb-2">
+                                    Why do you want to volunteer for this opportunity? *
+                                </label>
+                                <textarea name="motivation" 
+                                          rows="5"
+                                          required
+                                          class="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                                          oninput="updateCharacterCount(this)"
+                                          placeholder="Share your reasons for volunteering, what you hope to contribute, and what you expect to gain..."></textarea>
+                                <div class="flex justify-between mt-2">
+                                    <div class="text-sm text-gray-500">
+                                        Minimum 150 characters
+                                    </div>
+                                    <div class="text-sm text-gray-500 motivation-counter">
+                                        <span id="characterCount">0</span>/500 characters
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">How did you hear about this opportunity?</label>
+                                <select name="referral_source" 
+                                        class="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent">
+                                    <option value="">Select source</option>
+                                    <option value="website">EcoHub Website</option>
+                                    <option value="social_media">Social Media</option>
+                                    <option value="friend">Friend/Colleague</option>
+                                    <option value="email">Email Newsletter</option>
+                                    <option value="search">Search Engine</option>
+                                    <option value="other">Other</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <!-- Emergency Contact -->
+                        <div class="bg-white rounded-2xl shadow-lg p-8">
+                            <h2 class="text-2xl font-bold text-gray-800 mb-6">Emergency Contact</h2>
+                            
+                            <div class="emergency-contact bg-gray-50 rounded-xl p-6">
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-2">Contact Name *</label>
+                                        <input type="text" 
+                                               name="emergency_name"
+                                               required
+                                               class="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent">
+                                    </div>
+                                    
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-2">Relationship *</label>
+                                        <input type="text" 
+                                               name="emergency_relationship"
+                                               required
+                                               class="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                                               placeholder="e.g., Parent, Spouse, Friend">
+                                    </div>
+                                    
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-2">Phone Number *</label>
+                                        <input type="tel" 
+                                               name="emergency_phone"
+                                               required
+                                               class="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent">
+                                    </div>
+                                    
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-2">Email Address</label>
+                                        <input type="email" 
+                                               name="emergency_email"
+                                               class="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Health and Safety -->
+                        <div class="bg-white rounded-2xl shadow-lg p-8">
+                            <h2 class="text-2xl font-bold text-gray-800 mb-6">Health and Safety</h2>
+                            
+                            <div class="space-y-6">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Do you have any medical conditions we should be aware of?</label>
+                                    <textarea name="medical_conditions" 
+                                              rows="3"
+                                              class="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                                              placeholder="Please list any medical conditions, allergies, or medications..."></textarea>
+                                </div>
+                                
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-2">Tetanus vaccination up to date?</label>
+                                        <select name="tetanus_vaccine" 
+                                                class="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent">
+                                            <option value="">Select</option>
+                                            <option value="yes">Yes, up to date</option>
+                                            <option value="no">No</option>
+                                            <option value="unsure">Unsure</option>
+                                        </select>
+                                    </div>
+                                    
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-2">COVID-19 vaccination status</label>
+                                        <select name="covid_vaccine" 
+                                                class="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent">
+                                            <option value="">Select</option>
+                                            <option value="fully_vaccinated">Fully vaccinated</option>
+                                            <option value="partially_vaccinated">Partially vaccinated</option>
+                                            <option value="not_vaccinated">Not vaccinated</option>
+                                            <option value="prefer_not_to_say">Prefer not to say</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Dietary Restrictions</label>
+                                    <input type="text" 
+                                           name="dietary_restrictions"
+                                           class="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                                           placeholder="e.g., Vegetarian, Allergies, None">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Agreements -->
+                        <div class="bg-white rounded-2xl shadow-lg p-8">
+                            <h2 class="text-2xl font-bold text-gray-800 mb-6">Agreements</h2>
+                            
+                            <div class="space-y-4">
+                                <div class="flex items-start">
+                                    <input type="checkbox" 
+                                           id="code_of_conduct"
+                                           name="code_of_conduct"
+                                           required
+                                           class="mt-1 h-5 w-5 text-emerald-600">
+                                    <label for="code_of_conduct" class="ml-3 text-gray-700">
+                                        I agree to abide by the EcoHub 
+                                        <a href="#" class="text-emerald-600 hover:text-emerald-700">Volunteer Code of Conduct</a>
+                                    </label>
+                                </div>
+                                
+                                <div class="flex items-start">
+                                    <input type="checkbox" 
+                                           id="liability_waiver"
+                                           name="liability_waiver"
+                                           required
+                                           class="mt-1 h-5 w-5 text-emerald-600">
+                                    <label for="liability_waiver" class="ml-3 text-gray-700">
+                                        I understand and accept the risks involved in volunteer activities and release EcoHub from liability
+                                    </label>
+                                </div>
+                                
+                                <div class="flex items-start">
+                                    <input type="checkbox" 
+                                           id="media_release"
+                                           name="media_release"
+                                           class="mt-1 h-5 w-5 text-emerald-600">
+                                    <label for="media_release" class="ml-3 text-gray-700">
+                                        I grant permission for photos/videos taken during volunteer activities to be used for promotional purposes
+                                    </label>
+                                </div>
+                                
+                                <div class="flex items-start">
+                                    <input type="checkbox" 
+                                           id="privacy_policy"
+                                           name="privacy_policy"
+                                           required
+                                           class="mt-1 h-5 w-5 text-emerald-600">
+                                    <label for="privacy_policy" class="ml-3 text-gray-700">
+                                        I have read and agree to the 
+                                        <a href="#" class="text-emerald-600 hover:text-emerald-700">Privacy Policy</a>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Submit Buttons -->
+                        <div class="flex flex-col sm:flex-row gap-4">
+                            <button type="button" 
+                                    onclick="saveDraft()"
+                                    class="flex-1 btn btn-outline py-4">
+                                <i class="far fa-save mr-2"></i>
+                                Save as Draft
+                            </button>
+                            
+                            <button type="submit" 
+                                    class="flex-1 btn btn-primary py-4">
+                                <i class="fas fa-paper-plane mr-2"></i>
+                                Submit Application
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Right Column - Sidebar -->
+                <div class="lg:w-1/3">
+                    <!-- Application Status -->
+                    <div class="bg-white rounded-2xl shadow-lg p-6 mb-6">
+                        <h3 class="font-bold text-gray-800 mb-4">Application Status</h3>
+                        <div class="space-y-3">
+                            <div class="flex items-center justify-between">
+                                <span class="text-gray-600">Personal Info</span>
+                                <div class="flex items-center">
+                                    <div class="w-3 h-3 rounded-full bg-emerald-500 mr-2"></div>
+                                    <span class="text-sm text-emerald-600">Complete</span>
+                                </div>
+                            </div>
+                            
+                            <div class="flex items-center justify-between">
+                                <span class="text-gray-600">Availability</span>
+                                <div class="flex items-center">
+                                    <div class="w-3 h-3 rounded-full bg-amber-500 mr-2"></div>
+                                    <span class="text-sm text-amber-600">In Progress</span>
+                                </div>
+                            </div>
+                            
+                            <div class="flex items-center justify-between">
+                                <span class="text-gray-600">Skills & Experience</span>
+                                <div class="flex items-center">
+                                    <div class="w-3 h-3 rounded-full bg-gray-300 mr-2"></div>
+                                    <span class="text-sm text-gray-500">Pending</span>
+                                </div>
+                            </div>
+                            
+                            <div class="flex items-center justify-between">
+                                <span class="text-gray-600">Motivation</span>
+                                <div class="flex items-center">
+                                    <div class="w-3 h-3 rounded-full bg-gray-300 mr-2"></div>
+                                    <span class="text-sm text-gray-500">Pending</span>
+                                </div>
+                            </div>
+                            
+                            <div class="flex items-center justify-between">
+                                <span class="text-gray-600">Agreements</span>
+                                <div class="flex items-center">
+                                    <div class="w-3 h-3 rounded-full bg-gray-300 mr-2"></div>
+                                    <span class="text-sm text-gray-500">Pending</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="mt-6 pt-6 border-t border-gray-200">
+                            <div class="flex justify-between text-sm mb-2">
+                                <span class="text-gray-600">Overall Progress</span>
+                                <span class="font-medium text-emerald-600">40%</span>
+                            </div>
+                            <div class="h-2 bg-gray-200 rounded-full overflow-hidden">
+                                <div class="h-full bg-emerald-500 rounded-full" style="width: 40%"></div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Important Dates -->
+                    <div class="bg-white rounded-2xl shadow-lg p-6 mb-6">
+                        <h3 class="font-bold text-gray-800 mb-4">Important Dates</h3>
+                        <div class="space-y-4">
+                            <div>
+                                <div class="text-sm text-gray-600 mb-1">Application Deadline</div>
+                                <div class="font-medium text-gray-800">{{ opportunity.deadline|date:"F j, Y" }}</div>
+                            </div>
+                            
+                            <div>
+                                <div class="text-sm text-gray-600 mb-1">Review Period</div>
+                                <div class="font-medium text-gray-800">1-2 weeks</div>
+                            </div>
+                            
+                            <div>
+                                <div class="text-sm text-gray-600 mb-1">Orientation Date</div>
+                                <div class="font-medium text-gray-800">To be scheduled</div>
+                            </div>
+                            
+                            <div>
+                                <div class="text-sm text-gray-600 mb-1">Expected Start</div>
+                                <div class="font-medium text-gray-800">Within 3 weeks of approval</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Requirements -->
+                    <div class="bg-white rounded-2xl shadow-lg p-6 mb-6">
+                        <h3 class="font-bold text-gray-800 mb-4">Requirements</h3>
+                        <ul class="space-y-2 text-gray-600">
+                            <li class="flex items-start">
+                                <i class="fas fa-check text-emerald-500 mr-2 mt-1"></i>
+                                <span>Minimum age: 18 years</span>
+                            </li>
+                            <li class="flex items-start">
+                                <i class="fas fa-check text-emerald-500 mr-2 mt-1"></i>
+                                <span>Background check may be required</span>
+                            </li>
+                            <li class="flex items-start">
+                                <i class="fas fa-check text-emerald-500 mr-2 mt-1"></i>
+                                <span>Attendance at orientation session</span>
+                            </li>
+                            <li class="flex items-start">
+                                <i class="fas fa-check text-emerald-500 mr-2 mt-1"></i>
+                                <span>Commitment to full duration</span>
+                            </li>
+                            <li class="flex items-start">
+                                <i class="fas fa-check text-emerald-500 mr-2 mt-1"></i>
+                                <span>Appropriate clothing and footwear</span>
+                            </li>
+                        </ul>
+                    </div>
+                    
+                    <!-- What to Expect -->
+                    <div class="bg-white rounded-2xl shadow-lg p-6 mb-6">
+                        <h3 class="font-bold text-gray-800 mb-4">What to Expect</h3>
+                        <div class="space-y-3">
+                            <div class="flex items-start">
+                                <div class="flex-shrink-0 w-8 h-8 bg-emerald-100 rounded-lg flex items-center justify-center mr-3">
+                                    <i class="fas fa-users text-emerald-600"></i>
+                                </div>
+                                <div>
+                                    <h4 class="font-medium text-gray-800">Team Orientation</h4>
+                                    <p class="text-sm text-gray-600">Get to know your team and project</p>
+                                </div>
+                            </div>
+                            
+                            <div class="flex items-start">
+                                <div class="flex-shrink-0 w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center mr-3">
+                                    <i class="fas fa-tools text-blue-600"></i>
+                                </div>
+                                <div>
+                                    <h4 class="font-medium text-gray-800">Training Provided</h4>
+                                    <p class="text-sm text-gray-600">All necessary training will be provided</p>
+                                </div>
+                            </div>
+                            
+                            <div class="flex items-start">
+                                <div class="flex-shrink-0 w-8 h-8 bg-purple-100 rounded-lg flex items-center justify-center mr-3">
+                                    <i class="fas fa-shield-alt text-purple-600"></i>
+                                </div>
+                                <div>
+                                    <h4 class="font-medium text-gray-800">Safety First</h4>
+                                    <p class="text-sm text-gray-600">Comprehensive safety briefing</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Contact Support -->
+                    <div class="bg-gradient-to-r from-emerald-500 to-teal-600 rounded-2xl p-6 text-white">
+                        <div class="text-center mb-4">
+                            <i class="fas fa-headset text-3xl mb-3"></i>
+                            <h3 class="text-xl font-bold mb-2">Need Help?</h3>
+                        </div>
+                        <p class="text-emerald-100 text-sm mb-4 text-center">
+                            Our volunteer coordinators are here to help.
+                        </p>
+                        <div class="space-y-3">
+                            <a href="mailto:volunteer@ecohub.org" 
+                               class="flex items-center justify-center text-emerald-100 hover:text-white">
+                                <i class="fas fa-envelope mr-3"></i>
+                                volunteer@ecohub.org
+                            </a>
+                        </div>
+                        <button class="w-full mt-4 btn bg-white text-emerald-600 hover:bg-gray-100">
+                            <i class="fas fa-comments mr-2"></i>
+                            Chat with Coordinator
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Confirmation Modal -->
+<div id="confirmationModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50 p-4">
+    <div class="bg-white rounded-2xl max-w-md w-full">
+        <div class="p-6">
+            <div class="text-center mb-6">
+                <div class="w-16 h-16 mx-auto mb-4 bg-emerald-100 rounded-full flex items-center justify-center">
+                    <i class="fas fa-hands-helping text-emerald-600 text-2xl"></i>
+                </div>
+                <h3 class="text-xl font-bold text-gray-800 mb-2">Application Submitted!</h3>
+                <p class="text-gray-600">
+                    Thank you for your interest in volunteering with us.
+                </p>
+            </div>
+            
+            <div class="bg-gray-50 rounded-lg p-4 mb-6">
+                <div class="flex items-center justify-between mb-2">
+                    <span class="text-gray-700">Application ID</span>
+                    <span class="font-mono font-bold text-emerald-600">VOL-{{ "now"|date:"YmdHis" }}</span>
+                </div>
+                <div class="flex items-center justify-between">
+                    <span class="text-gray-700">Submitted On</span>
+                    <span class="font-medium">{{ "now"|date:"F j, Y" }}</span>
+                </div>
+            </div>
+            
+            <div class="text-sm text-gray-600 mb-6">
+                <p>You will receive a confirmation email shortly. Our team will review your application and contact you within 1-2 weeks.</p>
+            </div>
+            
+            <div class="flex flex-col gap-3">
+                <a href="{% url 'volunteer:opportunities:list' %}" class="btn btn-primary">
+                    Browse Other Opportunities
+                </a>
+                <a href="{% url 'users:dashboard:home' %}" class="btn btn-outline">
+                    Go to Dashboard
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Volunteer application functionality
+    document.addEventListener('DOMContentLoaded', function() {
+        // Day selection
+        window.toggleDaySelection = function(element) {
+            element.classList.toggle('selected');
+            const checkbox = element.querySelector('input[type="checkbox"]');
+            checkbox.checked = !checkbox.checked;
+            updateProgress();
+        };
+        
+        // Time slot selection
+        window.toggleTimeSlot = function(element) {
+            element.classList.toggle('selected');
+            const checkbox = element.querySelector('input[type="checkbox"]');
+            checkbox.checked = !checkbox.checked;
+            updateProgress();
+        };
+        
+        // Skill selection
+        window.toggleSkillSelection = function(element) {
+            element.classList.toggle('selected');
+            const checkbox = element.querySelector('input[type="checkbox"]');
+            checkbox.checked = !checkbox.checked;
+            updateProgress();
+        };
+        
+        // Add skill
+        window.addSkill = function() {
+            const input = document.getElementById('newSkillInput');
+            const skillText = input.value.trim();
+            
+            if (skillText) {
+                const container = document.getElementById('additionalSkills');
+                const skillId = `skill_${Date.now()}`;
+                
+                const skillElement = document.createElement('div');
+                skillElement.className = 'skill-badge bg-emerald-100 text-emerald-700 rounded-full flex items-center';
+                skillElement.innerHTML = `
+                    ${skillText}
+                    <button type="button" 
+                            onclick="removeSkill('${skillId}')"
+                            class="ml-2 text-emerald-500 hover:text-emerald-700">
+                        <i class="fas fa-times"></i>
+                    </button>
+                    <input type="hidden" name="additional_skills[]" value="${skillText}">
+                `;
+                skillElement.id = skillId;
+                
+                container.appendChild(skillElement);
+                input.value = '';
+                updateProgress();
+            }
+        };
+        
+        // Remove skill
+        window.removeSkill = function(skillId) {
+            const element = document.getElementById(skillId);
+            if (element) {
+                element.remove();
+                updateProgress();
+            }
+        };
+        
+        // Character count for motivation
+        window.updateCharacterCount = function(textarea) {
+            const count = textarea.value.length;
+            document.getElementById('characterCount').textContent = count;
+            
+            if (count < 150) {
+                textarea.classList.add('border-red-500');
+                textarea.classList.remove('border-emerald-500');
+            } else if (count > 500) {
+                textarea.classList.add('border-red-500');
+                textarea.classList.remove('border-emerald-500');
+            } else {
+                textarea.classList.remove('border-red-500');
+                textarea.classList.add('border-emerald-500');
+            }
+            
+            updateProgress();
+        };
+        
+        // Update progress
+        function updateProgress() {
+            const requiredFields = document.querySelectorAll('#volunteerApplicationForm [required]');
+            const totalFields = requiredFields.length;
+            let completedFields = 0;
+            
+            requiredFields.forEach(field => {
+                if (field.type === 'checkbox' || field.type === 'radio') {
+                    if (field.checked) completedFields++;
+                } else if (field.type === 'textarea') {
+                    if (field.value.trim().length >= 150) completedFields++;
+                } else if (field.value.trim()) {
+                    completedFields++;
+                }
+            });
+            
+            // Check at least one day selected
+            const daysSelected = document.querySelectorAll('.availability-day.selected').length;
+            if (daysSelected > 0) completedFields++;
+            
+            // Check at least one time slot selected
+            const timeSlotsSelected = document.querySelectorAll('.time-slot.selected').length;
+            if (timeSlotsSelected > 0) completedFields++;
+            
+            // Update progress bar
+            const progress = Math.round((completedFields / (totalFields + 2)) * 100);
+            const progressBar = document.querySelector('.bg-emerald-500');
+            if (progressBar) {
+                progressBar.style.width = `${progress}%`;
+            }
+            
+            // Update progress text
+            const progressText = document.querySelector('.font-medium.text-emerald-600');
+            if (progressText) {
+                progressText.textContent = `${progress}%`;
+            }
+        }
+        
+        // Save draft
+        window.saveDraft = function() {
+            // In a real app, this would save the form data
+            alert('Draft saved successfully!');
+            updateProgress();
+        };
+        
+        // Form submission
+        document.getElementById('volunteerApplicationForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Validate required fields
+            const requiredFields = this.querySelectorAll('[required]');
+            let isValid = true;
+            let firstInvalidField = null;
+            
+            requiredFields.forEach(field => {
+                if (field.type === 'checkbox') {
+                    if (!field.checked) {
+                        isValid = false;
+                        if (!firstInvalidField) firstInvalidField = field;
+                        field.parentElement.classList.add('text-red-500');
+                    } else {
+                        field.parentElement.classList.remove('text-red-500');
+                    }
+                } else if (field.type === 'textarea') {
+                    if (field.value.trim().length < 150) {
+                        isValid = false;
+                        if (!firstInvalidField) firstInvalidField = field;
+                        field.classList.add('border-red-500');
+                    } else {
+                        field.classList.remove('border-red-500');
+                    }
+                } else if (!field.value.trim()) {
+                    isValid = false;
+                    if (!firstInvalidField) firstInvalidField = field;
+                    field.classList.add('border-red-500');
+                } else {
+                    field.classList.remove('border-red-500');
+                }
+            });
+            
+            // Validate at least one day selected
+            const daysSelected = document.querySelectorAll('.availability-day.selected').length;
+            if (daysSelected === 0) {
+                isValid = false;
+                alert('Please select at least one preferred day.');
+            }
+            
+            // Validate at least one time slot selected
+            const timeSlotsSelected = document.querySelectorAll('.time-slot.selected').length;
+            if (timeSlotsSelected === 0) {
+                isValid = false;
+                alert('Please select at least one preferred time slot.');
+            }
+            
+            if (!isValid) {
+                if (firstInvalidField) {
+                    firstInvalidField.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    if (firstInvalidField.type !== 'checkbox') {
+                        firstInvalidField.focus();
+                    }
+                }
+                alert('Please fill in all required fields correctly.');
+                return;
+            }
+            
+            // Show confirmation modal
+            const modal = document.getElementById('confirmationModal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        });
+        
+        // Real-time validation
+        const formInputs = document.querySelectorAll('#volunteerApplicationForm input, #volunteerApplicationForm textarea, #volunteerApplicationForm select');
+        formInputs.forEach(input => {
+            input.addEventListener('input', function() {
+                this.classList.remove('border-red-500', 'text-red-500');
+                if (this.parentElement) {
+                    this.parentElement.classList.remove('text-red-500');
+                }
+                updateProgress();
+            });
+            
+            input.addEventListener('change', function() {
+                this.classList.remove('border-red-500', 'text-red-500');
+                if (this.parentElement) {
+                    this.parentElement.classList.remove('text-red-500');
+                }
+                updateProgress();
+            });
+        });
+        
+        // Initialize progress
+        updateProgress();
+        
+        // Set minimum date for start date
+        const startDateInput = document.querySelector('input[name="start_date"]');
+        if (startDateInput) {
+            const today = new Date().toISOString().split('T')[0];
+            startDateInput.min = today;
+        }
+    });
+</script>
+{% endblock %}

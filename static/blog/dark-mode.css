@@ -1,0 +1,356 @@
+/* Dark Mode Specific Styles */
+@media (prefers-color-scheme: dark) {
+    :root {
+        --blog-primary: #3b82f6;
+        --blog-primary-dark: #2563eb;
+        --blog-primary-light: #60a5fa;
+        --blog-secondary: #10b981;
+        --blog-secondary-dark: #059669;
+        --blog-secondary-light: #34d399;
+        --blog-accent: #f97316;
+        --blog-accent-dark: #ea580c;
+        --blog-accent-light: #fb923c;
+        
+        --blog-neutral-50: #0f172a;
+        --blog-neutral-100: #1e293b;
+        --blog-neutral-200: #334155;
+        --blog-neutral-300: #475569;
+        --blog-neutral-400: #64748b;
+        --blog-neutral-500: #94a3b8;
+        --blog-neutral-600: #cbd5e1;
+        --blog-neutral-700: #e2e8f0;
+        --blog-neutral-800: #f1f5f9;
+        --blog-neutral-900: #f8fafc;
+        
+        --blog-success: #10b981;
+        --blog-warning: #f59e0b;
+        --blog-danger: #ef4444;
+        --blog-info: #3b82f6;
+    }
+    
+    /* Hero Section Dark Mode */
+    .blog-hero-section {
+        background: linear-gradient(135deg, var(--blog-neutral-50) 0%, var(--blog-neutral-100) 100%);
+        color: var(--blog-neutral-800);
+    }
+    
+    .blog-hero-section::before {
+        background: radial-gradient(circle at 20% 80%, rgba(59, 130, 246, 0.1) 0%, transparent 50%),
+                    radial-gradient(circle at 80% 20%, rgba(16, 185, 129, 0.1) 0%, transparent 50%);
+    }
+    
+    .hero-subtitle {
+        color: var(--blog-neutral-600);
+    }
+    
+    /* Metric Cards Dark Mode */
+    .metric-card {
+        background: rgba(30, 41, 59, 0.5);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(51, 65, 85, 0.5);
+    }
+    
+    .metric-label {
+        color: var(--blog-neutral-500);
+    }
+    
+    /* Featured Research Section Dark Mode */
+    .featured-research-section {
+        background: linear-gradient(to bottom, var(--blog-neutral-50), var(--blog-neutral-100));
+    }
+    
+    /* Newsletter CTA Dark Mode */
+    .newsletter-cta {
+        background: linear-gradient(135deg, var(--blog-primary) 0%, var(--blog-secondary) 100%);
+    }
+    
+    /* Global Stats Dark Mode */
+    .global-stats-section {
+        background: linear-gradient(135deg, var(--blog-neutral-50) 0%, var(--blog-neutral-100) 100%);
+        color: var(--blog-neutral-800);
+    }
+    
+    .topic-distribution {
+        background: rgba(30, 41, 59, 0.5);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(51, 65, 85, 0.5);
+    }
+    
+    /* CTA Section Dark Mode */
+    .cta-section {
+        background: linear-gradient(135deg, var(--blog-primary) 0%, var(--blog-secondary) 100%);
+    }
+    
+    /* Form Elements Dark Mode */
+    .search-input,
+    .email-input,
+    .interests-select,
+    .per-page-select,
+    .link-input {
+        background-color: var(--blog-neutral-200);
+        border-color: var(--blog-neutral-300);
+        color: var(--blog-neutral-800);
+    }
+    
+    .search-input::placeholder,
+    .email-input::placeholder {
+        color: var(--blog-neutral-500);
+    }
+    
+    /* Buttons Dark Mode */
+    .btn:focus {
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3);
+    }
+    
+    /* Shadows Dark Mode */
+    .blog-card:hover {
+        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3),
+                    0 10px 10px -5px rgba(0, 0, 0, 0.1);
+    }
+    
+    /* Borders Dark Mode */
+    .blog-card,
+    .sidebar-widget,
+    .newsletter-cta,
+    .pagination-container,
+    .research-series-card {
+        border-color: var(--blog-neutral-700);
+    }
+    
+    /* Divider Lines Dark Mode */
+    .card-metadata,
+    .post-footer,
+    .widget-header,
+    .filter-actions,
+    .series-authors,
+    .series-footer,
+    .modal-header,
+    .modal-footer {
+        border-color: var(--blog-neutral-700);
+    }
+    
+    /* Backgrounds Dark Mode */
+    .research-highlights,
+    .series-header,
+    .series-footer,
+    .modal-footer {
+        background-color: var(--blog-neutral-700);
+    }
+    
+    /* Text Selection Dark Mode */
+    ::selection {
+        background-color: rgba(59, 130, 246, 0.3);
+        color: var(--blog-neutral-100);
+    }
+    
+    /* Scrollbar Dark Mode */
+    ::-webkit-scrollbar {
+        background-color: var(--blog-neutral-100);
+    }
+    
+    ::-webkit-scrollbar-thumb {
+        background-color: var(--blog-neutral-300);
+    }
+    
+    ::-webkit-scrollbar-thumb:hover {
+        background-color: var(--blog-neutral-400);
+    }
+    
+    /* Placeholder Images Dark Mode */
+    .image-placeholder {
+        background: linear-gradient(135deg, var(--blog-neutral-200), var(--blog-neutral-300));
+    }
+    
+    /* Loading Spinner Dark Mode */
+    .loading-spinner .spinner-ring {
+        border-top-color: var(--blog-primary);
+    }
+    
+    .loading-spinner .spinner-ring:nth-child(2) {
+        border-top-color: var(--blog-secondary);
+    }
+    
+    .loading-spinner .spinner-ring:nth-child(3) {
+        border-top-color: var(--blog-accent);
+    }
+    
+    .loading-spinner .spinner-ring:nth-child(4) {
+        border-top-color: var(--blog-neutral-400);
+    }
+    
+    /* Focus States Dark Mode */
+    .search-input:focus,
+    .email-input:focus,
+    .interests-select:focus,
+    .per-page-select:focus,
+    .link-input:focus {
+        border-color: var(--blog-primary);
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    }
+    
+    /* Active States Dark Mode */
+    .page-number.active {
+        background-color: var(--blog-primary);
+        color: white;
+    }
+    
+    .date-filter-option input[type="radio"]:checked + .filter-label,
+    .content-type-option input[type="checkbox"]:checked + .type-indicator + .filter-label,
+    .reading-level-option input[type="checkbox"]:checked + .level-indicator + .filter-label {
+        color: var(--blog-primary);
+        font-weight: 600;
+    }
+    
+    /* Hover States Dark Mode */
+    .trending-topic:hover,
+    .top-author:hover,
+    .research-tool:hover,
+    .upcoming-event:hover,
+    .resource-item:hover {
+        background-color: var(--blog-neutral-700);
+    }
+    
+    .tag:hover {
+        background-color: rgba(59, 130, 246, 0.2);
+    }
+    
+    /* Badges Dark Mode */
+    .card-category,
+    .series-badge {
+        background-color: rgba(59, 130, 246, 0.2);
+        color: var(--blog-primary);
+    }
+    
+    .badge.premium {
+        background-color: rgba(245, 158, 11, 0.2);
+        color: var(--blog-warning);
+    }
+    
+    .badge.trending {
+        background-color: rgba(239, 68, 68, 0.2);
+        color: var(--blog-danger);
+    }
+    
+    .badge.audio {
+        background-color: rgba(139, 92, 246, 0.2);
+        color: #a78bfa;
+    }
+    
+    .research-badge.peer-reviewed {
+        background-color: rgba(16, 185, 129, 0.2);
+        color: var(--blog-success);
+    }
+    
+    .research-badge.open-access {
+        background-color: rgba(59, 130, 246, 0.2);
+        color: var(--blog-info);
+    }
+    
+    .research-badge.trending {
+        background-color: rgba(239, 68, 68, 0.2);
+        color: var(--blog-danger);
+    }
+    
+    /* Difficulty Levels Dark Mode */
+    .difficulty-level.beginner {
+        background-color: rgba(16, 185, 129, 0.2);
+        color: var(--blog-success);
+    }
+    
+    .difficulty-level.intermediate {
+        background-color: rgba(245, 158, 11, 0.2);
+        color: var(--blog-warning);
+    }
+    
+    .difficulty-level.advanced {
+        background-color: rgba(239, 68, 68, 0.2);
+        color: var(--blog-danger);
+    }
+    
+    .difficulty-level.expert {
+        background-color: rgba(139, 92, 246, 0.2);
+        color: #a78bfa;
+    }
+    
+    /* Progress Bars Dark Mode */
+    .progress-bar {
+        background-color: var(--blog-neutral-700);
+    }
+    
+    .progress-fill {
+        background: linear-gradient(90deg, var(--blog-primary), var(--blog-secondary));
+    }
+    
+    /* Sliders Dark Mode */
+    .progress-slider,
+    .volume-slider {
+        background-color: var(--blog-neutral-700);
+    }
+    
+    .progress-slider::-webkit-slider-thumb,
+    .volume-slider::-webkit-slider-thumb {
+        border-color: var(--blog-neutral-800);
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    }
+    
+    /* Charts Dark Mode */
+    #topicDistributionChart {
+        filter: brightness(0.8) contrast(1.2);
+    }
+    
+    /* Tooltips Dark Mode (if using tippy.js) */
+    .tippy-box {
+        background-color: var(--blog-neutral-200);
+        color: var(--blog-neutral-800);
+    }
+    
+    .tippy-arrow {
+        color: var(--blog-neutral-200);
+    }
+    
+    /* Print Styles Dark Mode */
+    @media print {
+        .blog-container {
+            background-color: white !important;
+            color: black !important;
+        }
+        
+        .blog-card,
+        .sidebar-widget,
+        .research-series-card {
+            border: 1px solid #ddd !important;
+        }
+        
+        a {
+            color: black !important;
+        }
+    }
+}
+
+/* Manual Dark Mode Toggle */
+.dark-mode .blog-container {
+    background-color: var(--blog-neutral-900);
+    color: var(--blog-neutral-200);
+}
+
+.dark-mode .blog-hero-section {
+    background: linear-gradient(135deg, var(--blog-neutral-900) 0%, var(--blog-neutral-800) 100%);
+    color: var(--blog-neutral-100);
+}
+
+.dark-mode .blog-card,
+.dark-mode .sidebar-widget,
+.dark-mode .research-series-card {
+    background-color: var(--blog-neutral-800);
+    border-color: var(--blog-neutral-700);
+}
+
+/* Forced Dark Mode */
+[data-theme="dark"] {
+    color-scheme: dark;
+}
+
+[data-theme="dark"] .blog-container {
+    background-color: var(--blog-neutral-900);
+    color: var(--blog-neutral-200);
+}

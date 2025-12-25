@@ -1,0 +1,764 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}My Mentorship Sessions - EcoHub{% endblock %}
+
+{% block extra_css %}
+<style>
+    .session-card {
+        transition: all 0.3s ease;
+        background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+    }
+    
+    .session-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 15px 30px -10px rgba(59, 130, 246, 0.15);
+    }
+    
+    .session-status {
+        font-size: 0.75rem;
+        padding: 0.25rem 0.75rem;
+    }
+    
+    .session-type {
+        width: 40px;
+        height: 40px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .calendar-day {
+        width: 36px;
+        height: 36px;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+    
+    .calendar-day.has-session {
+        background-color: #dbeafe;
+        color: #1d4ed8;
+        font-weight: 600;
+    }
+    
+    .calendar-day.today {
+        background-color: #10b981;
+        color: white;
+        font-weight: 600;
+    }
+    
+    .calendar-day.selected {
+        background-color: #3b82f6;
+        color: white;
+        font-weight: 600;
+    }
+    
+    .time-slot {
+        transition: all 0.2s ease;
+    }
+    
+    .time-slot:hover {
+        transform: scale(1.02);
+    }
+    
+    .session-action-btn {
+        width: 32px;
+        height: 32px;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .progress-ring {
+        transform: rotate(-90deg);
+    }
+    
+    .progress-ring-circle {
+        stroke-dasharray: 283;
+        stroke-dashoffset: 283;
+        transition: stroke-dashoffset 1s ease;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gray-50">
+    <!-- Header -->
+    <div class="bg-gradient-to-r from-blue-500 to-indigo-600 text-white">
+        <div class="container mx-auto px-4 py-12">
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center">
+                <div class="mb-6 md:mb-0">
+                    <h1 class="text-3xl font-bold mb-2">My Mentorship Sessions</h1>
+                    <p class="text-blue-100">Manage your mentorship schedule and track progress</p>
+                </div>
+                
+                <div class="flex flex-col sm:flex-row gap-4">
+                    <a href="{% url 'mentorship:programs:list' %}" class="btn bg-white text-blue-700 hover:bg-gray-100">
+                        <i class="fas fa-search mr-2"></i>
+                        Find New Mentor
+                    </a>
+                    <a href="#upcoming" class="btn bg-transparent border-2 border-white hover:bg-white/10">
+                        <i class="fas fa-plus mr-2"></i>
+                        Schedule Session
+                    </a>
+                </div>
+            </div>
+            
+            <!-- Stats -->
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mt-8">
+                <div class="bg-white/10 backdrop-blur-sm rounded-xl p-4">
+                    <div class="text-2xl font-bold mb-1">{{ upcoming_sessions|length }}</div>
+                    <div class="text-sm text-blue-200">Upcoming</div>
+                </div>
+                <div class="bg-white/10 backdrop-blur-sm rounded-xl p-4">
+                    <div class="text-2xl font-bold mb-1">{{ completed_sessions|length }}</div>
+                    <div class="text-sm text-blue-200">Completed</div>
+                </div>
+                <div class="bg-white/10 backdrop-blur-sm rounded-xl p-4">
+                    <div class="text-2xl font-bold mb-1">{{ total_hours }}</div>
+                    <div class="text-sm text-blue-200">Total Hours</div>
+                </div>
+                <div class="bg-white/10 backdrop-blur-sm rounded-xl p-4">
+                    <div class="text-2xl font-bold mb-1">{{ average_rating|default:"4.8" }}</div>
+                    <div class="text-sm text-blue-200">Avg. Rating</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="container mx-auto px-4 py-8">
+        <div class="flex flex-col lg:flex-row gap-8">
+            <!-- Sidebar -->
+            <div class="lg:w-1/3">
+                <!-- Quick Actions -->
+                <div class="bg-white rounded-2xl shadow-lg p-6 mb-6">
+                    <h3 class="font-bold text-gray-800 mb-4">Quick Actions</h3>
+                    <div class="grid grid-cols-2 gap-3">
+                        <a href="#upcoming" class="flex flex-col items-center justify-center p-4 border border-gray-200 rounded-xl hover:border-blue-300 hover:bg-blue-50 transition-all">
+                            <div class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center mb-2">
+                                <i class="fas fa-calendar-plus text-blue-600"></i>
+                            </div>
+                            <span class="text-sm font-medium text-gray-700">Schedule</span>
+                        </a>
+                        <a href="#" class="flex flex-col items-center justify-center p-4 border border-gray-200 rounded-xl hover:border-emerald-300 hover:bg-emerald-50 transition-all">
+                            <div class="w-10 h-10 bg-emerald-100 rounded-lg flex items-center justify-center mb-2">
+                                <i class="fas fa-file-alt text-emerald-600"></i>
+                            </div>
+                            <span class="text-sm font-medium text-gray-700">Resources</span>
+                        </a>
+                        <a href="#" class="flex flex-col items-center justify-center p-4 border border-gray-200 rounded-xl hover:border-purple-300 hover:bg-purple-50 transition-all">
+                            <div class="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center mb-2">
+                                <i class="fas fa-video text-purple-600"></i>
+                            </div>
+                            <span class="text-sm font-medium text-gray-700">Recordings</span>
+                        </a>
+                        <a href="#" class="flex flex-col items-center justify-center p-4 border border-gray-200 rounded-xl hover:border-amber-300 hover:bg-amber-50 transition-all">
+                            <div class="w-10 h-10 bg-amber-100 rounded-lg flex items-center justify-center mb-2">
+                                <i class="fas fa-star text-amber-600"></i>
+                            </div>
+                            <span class="text-sm font-medium text-gray-700">Reviews</span>
+                        </a>
+                    </div>
+                </div>
+                
+                <!-- Calendar -->
+                <div class="bg-white rounded-2xl shadow-lg p-6 mb-6">
+                    <div class="flex items-center justify-between mb-6">
+                        <h3 class="font-bold text-gray-800">Calendar</h3>
+                        <div class="flex items-center space-x-2">
+                            <button class="p-1 text-gray-500 hover:text-gray-700">
+                                <i class="fas fa-chevron-left"></i>
+                            </button>
+                            <span class="font-medium text-gray-700">April 2024</span>
+                            <button class="p-1 text-gray-500 hover:text-gray-700">
+                                <i class="fas fa-chevron-right"></i>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Week Days -->
+                    <div class="grid grid-cols-7 gap-1 mb-4">
+                        {% for day in "SMTWTFS" %}
+                        <div class="text-center text-xs text-gray-500 py-1">{{ day }}</div>
+                        {% endfor %}
+                        
+                        <!-- Calendar Days -->
+                        {% for day in calendar_days %}
+                        <div class="calendar-day {{ day.classes }} {% if day.has_session %}has-session{% endif %}">
+                            {{ day.day }}
+                        </div>
+                        {% endfor %}
+                    </div>
+                    
+                    <!-- Legend -->
+                    <div class="space-y-2 text-sm">
+                        <div class="flex items-center">
+                            <div class="w-3 h-3 bg-blue-100 rounded mr-2"></div>
+                            <span class="text-gray-600">Has sessions</span>
+                        </div>
+                        <div class="flex items-center">
+                            <div class="w-3 h-3 bg-emerald-500 rounded mr-2"></div>
+                            <span class="text-gray-600">Today</span>
+                        </div>
+                        <div class="flex items-center">
+                            <div class="w-3 h-3 bg-blue-500 rounded mr-2"></div>
+                            <span class="text-gray-600">Selected</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Progress -->
+                <div class="bg-white rounded-2xl shadow-lg p-6">
+                    <h3 class="font-bold text-gray-800 mb-6">Mentorship Progress</h3>
+                    
+                    <!-- Goals Progress -->
+                    <div class="mb-6">
+                        <div class="flex justify-between items-center mb-2">
+                            <span class="text-sm font-medium text-gray-700">Goals Achieved</span>
+                            <span class="text-sm font-bold text-blue-600">3/5</span>
+                        </div>
+                        <div class="h-2 bg-gray-200 rounded-full overflow-hidden">
+                            <div class="h-full bg-blue-500 rounded-full" style="width: 60%"></div>
+                        </div>
+                    </div>
+                    
+                    <!-- Skills Development -->
+                    <div class="space-y-4">
+                        <div>
+                            <div class="flex justify-between text-sm mb-1">
+                                <span class="text-gray-600">Leadership</span>
+                                <span class="font-medium text-gray-700">85%</span>
+                            </div>
+                            <div class="h-1.5 bg-gray-200 rounded-full overflow-hidden">
+                                <div class="h-full bg-emerald-500 rounded-full" style="width: 85%"></div>
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <div class="flex justify-between text-sm mb-1">
+                                <span class="text-gray-600">Technical Skills</span>
+                                <span class="font-medium text-gray-700">70%</span>
+                            </div>
+                            <div class="h-1.5 bg-gray-200 rounded-full overflow-hidden">
+                                <div class="h-full bg-blue-500 rounded-full" style="width: 70%"></div>
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <div class="flex justify-between text-sm mb-1">
+                                <span class="text-gray-600">Networking</span>
+                                <span class="font-medium text-gray-700">90%</span>
+                            </div>
+                            <div class="h-1.5 bg-gray-200 rounded-full overflow-hidden">
+                                <div class="h-full bg-purple-500 rounded-full" style="width: 90%"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Main Content -->
+            <div class="lg:w-2/3">
+                <!-- Tabs -->
+                <div class="bg-white rounded-2xl shadow-lg mb-6">
+                    <div class="border-b border-gray-200">
+                        <nav class="flex space-x-8 px-6">
+                            <button class="tab-button py-4 font-medium text-gray-500 hover:text-blue-600 tab-active" data-tab="upcoming">
+                                <i class="far fa-calendar-alt mr-2"></i>
+                                Upcoming
+                            </button>
+                            <button class="tab-button py-4 font-medium text-gray-500 hover:text-blue-600" data-tab="past">
+                                <i class="fas fa-history mr-2"></i>
+                                Past Sessions
+                            </button>
+                            <button class="tab-button py-4 font-medium text-gray-500 hover:text-blue-600" data-tab="requests">
+                                <i class="fas fa-clock mr-2"></i>
+                                Pending Requests
+                            </button>
+                        </nav>
+                    </div>
+                </div>
+
+                <!-- Tab Content -->
+                <div id="tab-content">
+                    <!-- Upcoming Sessions -->
+                    <div id="upcoming-tab" class="tab-panel active space-y-6">
+                        {% if upcoming_sessions %}
+                            {% for session in upcoming_sessions %}
+                            <div class="session-card rounded-2xl border border-gray-200 p-6">
+                                <div class="flex flex-col md:flex-row md:items-start justify-between mb-4">
+                                    <!-- Session Info -->
+                                    <div class="flex items-start space-x-4 mb-4 md:mb-0">
+                                        <div class="session-type 
+                                            {% if session.type == 'video' %}bg-blue-100 text-blue-600
+                                            {% elif session.type == 'in_person' %}bg-emerald-100 text-emerald-600
+                                            {% else %}bg-purple-100 text-purple-600{% endif %}">
+                                            <i class="fas 
+                                                {% if session.type == 'video' %}fa-video
+                                                {% elif session.type == 'in_person' %}fa-users
+                                                {% else %}fa-phone{% endif %}"></i>
+                                        </div>
+                                        
+                                        <div>
+                                            <h3 class="text-lg font-bold text-gray-800 mb-1">{{ session.title }}</h3>
+                                            <div class="flex items-center space-x-4 text-sm text-gray-600">
+                                                <div class="flex items-center">
+                                                    <i class="far fa-calendar-alt mr-2"></i>
+                                                    {{ session.date|date:"F j, Y" }}
+                                                </div>
+                                                <div class="flex items-center">
+                                                    <i class="far fa-clock mr-2"></i>
+                                                    {{ session.time }}
+                                                </div>
+                                                <div class="flex items-center">
+                                                    <i class="fas fa-hourglass-half mr-2"></i>
+                                                    {{ session.duration }} min
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Status & Actions -->
+                                    <div class="flex items-center space-x-3">
+                                        <span class="session-status px-3 py-1 
+                                            {% if session.status == 'confirmed' %}bg-emerald-100 text-emerald-800
+                                            {% elif session.status == 'pending' %}bg-amber-100 text-amber-800
+                                            {% else %}bg-red-100 text-red-800{% endif %} rounded-full">
+                                            {{ session.get_status_display }}
+                                        </span>
+                                        
+                                        <div class="flex space-x-1">
+                                            <button class="session-action-btn bg-blue-50 text-blue-600 hover:bg-blue-100">
+                                                <i class="fas fa-edit text-sm"></i>
+                                            </button>
+                                            <button class="session-action-btn bg-emerald-50 text-emerald-600 hover:bg-emerald-100">
+                                                <i class="fas fa-video text-sm"></i>
+                                            </button>
+                                            <button class="session-action-btn bg-red-50 text-red-600 hover:bg-red-100">
+                                                <i class="fas fa-times text-sm"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Mentor Info -->
+                                <div class="flex items-center justify-between mb-4">
+                                    <div class="flex items-center">
+                                        <div class="w-10 h-10 rounded-full overflow-hidden mr-3">
+                                            {% if session.mentor.avatar %}
+                                            <img src="{{ session.mentor.avatar.url }}" 
+                                                 alt="{{ session.mentor.name }}" 
+                                                 class="w-full h-full object-cover">
+                                            {% else %}
+                                            <div class="w-full h-full bg-gradient-to-r from-blue-400 to-indigo-500 flex items-center justify-center">
+                                                <i class="fas fa-user text-white"></i>
+                                            </div>
+                                            {% endif %}
+                                        </div>
+                                        <div>
+                                            <h4 class="font-medium text-gray-800">{{ session.mentor.name }}</h4>
+                                            <p class="text-sm text-gray-600">{{ session.mentor.title }}</p>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="text-right">
+                                        <div class="text-sm text-gray-600">Session ID</div>
+                                        <div class="text-sm font-mono text-gray-800">{{ session.id }}</div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Agenda -->
+                                <div class="mb-4">
+                                    <h4 class="text-sm font-medium text-gray-700 mb-2">Agenda</h4>
+                                    <p class="text-gray-600 text-sm">{{ session.agenda|truncatewords:30 }}</p>
+                                </div>
+                                
+                                <!-- Preparation -->
+                                <div class="bg-blue-50 rounded-lg p-4">
+                                    <div class="flex items-center justify-between mb-2">
+                                        <h4 class="text-sm font-medium text-blue-800">Preparation Required</h4>
+                                        <span class="text-xs text-blue-600">
+                                            <i class="fas fa-check-circle mr-1"></i>
+                                            {{ session.preparation_completed }}/{{ session.preparation_items }} completed
+                                        </span>
+                                    </div>
+                                    <ul class="space-y-1 text-sm text-blue-700">
+                                        {% for item in session.preparation_list %}
+                                        <li class="flex items-center">
+                                            <input type="checkbox" 
+                                                   class="h-4 w-4 text-blue-600 mr-2" 
+                                                   {% if item.completed %}checked{% endif %}>
+                                            {{ item.text }}
+                                        </li>
+                                        {% endfor %}
+                                    </ul>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        {% else %}
+                        <!-- No Upcoming Sessions -->
+                        <div class="bg-white rounded-2xl shadow-lg p-12 text-center">
+                            <div class="w-24 h-24 mx-auto mb-6 bg-gray-100 rounded-full flex items-center justify-center">
+                                <i class="fas fa-calendar-times text-3xl text-gray-400"></i>
+                            </div>
+                            <h3 class="text-2xl font-bold text-gray-800 mb-4">No Upcoming Sessions</h3>
+                            <p class="text-gray-600 mb-8 max-w-md mx-auto">
+                                Schedule your next mentorship session to continue your learning journey.
+                            </p>
+                            <a href="{% url 'mentorship:programs:list' %}" class="btn btn-primary">
+                                <i class="fas fa-plus mr-2"></i>
+                                Schedule Session
+                            </a>
+                        </div>
+                        {% endif %}
+                        
+                        <!-- Schedule New Session -->
+                        <div class="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-2xl p-6">
+                            <h3 class="text-xl font-bold text-gray-800 mb-4">Schedule New Session</h3>
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                <!-- Available Time Slots -->
+                                {% for slot in available_slots %}
+                                <div class="time-slot bg-white rounded-xl p-4 border border-gray-200 cursor-pointer hover:border-blue-300">
+                                    <div class="text-center">
+                                        <div class="text-lg font-bold text-gray-800">{{ slot.time }}</div>
+                                        <div class="text-sm text-gray-600">{{ slot.date }}</div>
+                                        <div class="text-xs text-emerald-600 mt-2">
+                                            <i class="fas fa-check-circle mr-1"></i>
+                                            Available
+                                        </div>
+                                    </div>
+                                </div>
+                                {% empty %}
+                                <div class="col-span-3 text-center py-8">
+                                    <i class="fas fa-clock text-3xl text-gray-300 mb-4"></i>
+                                    <p class="text-gray-600">No available time slots</p>
+                                </div>
+                                {% endfor %}
+                            </div>
+                            <div class="mt-6 text-center">
+                                <a href="{% url 'mentorship:programs:list' %}" class="btn btn-primary">
+                                    <i class="fas fa-search mr-2"></i>
+                                    Find Available Mentors
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Past Sessions -->
+                    <div id="past-tab" class="tab-panel hidden space-y-6">
+                        {% if completed_sessions %}
+                            {% for session in completed_sessions %}
+                            <div class="session-card rounded-2xl border border-gray-200 p-6">
+                                <div class="flex items-start justify-between mb-4">
+                                    <div>
+                                        <h3 class="text-lg font-bold text-gray-800 mb-1">{{ session.title }}</h3>
+                                        <div class="flex items-center space-x-4 text-sm text-gray-600">
+                                            <div class="flex items-center">
+                                                <i class="far fa-calendar-alt mr-2"></i>
+                                                {{ session.date|date:"F j, Y" }}
+                                            </div>
+                                            <div class="flex items-center">
+                                                <i class="fas fa-user-tie mr-2"></i>
+                                                {{ session.mentor.name }}
+                                            </div>
+                                            <div class="flex items-center">
+                                                <i class="fas fa-star text-amber-400 mr-1"></i>
+                                                {{ session.rating }}/5
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="text-right">
+                                        <span class="session-status px-3 py-1 bg-emerald-100 text-emerald-800 rounded-full">
+                                            Completed
+                                        </span>
+                                    </div>
+                                </div>
+                                
+                                <!-- Key Takeaways -->
+                                <div class="mb-4">
+                                    <h4 class="text-sm font-medium text-gray-700 mb-2">Key Takeaways</h4>
+                                    <p class="text-gray-600 text-sm">{{ session.key_takeaways|truncatewords:40 }}</p>
+                                </div>
+                                
+                                <!-- Action Items -->
+                                <div class="bg-gray-50 rounded-lg p-4 mb-4">
+                                    <h4 class="text-sm font-medium text-gray-700 mb-2">Action Items</h4>
+                                    <ul class="space-y-1 text-sm text-gray-600">
+                                        {% for item in session.action_items %}
+                                        <li class="flex items-center">
+                                            <input type="checkbox" 
+                                                   class="h-4 w-4 text-emerald-600 mr-2" 
+                                                   {% if item.completed %}checked{% endif %}>
+                                            {{ item.text }}
+                                        </li>
+                                        {% endfor %}
+                                    </ul>
+                                </div>
+                                
+                                <!-- Actions -->
+                                <div class="flex space-x-3">
+                                    <button class="btn btn-outline btn-sm">
+                                        <i class="fas fa-play-circle mr-2"></i>
+                                        Watch Recording
+                                    </button>
+                                    <button class="btn btn-primary btn-sm">
+                                        <i class="fas fa-edit mr-2"></i>
+                                        Add Review
+                                    </button>
+                                    <button class="btn btn-outline btn-sm">
+                                        <i class="fas fa-download mr-2"></i>
+                                        Notes
+                                    </button>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        {% else %}
+                        <!-- No Past Sessions -->
+                        <div class="bg-white rounded-2xl shadow-lg p-12 text-center">
+                            <div class="w-24 h-24 mx-auto mb-6 bg-gray-100 rounded-full flex items-center justify-center">
+                                <i class="fas fa-history text-3xl text-gray-400"></i>
+                            </div>
+                            <h3 class="text-2xl font-bold text-gray-800 mb-4">No Past Sessions</h3>
+                            <p class="text-gray-600 mb-8 max-w-md mx-auto">
+                                Your completed mentorship sessions will appear here.
+                            </p>
+                        </div>
+                        {% endif %}
+                        
+                        <!-- Statistics -->
+                        <div class="bg-white rounded-2xl shadow-lg p-6">
+                            <h3 class="font-bold text-gray-800 mb-6">Session Statistics</h3>
+                            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                                <div class="text-center">
+                                    <div class="text-2xl font-bold text-gray-800">{{ total_sessions }}</div>
+                                    <div class="text-sm text-gray-600">Total Sessions</div>
+                                </div>
+                                <div class="text-center">
+                                    <div class="text-2xl font-bold text-gray-800">{{ total_hours }}</div>
+                                    <div class="text-sm text-gray-600">Total Hours</div>
+                                </div>
+                                <div class="text-center">
+                                    <div class="text-2xl font-bold text-gray-800">{{ average_rating|default:"4.8" }}</div>
+                                    <div class="text-sm text-gray-600">Avg. Rating</div>
+                                </div>
+                                <div class="text-center">
+                                    <div class="text-2xl font-bold text-gray-800">{{ completion_rate }}%</div>
+                                    <div class="text-sm text-gray-600">Completion Rate</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Pending Requests -->
+                    <div id="requests-tab" class="tab-panel hidden space-y-6">
+                        {% if pending_requests %}
+                            {% for request in pending_requests %}
+                            <div class="session-card rounded-2xl border border-gray-200 p-6">
+                                <div class="flex items-start justify-between mb-4">
+                                    <div class="flex items-start space-x-4">
+                                        <div class="w-12 h-12 rounded-full overflow-hidden">
+                                            {% if request.mentor.avatar %}
+                                            <img src="{{ request.mentor.avatar.url }}" 
+                                                 alt="{{ request.mentor.name }}" 
+                                                 class="w-full h-full object-cover">
+                                            {% else %}
+                                            <div class="w-full h-full bg-gradient-to-r from-blue-400 to-indigo-500 flex items-center justify-center">
+                                                <i class="fas fa-user text-white"></i>
+                                            </div>
+                                            {% endif %}
+                                        </div>
+                                        <div>
+                                            <h3 class="text-lg font-bold text-gray-800 mb-1">Request to {{ request.mentor.name }}</h3>
+                                            <div class="flex items-center space-x-4 text-sm text-gray-600">
+                                                <div class="flex items-center">
+                                                    <i class="far fa-calendar-alt mr-2"></i>
+                                                    {{ request.preferred_date|date:"F j, Y" }}
+                                                </div>
+                                                <div class="flex items-center">
+                                                    <i class="far fa-clock mr-2"></i>
+                                                    {{ request.preferred_time }}
+                                                </div>
+                                                <div class="flex items-center">
+                                                    <i class="fas fa-hourglass-half mr-2"></i>
+                                                    {{ request.duration }} min
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <span class="session-status px-3 py-1 bg-amber-100 text-amber-800 rounded-full">
+                                        Pending Response
+                                    </span>
+                                </div>
+                                
+                                <!-- Request Details -->
+                                <div class="mb-4">
+                                    <h4 class="text-sm font-medium text-gray-700 mb-2">Request Message</h4>
+                                    <p class="text-gray-600 text-sm">{{ request.message|truncatewords:40 }}</p>
+                                </div>
+                                
+                                <!-- Goals -->
+                                <div class="bg-gray-50 rounded-lg p-4 mb-4">
+                                    <h4 class="text-sm font-medium text-gray-700 mb-2">Goals for This Session</h4>
+                                    <ul class="space-y-1 text-sm text-gray-600">
+                                        {% for goal in request.goals %}
+                                        <li class="flex items-center">
+                                            <i class="fas fa-check text-emerald-500 mr-2 text-xs"></i>
+                                            {{ goal }}
+                                        </li>
+                                        {% endfor %}
+                                    </ul>
+                                </div>
+                                
+                                <!-- Actions -->
+                                <div class="flex space-x-3">
+                                    <button class="btn btn-primary btn-sm">
+                                        <i class="fas fa-check mr-2"></i>
+                                        Accept Alternative Time
+                                    </button>
+                                    <button class="btn btn-outline btn-sm">
+                                        <i class="fas fa-times mr-2"></i>
+                                        Cancel Request
+                                    </button>
+                                    <button class="btn btn-outline btn-sm">
+                                        <i class="fas fa-envelope mr-2"></i>
+                                        Send Reminder
+                                    </button>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        {% else %}
+                        <!-- No Pending Requests -->
+                        <div class="bg-white rounded-2xl shadow-lg p-12 text-center">
+                            <div class="w-24 h-24 mx-auto mb-6 bg-gray-100 rounded-full flex items-center justify-center">
+                                <i class="fas fa-inbox text-3xl text-gray-400"></i>
+                            </div>
+                            <h3 class="text-2xl font-bold text-gray-800 mb-4">No Pending Requests</h3>
+                            <p class="text-gray-600 mb-8 max-w-md mx-auto">
+                                You have no pending mentorship requests at this time.
+                            </p>
+                        </div>
+                        {% endif %}
+                        
+                        <!-- Request Tips -->
+                        <div class="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-2xl p-6">
+                            <h3 class="text-lg font-bold text-gray-800 mb-4">Tips for Successful Requests</h3>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div class="flex items-start space-x-3">
+                                    <div class="flex-shrink-0 w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center">
+                                        <i class="fas fa-bullseye text-blue-600 text-sm"></i>
+                                    </div>
+                                    <p class="text-sm text-gray-600">Be specific about your goals and what you hope to achieve</p>
+                                </div>
+                                <div class="flex items-start space-x-3">
+                                    <div class="flex-shrink-0 w-8 h-8 bg-emerald-100 rounded-lg flex items-center justify-center">
+                                        <i class="fas fa-clock text-emerald-600 text-sm"></i>
+                                    </div>
+                                    <p class="text-sm text-gray-600">Provide flexible time options when possible</p>
+                                </div>
+                                <div class="flex items-start space-x-3">
+                                    <div class="flex-shrink-0 w-8 h-8 bg-purple-100 rounded-lg flex items-center justify-center">
+                                        <i class="fas fa-file-alt text-purple-600 text-sm"></i>
+                                    </div>
+                                    <p class="text-sm text-gray-600">Include relevant background information about yourself</p>
+                                </div>
+                                <div class="flex items-start space-x-3">
+                                    <div class="flex-shrink-0 w-8 h-8 bg-amber-100 rounded-lg flex items-center justify-center">
+                                        <i class="fas fa-comments text-amber-600 text-sm"></i>
+                                    </div>
+                                    <p class="text-sm text-gray-600">Mention specific topics or questions you want to discuss</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Mentorship sessions functionality
+    document.addEventListener('DOMContentLoaded', function() {
+        // Tab switching
+        const tabs = document.querySelectorAll('.tab-button');
+        const panels = document.querySelectorAll('.tab-panel');
+        
+        tabs.forEach(tab => {
+            tab.addEventListener('click', function() {
+                const target = this.getAttribute('data-tab');
+                
+                // Update active tab
+                tabs.forEach(t => {
+                    t.classList.remove('tab-active');
+                    t.classList.add('text-gray-500');
+                    t.classList.remove('text-blue-600');
+                });
+                this.classList.add('tab-active');
+                this.classList.remove('text-gray-500');
+                this.classList.add('text-blue-600');
+                
+                // Show target panel
+                panels.forEach(panel => {
+                    panel.classList.remove('active');
+                    panel.classList.add('hidden');
+                });
+                document.getElementById(`${target}-tab`).classList.remove('hidden');
+                document.getElementById(`${target}-tab`).classList.add('active');
+            });
+        });
+        
+        // Calendar day selection
+        const calendarDays = document.querySelectorAll('.calendar-day:not(.disabled)');
+        calendarDays.forEach(day => {
+            day.addEventListener('click', function() {
+                // Remove selection from all days
+                calendarDays.forEach(d => d.classList.remove('selected'));
+                // Add selection to clicked day
+                this.classList.add('selected');
+                
+                // In a real app, this would filter sessions by date
+                console.log('Selected date:', this.textContent);
+            });
+        });
+        
+        // Time slot selection
+        const timeSlots = document.querySelectorAll('.time-slot');
+        timeSlots.forEach(slot => {
+            slot.addEventListener('click', function() {
+                const time = this.querySelector('.text-lg').textContent;
+                const date = this.querySelector('.text-sm').textContent;
+                
+                console.log('Selected time slot:', time, 'on', date);
+                // In a real app, this would open a scheduling modal
+                alert(`Schedule session for ${date} at ${time}`);
+            });
+        });
+        
+        // Session action buttons
+        const actionButtons = document.querySelectorAll('.session-action-btn');
+        actionButtons.forEach(button => {
+            button.addEventListener('click', function(e) {
+                e.stopPropagation();
+                const action = this.querySelector('i').className;
+                
+                if (action.includes('fa-edit')) {
+                    console.log('Edit session');
+                } else if (action.includes('fa-video')) {
+                    console.log('Join video call');
+                } else if (action.includes('fa-times')) {
+                    console.log('Cancel session');
+                }
+            });
+        });
+    });
+</script>
+{% endblock %}

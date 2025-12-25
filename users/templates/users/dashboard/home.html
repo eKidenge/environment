@@ -1,0 +1,375 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Dashboard - EcoHub{% endblock %}
+
+{% block extra_css %}
+<style>
+    .stat-card {
+        transition: all 0.3s ease;
+        background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+    }
+    
+    .stat-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 20px 40px rgba(16, 185, 129, 0.15);
+    }
+    
+    .progress-ring {
+        transform: rotate(-90deg);
+    }
+    
+    .progress-ring-circle {
+        stroke-dasharray: 283;
+        stroke-dashoffset: 283;
+        transition: stroke-dashoffset 1s ease;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gray-50">
+    <!-- Dashboard Header -->
+    <div class="bg-gradient-to-r from-emerald-500 to-teal-600 text-white">
+        <div class="container mx-auto px-4 py-8">
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center space-y-4 md:space-y-0">
+                <div>
+                    <h1 class="text-3xl font-bold mb-2">Welcome back, {{ user.get_full_name|default:user.username }}!</h1>
+                    <p class="text-emerald-100">Track your environmental impact and continue your sustainability journey</p>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <div class="text-right">
+                        <p class="text-sm text-emerald-100">Member since</p>
+                        <p class="font-semibold">{{ user.date_joined|date:"F j, Y" }}</p>
+                    </div>
+                    <div class="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center border-4 border-white/30">
+                        <i class="fas fa-leaf text-2xl"></i>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Quick Stats -->
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mt-8">
+                <div class="bg-white/10 backdrop-blur-sm rounded-xl p-4">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-sm text-emerald-100">Impact Score</p>
+                            <p class="text-2xl font-bold">1,245</p>
+                        </div>
+                        <i class="fas fa-bolt text-xl text-yellow-300"></i>
+                    </div>
+                    <div class="mt-2 text-xs text-emerald-100">
+                        <i class="fas fa-arrow-up mr-1"></i>
+                        12% from last month
+                    </div>
+                </div>
+                
+                <div class="bg-white/10 backdrop-blur-sm rounded-xl p-4">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-sm text-emerald-100">Active Programs</p>
+                            <p class="text-2xl font-bold">3</p>
+                        </div>
+                        <i class="fas fa-graduation-cap text-xl text-blue-300"></i>
+                    </div>
+                    <div class="mt-2 text-xs text-emerald-100">
+                        2 nearing completion
+                    </div>
+                </div>
+                
+                <div class="bg-white/10 backdrop-blur-sm rounded-xl p-4">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-sm text-emerald-100">Volunteer Hours</p>
+                            <p class="text-2xl font-bold">156</p>
+                        </div>
+                        <i class="fas fa-hands-helping text-xl text-purple-300"></i>
+                    </div>
+                    <div class="mt-2 text-xs text-emerald-100">
+                        <i class="fas fa-star mr-1"></i>
+                        Top 15% contributor
+                    </div>
+                </div>
+                
+                <div class="bg-white/10 backdrop-blur-sm rounded-xl p-4">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-sm text-emerald-100">Carbon Saved</p>
+                            <p class="text-2xl font-bold">2.4T</p>
+                        </div>
+                        <i class="fas fa-cloud text-xl text-green-300"></i>
+                    </div>
+                    <div class="mt-2 text-xs text-emerald-100">
+                        Equivalent to 52 trees
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Dashboard Content -->
+    <div class="container mx-auto px-4 py-8 -mt-6">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <!-- Left Column -->
+            <div class="lg:col-span-2 space-y-8">
+                <!-- Progress Overview -->
+                <div class="bg-white rounded-2xl shadow-lg p-6">
+                    <div class="flex justify-between items-center mb-6">
+                        <h2 class="text-xl font-bold text-gray-800">Learning Progress</h2>
+                        <a href="{% url 'programs:list' %}" class="text-emerald-600 hover:text-emerald-700 font-medium">
+                            View All
+                        </a>
+                    </div>
+                    
+                    <div class="space-y-6">
+                        {% for program in active_programs %}
+                        <div class="border border-gray-200 rounded-xl p-4 hover:border-emerald-200 transition-colors">
+                            <div class="flex items-center justify-between mb-3">
+                                <div>
+                                    <h3 class="font-semibold text-gray-800">{{ program.title }}</h3>
+                                    <p class="text-sm text-gray-600">{{ program.category }}</p>
+                                </div>
+                                <span class="px-3 py-1 bg-emerald-100 text-emerald-800 rounded-full text-sm font-medium">
+                                    {{ program.progress }}% Complete
+                                </span>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <div class="flex justify-between text-sm text-gray-600 mb-1">
+                                    <span>Progress</span>
+                                    <span>{{ program.progress }}%</span>
+                                </div>
+                                <div class="h-2 bg-gray-200 rounded-full overflow-hidden">
+                                    <div class="h-full bg-gradient-to-r from-emerald-400 to-emerald-600 rounded-full" 
+                                         style="width: {{ program.progress }}%"></div>
+                                </div>
+                            </div>
+                            
+                            <div class="flex items-center justify-between text-sm">
+                                <div class="flex items-center space-x-4">
+                                    <span class="text-gray-600">
+                                        <i class="fas fa-book-open mr-1"></i>
+                                        {{ program.modules_completed }}/{{ program.total_modules }} modules
+                                    </span>
+                                    <span class="text-gray-600">
+                                        <i class="fas fa-clock mr-1"></i>
+                                        {{ program.time_remaining }} hours left
+                                    </span>
+                                </div>
+                                <button class="btn btn-sm btn-primary">
+                                    Continue
+                                </button>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <!-- Recent Activity -->
+                <div class="bg-white rounded-2xl shadow-lg p-6">
+                    <h2 class="text-xl font-bold text-gray-800 mb-6">Recent Activity</h2>
+                    
+                    <div class="space-y-4">
+                        {% for activity in recent_activities %}
+                        <div class="flex items-start space-x-4 p-3 hover:bg-gray-50 rounded-lg transition-colors">
+                            <div class="flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center 
+                                {% if activity.type == 'achievement' %}bg-yellow-100 text-yellow-600
+                                {% elif activity.type == 'learning' %}bg-blue-100 text-blue-600
+                                {% elif activity.type == 'volunteer' %}bg-purple-100 text-purple-600
+                                {% else %}bg-emerald-100 text-emerald-600{% endif %}">
+                                <i class="{{ activity.icon }}"></i>
+                            </div>
+                            <div class="flex-1">
+                                <p class="text-gray-800">{{ activity.description }}</p>
+                                <p class="text-sm text-gray-500">{{ activity.timestamp|timesince }} ago</p>
+                            </div>
+                            {% if activity.points %}
+                            <div class="flex-shrink-0">
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-100 text-emerald-800">
+                                    <i class="fas fa-bolt mr-1"></i>
+                                    +{{ activity.points }} pts
+                                </span>
+                            </div>
+                            {% endif %}
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Column -->
+            <div class="space-y-8">
+                <!-- Profile Summary -->
+                <div class="bg-white rounded-2xl shadow-lg p-6">
+                    <div class="text-center mb-6">
+                        <div class="relative inline-block">
+                            <div class="w-24 h-24 mx-auto bg-gradient-to-br from-emerald-400 to-teal-500 rounded-full flex items-center justify-center text-white text-3xl font-bold mb-4">
+                                {{ user.username|first|upper }}
+                            </div>
+                            <div class="absolute bottom-4 right-0 w-8 h-8 bg-emerald-500 rounded-full border-4 border-white flex items-center justify-center">
+                                <i class="fas fa-check text-white text-xs"></i>
+                            </div>
+                        </div>
+                        <h3 class="text-lg font-bold text-gray-800">{{ user.get_full_name|default:user.username }}</h3>
+                        <p class="text-gray-600">Environmental Enthusiast</p>
+                    </div>
+                    
+                    <div class="space-y-4">
+                        <div class="flex justify-between items-center">
+                            <span class="text-gray-600">Member Level</span>
+                            <span class="font-semibold text-emerald-600">Eco Champion</span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-gray-600">Badges Earned</span>
+                            <span class="font-semibold">12</span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-gray-600">Streak</span>
+                            <span class="font-semibold">24 days 🔥</span>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-6">
+                        <a href="{% url 'users:profile:edit' %}" class="w-full btn btn-outline mb-3">
+                            <i class="fas fa-edit mr-2"></i>
+                            Edit Profile
+                        </a>
+                        <a href="{% url 'users:profile:detail' %}" class="w-full btn btn-primary">
+                            <i class="fas fa-eye mr-2"></i>
+                            View Full Profile
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Quick Actions -->
+                <div class="bg-white rounded-2xl shadow-lg p-6">
+                    <h3 class="text-lg font-bold text-gray-800 mb-4">Quick Actions</h3>
+                    
+                    <div class="grid grid-cols-2 gap-3">
+                        <a href="{% url 'mentorship:sessions:list' %}" class="quick-action-btn">
+                            <i class="fas fa-comments text-blue-500"></i>
+                            <span>Mentorship</span>
+                        </a>
+                        <a href="{% url 'volunteer:opportunities:list' %}" class="quick-action-btn">
+                            <i class="fas fa-hands-helping text-purple-500"></i>
+                            <span>Volunteer</span>
+                        </a>
+                        <a href="{% url 'research:datasets:list' %}" class="quick-action-btn">
+                            <i class="fas fa-database text-emerald-500"></i>
+                            <span>Research Data</span>
+                        </a>
+                        <a href="{% url 'blog:list' %}" class="quick-action-btn">
+                            <i class="fas fa-blog text-orange-500"></i>
+                            <span>Blog</span>
+                        </a>
+                        <a href="{% url 'users:dashboard:activity' %}" class="quick-action-btn">
+                            <i class="fas fa-chart-line text-teal-500"></i>
+                            <span>Analytics</span>
+                        </a>
+                        <a href="#" class="quick-action-btn">
+                            <i class="fas fa-certificate text-yellow-500"></i>
+                            <span>Certificates</span>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Upcoming Events -->
+                <div class="bg-white rounded-2xl shadow-lg p-6">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="text-lg font-bold text-gray-800">Upcoming Events</h3>
+                        <span class="text-sm text-emerald-600">{{ upcoming_events|length }} upcoming</span>
+                    </div>
+                    
+                    <div class="space-y-4">
+                        {% for event in upcoming_events %}
+                        <div class="border border-gray-200 rounded-lg p-3">
+                            <div class="flex items-start justify-between mb-2">
+                                <div>
+                                    <h4 class="font-medium text-gray-800">{{ event.title }}</h4>
+                                    <p class="text-xs text-gray-500">{{ event.date|date:"M d, Y" }} • {{ event.time }}</p>
+                                </div>
+                                {% if event.type == 'webinar' %}
+                                <span class="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded">Webinar</span>
+                                {% elif event.type == 'workshop' %}
+                                <span class="px-2 py-1 bg-emerald-100 text-emerald-800 text-xs rounded">Workshop</span>
+                                {% endif %}
+                            </div>
+                            <div class="flex items-center text-sm text-gray-600">
+                                <i class="fas fa-users mr-1"></i>
+                                <span>{{ event.participants }} attending</span>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    
+                    <a href="{% url 'programs:events:list' %}" class="mt-4 block text-center text-emerald-600 hover:text-emerald-700 font-medium">
+                        View All Events
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Impact Visualization -->
+        <div class="mt-8 bg-white rounded-2xl shadow-lg p-6">
+            <h2 class="text-xl font-bold text-gray-800 mb-6">Your Environmental Impact</h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <div class="text-center p-4">
+                    <div class="relative inline-block mb-4">
+                        <svg class="w-20 h-20 progress-ring" viewBox="0 0 100 100">
+                            <circle class="text-gray-200" stroke-width="8" stroke="currentColor" fill="transparent" r="45" cx="50" cy="50"/>
+                            <circle class="progress-ring-circle text-emerald-500" stroke-width="8" stroke-linecap="round" stroke="currentColor" fill="transparent" r="45" cx="50" cy="50" style="stroke-dashoffset: {{ 283|multiply:0.75 }}"/>
+                        </svg>
+                        <div class="absolute inset-0 flex items-center justify-center">
+                            <span class="text-2xl font-bold text-gray-800">75%</span>
+                        </div>
+                    </div>
+                    <h4 class="font-semibold text-gray-800 mb-1">Carbon Reduction</h4>
+                    <p class="text-sm text-gray-600">Towards annual goal</p>
+                </div>
+                
+                <div class="text-center p-4">
+                    <div class="w-20 h-20 mx-auto mb-4 flex items-center justify-center rounded-full bg-blue-100">
+                        <i class="fas fa-tint text-3xl text-blue-500"></i>
+                    </div>
+                    <h4 class="font-semibold text-gray-800 mb-1">Water Saved</h4>
+                    <p class="text-2xl font-bold text-blue-600">5,240L</p>
+                    <p class="text-sm text-gray-600">This month</p>
+                </div>
+                
+                <div class="text-center p-4">
+                    <div class="w-20 h-20 mx-auto mb-4 flex items-center justify-center rounded-full bg-purple-100">
+                        <i class="fas fa-recycle text-3xl text-purple-500"></i>
+                    </div>
+                    <h4 class="font-semibold text-gray-800 mb-1">Waste Diverted</h4>
+                    <p class="text-2xl font-bold text-purple-600">42kg</p>
+                    <p class="text-sm text-gray-600">From landfill</p>
+                </div>
+                
+                <div class="text-center p-4">
+                    <div class="w-20 h-20 mx-auto mb-4 flex items-center justify-center rounded-full bg-yellow-100">
+                        <i class="fas fa-seedling text-3xl text-yellow-600"></i>
+                    </div>
+                    <h4 class="font-semibold text-gray-800 mb-1">Trees Equivalent</h4>
+                    <p class="text-2xl font-bold text-yellow-600">52</p>
+                    <p class="text-sm text-gray-600">Carbon offset</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Initialize progress rings
+    document.addEventListener('DOMContentLoaded', function() {
+        const rings = document.querySelectorAll('.progress-ring-circle');
+        rings.forEach(ring => {
+            const value = parseInt(ring.parentElement.nextElementSibling.querySelector('span').textContent);
+            const circumference = 2 * Math.PI * 45;
+            const offset = circumference - (value / 100) * circumference;
+            ring.style.strokeDashoffset = offset;
+            ring.style.strokeDasharray = circumference;
+        });
+    });
+</script>
+{% endblock %}

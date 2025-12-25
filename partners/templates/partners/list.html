@@ -1,0 +1,614 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Partners & Collaborators - EcoHub{% endblock %}
+
+{% block extra_css %}
+<style>
+    .partner-card {
+        transition: all 0.3s ease;
+        background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+    }
+    
+    .partner-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 20px 40px rgba(139, 92, 246, 0.15);
+    }
+    
+    .partner-logo {
+        height: 80px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 1rem;
+        background: white;
+        border-radius: 12px;
+        border: 1px solid #e5e7eb;
+    }
+    
+    .partner-tier {
+        font-size: 0.75rem;
+        padding: 0.25rem 0.75rem;
+    }
+    
+    .collaboration-count {
+        font-variant-numeric: tabular-nums;
+    }
+    
+    .impact-badge {
+        width: 32px;
+        height: 32px;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .sector-filter {
+        transition: all 0.2s ease;
+    }
+    
+    .sector-filter:hover {
+        transform: scale(1.05);
+    }
+    
+    .sector-filter.active {
+        background-color: #8b5cf6;
+        color: white;
+    }
+    
+    .map-point {
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        animation: pulse 2s ease-in-out infinite;
+    }
+    
+    .project-preview {
+        height: 120px;
+        background: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%);
+    }
+    
+    .partnership-type {
+        font-size: 0.8rem;
+        padding: 0.25rem 0.75rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gray-50">
+    <!-- Hero Section -->
+    <div class="bg-gradient-to-r from-purple-600 to-indigo-600 text-white">
+        <div class="container mx-auto px-4 py-16">
+            <div class="max-w-4xl mx-auto text-center">
+                <h1 class="text-4xl md:text-5xl font-bold mb-6">Our Partners & Collaborators</h1>
+                <p class="text-xl text-purple-100 mb-10">
+                    Building a sustainable future through strategic partnerships with leading organizations, 
+                    research institutions, and corporations worldwide.
+                </p>
+                
+                <!-- Partnership Stats -->
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-6 mb-12">
+                    <div class="text-center p-4 bg-white/10 backdrop-blur-sm rounded-xl">
+                        <div class="text-3xl font-bold mb-2">{{ total_partners|default:"150+" }}</div>
+                        <div class="text-purple-200">Partners</div>
+                    </div>
+                    <div class="text-center p-4 bg-white/10 backdrop-blur-sm rounded-xl">
+                        <div class="text-3xl font-bold mb-2">{{ active_projects|default:"80+" }}</div>
+                        <div class="text-purple-200">Active Projects</div>
+                    </div>
+                    <div class="text-center p-4 bg-white/10 backdrop-blur-sm rounded-xl">
+                        <div class="text-3xl font-bold mb-2">${{ funding_raised|default:"5.2" }}M</div>
+                        <div class="text-purple-200">Funding Raised</div>
+                    </div>
+                    <div class="text-center p-4 bg-white/10 backdrop-blur-sm rounded-xl">
+                        <div class="text-3xl font-bold mb-2">{{ countries|default:"40+" }}</div>
+                        <div class="text-purple-200">Countries</div>
+                    </div>
+                </div>
+                
+                <!-- CTA Buttons -->
+                <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                    <a href="#partners" class="btn bg-white text-purple-700 hover:bg-gray-100">
+                        <i class="fas fa-handshake mr-2"></i>
+                        Explore Partners
+                    </a>
+                    <a href="{% url 'core:contact' %}" class="btn bg-transparent border-2 border-white hover:bg-white/10">
+                        <i class="fas fa-envelope mr-2"></i>
+                        Become a Partner
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="container mx-auto px-4 py-12">
+        <!-- Global Reach Map -->
+        <div class="bg-white rounded-2xl shadow-lg p-6 mb-8">
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
+                <div>
+                    <h2 class="text-2xl font-bold text-gray-800">Global Reach</h2>
+                    <p class="text-gray-600">Our partners span across {{ countries|default:"40" }} countries worldwide</p>
+                </div>
+                <div class="flex items-center space-x-4 mt-4 md:mt-0">
+                    <div class="flex items-center">
+                        <div class="map-point bg-emerald-500 mr-2"></div>
+                        <span class="text-sm text-gray-600">Research Partners</span>
+                    </div>
+                    <div class="flex items-center">
+                        <div class="map-point bg-blue-500 mr-2"></div>
+                        <span class="text-sm text-gray-600">Corporate Partners</span>
+                    </div>
+                    <div class="flex items-center">
+                        <div class="map-point bg-purple-500 mr-2"></div>
+                        <span class="text-sm text-gray-600">NGO Partners</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Map Visualization -->
+            <div class="relative h-64 bg-gradient-to-br from-gray-100 to-gray-200 rounded-xl overflow-hidden">
+                <div class="absolute inset-0 flex items-center justify-center">
+                    <div class="text-center">
+                        <i class="fas fa-globe-americas text-4xl text-gray-300 mb-4"></i>
+                        <h3 class="text-lg font-medium text-gray-700 mb-2">Interactive Partner Map</h3>
+                        <p class="text-gray-600 text-sm">Visualizing our global network of partners</p>
+                    </div>
+                </div>
+                
+                <!-- Map Points (simplified) -->
+                <div class="absolute top-1/4 left-1/4">
+                    <div class="map-point bg-emerald-500"></div>
+                </div>
+                <div class="absolute top-1/3 right-1/3">
+                    <div class="map-point bg-blue-500"></div>
+                </div>
+                <div class="absolute bottom-1/3 left-1/3">
+                    <div class="map-point bg-purple-500"></div>
+                </div>
+                <div class="absolute top-2/3 right-1/4">
+                    <div class="map-point bg-emerald-500"></div>
+                </div>
+                <div class="absolute bottom-1/4 left-2/3">
+                    <div class="map-point bg-blue-500"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sector Filter -->
+        <div class="mb-8">
+            <h3 class="text-xl font-bold text-gray-800 mb-4">Browse by Sector</h3>
+            <div class="flex flex-wrap gap-3">
+                <button class="sector-filter active px-4 py-2 bg-purple-600 text-white rounded-lg font-medium">
+                    All Sectors
+                </button>
+                {% for sector in sectors %}
+                <button class="sector-filter px-4 py-2 bg-gray-100 hover:bg-purple-100 text-gray-700 hover:text-purple-700 rounded-lg font-medium"
+                        data-sector="{{ sector.slug }}">
+                    {{ sector.name }}
+                    <span class="ml-2 text-xs bg-white/50 px-2 py-1 rounded">{{ sector.count }}</span>
+                </button>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Partners Grid -->
+        <div id="partners" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+            {% for partner in partners %}
+            <div class="partner-card rounded-2xl border border-gray-200 p-6">
+                <!-- Partner Logo & Tier -->
+                <div class="flex items-start justify-between mb-4">
+                    <div class="partner-logo w-full">
+                        {% if partner.logo %}
+                        <img src="{{ partner.logo.url }}" 
+                             alt="{{ partner.name }}" 
+                             class="max-h-full max-w-full object-contain">
+                        {% else %}
+                        <div class="text-center">
+                            <div class="text-2xl font-bold text-gray-800 mb-1">{{ partner.name|slice:":2" }}</div>
+                            <div class="text-xs text-gray-500">Partner</div>
+                        </div>
+                        {% endif %}
+                    </div>
+                    
+                    <!-- Partner Tier -->
+                    <div class="ml-4">
+                        <span class="partner-tier px-3 py-1 
+                            {% if partner.tier == 'strategic' %}bg-purple-100 text-purple-800
+                            {% elif partner.tier == 'premium' %}bg-amber-100 text-amber-800
+                            {% else %}bg-emerald-100 text-emerald-800{% endif %} rounded-full">
+                            {{ partner.get_tier_display }}
+                        </span>
+                    </div>
+                </div>
+                
+                <!-- Partner Info -->
+                <div class="mb-4">
+                    <h3 class="text-xl font-bold text-gray-800 mb-2">{{ partner.name }}</h3>
+                    <p class="text-gray-600 text-sm mb-3">{{ partner.description|truncatewords:20 }}</p>
+                    
+                    <div class="flex items-center text-sm text-gray-500 mb-2">
+                        <i class="fas fa-map-marker-alt mr-2 text-purple-500"></i>
+                        <span>{{ partner.location }}</span>
+                    </div>
+                    
+                    <div class="flex items-center text-sm text-gray-500">
+                        <i class="fas fa-calendar-alt mr-2 text-purple-500"></i>
+                        <span>Partner since {{ partner.joined_date|date:"Y" }}</span>
+                    </div>
+                </div>
+                
+                <!-- Partnership Details -->
+                <div class="mb-4">
+                    <div class="flex items-center justify-between mb-2">
+                        <h4 class="text-sm font-medium text-gray-700">Partnership Type</h4>
+                        <span class="partnership-type px-3 py-1 bg-gray-100 text-gray-700 rounded-full">
+                            {{ partner.get_partnership_type_display }}
+                        </span>
+                    </div>
+                    
+                    <!-- Impact Areas -->
+                    <div class="mb-3">
+                        <h4 class="text-sm font-medium text-gray-700 mb-2">Impact Areas</h4>
+                        <div class="flex flex-wrap gap-2">
+                            {% for area in partner.impact_areas.all|slice:":2" %}
+                            <span class="text-xs px-2 py-1 bg-emerald-50 text-emerald-700 rounded">
+                                {{ area.name }}
+                            </span>
+                            {% endfor %}
+                            {% if partner.impact_areas.count > 2 %}
+                            <span class="text-xs px-2 py-1 bg-gray-100 text-gray-600 rounded">
+                                +{{ partner.impact_areas.count|add:"-2" }}
+                            </span>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Collaboration Stats -->
+                <div class="grid grid-cols-2 gap-4 mb-4">
+                    <div class="text-center p-2 bg-gray-50 rounded-lg">
+                        <div class="text-lg font-bold text-gray-800 collaboration-count">
+                            {{ partner.projects_count|default:"0" }}
+                        </div>
+                        <div class="text-xs text-gray-500">Projects</div>
+                    </div>
+                    <div class="text-center p-2 bg-gray-50 rounded-lg">
+                        <div class="text-lg font-bold text-gray-800">
+                            {{ partner.duration_years|default:"0" }}+
+                        </div>
+                        <div class="text-xs text-gray-500">Years</div>
+                    </div>
+                </div>
+                
+                <!-- Actions -->
+                <div class="flex space-x-3">
+                    <a href="{% url 'partners:detail' partner.id %}" 
+                       class="flex-1 btn btn-outline btn-sm">
+                        <i class="fas fa-eye mr-2"></i>
+                        View Details
+                    </a>
+                    <a href="{% url 'partners:projects:list' %}?partner={{ partner.id }}" 
+                       class="flex-1 btn btn-primary btn-sm">
+                        <i class="fas fa-project-diagram mr-2"></i>
+                        Projects
+                    </a>
+                </div>
+            </div>
+            {% empty %}
+            <!-- No Partners -->
+            <div class="col-span-3 bg-white rounded-2xl shadow-lg p-12 text-center">
+                <div class="w-24 h-24 mx-auto mb-6 bg-gray-100 rounded-full flex items-center justify-center">
+                    <i class="fas fa-handshake text-3xl text-gray-400"></i>
+                </div>
+                <h3 class="text-2xl font-bold text-gray-800 mb-4">No Partners Found</h3>
+                <p class="text-gray-600 mb-8 max-w-md mx-auto">
+                    Check back soon for partnership updates.
+                </p>
+            </div>
+            {% endfor %}
+        </div>
+
+        <!-- Partnership Tiers -->
+        <div class="mb-8">
+            <h3 class="text-xl font-bold text-gray-800 mb-6">Partnership Tiers</h3>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="bg-white rounded-2xl shadow-lg p-6 border border-gray-200">
+                    <div class="text-center mb-6">
+                        <div class="w-16 h-16 mx-auto mb-4 bg-emerald-100 rounded-full flex items-center justify-center">
+                            <i class="fas fa-seedling text-emerald-600 text-2xl"></i>
+                        </div>
+                        <h4 class="font-bold text-gray-800 mb-2">Foundation Partner</h4>
+                        <p class="text-sm text-gray-600">Starting partnerships</p>
+                    </div>
+                    <ul class="space-y-2 mb-6">
+                        <li class="flex items-center text-sm text-gray-600">
+                            <i class="fas fa-check text-emerald-500 mr-2 text-xs"></i>
+                            Basic collaboration
+                        </li>
+                        <li class="flex items-center text-sm text-gray-600">
+                            <i class="fas fa-check text-emerald-500 mr-2 text-xs"></i>
+                            Project participation
+                        </li>
+                        <li class="flex items-center text-sm text-gray-600">
+                            <i class="fas fa-check text-emerald-500 mr-2 text-xs"></i>
+                            Network access
+                        </li>
+                    </ul>
+                </div>
+                
+                <div class="bg-white rounded-2xl shadow-lg p-6 border-2 border-amber-200 shadow-xl">
+                    <div class="text-center mb-6">
+                        <div class="w-16 h-16 mx-auto mb-4 bg-amber-100 rounded-full flex items-center justify-center">
+                            <i class="fas fa-star text-amber-600 text-2xl"></i>
+                        </div>
+                        <h4 class="font-bold text-gray-800 mb-2">Premium Partner</h4>
+                        <p class="text-sm text-gray-600">Strategic collaboration</p>
+                    </div>
+                    <ul class="space-y-2 mb-6">
+                        <li class="flex items-center text-sm text-gray-600">
+                            <i class="fas fa-check text-amber-500 mr-2 text-xs"></i>
+                            All Foundation benefits
+                        </li>
+                        <li class="flex items-center text-sm text-gray-600">
+                            <i class="fas fa-check text-amber-500 mr-2 text-xs"></i>
+                            Joint research projects
+                        </li>
+                        <li class="flex items-center text-sm text-gray-600">
+                            <i class="fas fa-check text-amber-500 mr-2 text-xs"></i>
+                            Co-branded initiatives
+                        </li>
+                        <li class="flex items-center text-sm text-gray-600">
+                            <i class="fas fa-check text-amber-500 mr-2 text-xs"></i>
+                            Priority support
+                        </li>
+                    </ul>
+                </div>
+                
+                <div class="bg-white rounded-2xl shadow-lg p-6 border border-purple-200">
+                    <div class="text-center mb-6">
+                        <div class="w-16 h-16 mx-auto mb-4 bg-purple-100 rounded-full flex items-center justify-center">
+                            <i class="fas fa-crown text-purple-600 text-2xl"></i>
+                        </div>
+                        <h4 class="font-bold text-gray-800 mb-2">Strategic Partner</h4>
+                        <p class="text-sm text-gray-600">Deep integration</p>
+                    </div>
+                    <ul class="space-y-2 mb-6">
+                        <li class="flex items-center text-sm text-gray-600">
+                            <i class="fas fa-check text-purple-500 mr-2 text-xs"></i>
+                            All Premium benefits
+                        </li>
+                        <li class="flex items-center text-sm text-gray-600">
+                            <i class="fas fa-check text-purple-500 mr-2 text-xs"></i>
+                            Board representation
+                        </li>
+                        <li class="flex items-center text-sm text-gray-600">
+                            <i class="fas fa-check text-purple-500 mr-2 text-xs"></i>
+                            Global initiatives
+                        </li>
+                        <li class="flex items-center text-sm text-gray-600">
+                            <i class="fas fa-check text-purple-500 mr-2 text-xs"></i>
+                            Research funding
+                        </li>
+                        <li class="flex items-center text-sm text-gray-600">
+                            <i class="fas fa-check text-purple-500 mr-2 text-xs"></i>
+                            Exclusive events
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Featured Projects -->
+        <div class="bg-gradient-to-r from-purple-50 to-indigo-50 rounded-2xl p-8 mb-8">
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
+                <div>
+                    <h3 class="text-2xl font-bold text-gray-800">Featured Collaborations</h3>
+                    <p class="text-gray-600">Highlighting successful partnership projects</p>
+                </div>
+                <a href="{% url 'partners:projects:list' %}" class="mt-4 md:mt-0 text-purple-600 hover:text-purple-700 font-medium">
+                    View All Projects →
+                </a>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {% for project in featured_projects %}
+                <div class="bg-white rounded-xl overflow-hidden shadow-sm">
+                    <!-- Project Image -->
+                    <div class="project-preview relative overflow-hidden">
+                        {% if project.image %}
+                        <img src="{{ project.image.url }}" 
+                             alt="{{ project.title }}" 
+                             class="w-full h-full object-cover">
+                        {% endif %}
+                        <div class="absolute top-3 left-3">
+                            <span class="px-3 py-1 bg-white/90 backdrop-blur-sm rounded-full text-sm font-medium">
+                                {{ project.partner.name|truncatechars:15 }}
+                            </span>
+                        </div>
+                    </div>
+                    
+                    <!-- Project Info -->
+                    <div class="p-4">
+                        <h4 class="font-bold text-gray-800 mb-2">{{ project.title }}</h4>
+                        <p class="text-gray-600 text-sm mb-4">{{ project.description|truncatewords:15 }}</p>
+                        
+                        <div class="flex items-center justify-between">
+                            <div class="text-xs text-gray-500">
+                                <i class="far fa-calendar-alt mr-1"></i>
+                                {{ project.start_date|date:"M Y" }}
+                            </div>
+                            <span class="text-xs px-2 py-1 
+                                {% if project.status == 'completed' %}bg-emerald-100 text-emerald-800
+                                {% elif project.status == 'active' %}bg-blue-100 text-blue-800
+                                {% else %}bg-amber-100 text-amber-800{% endif %} rounded">
+                                {{ project.get_status_display }}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                {% empty %}
+                <div class="col-span-3 text-center py-8">
+                    <i class="fas fa-project-diagram text-3xl text-gray-300 mb-4"></i>
+                    <p class="text-gray-600">No featured projects available</p>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Become a Partner -->
+        <div class="bg-gradient-to-r from-purple-600 to-indigo-600 rounded-2xl p-8 text-white">
+            <div class="flex flex-col lg:flex-row items-center justify-between">
+                <div class="lg:w-2/3 mb-8 lg:mb-0">
+                    <h3 class="text-2xl font-bold mb-4">Ready to Partner With Us?</h3>
+                    <p class="text-purple-100 mb-6">
+                        Join our network of organizations making a real difference in environmental sustainability. 
+                        Whether you're a corporation, research institution, or NGO, we have partnership opportunities 
+                        that align with your goals.
+                    </p>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div class="flex items-center">
+                            <i class="fas fa-check-circle text-emerald-300 mr-3"></i>
+                            <span>Shared expertise</span>
+                        </div>
+                        <div class="flex items-center">
+                            <i class="fas fa-check-circle text-emerald-300 mr-3"></i>
+                            <span>Global impact</span>
+                        </div>
+                        <div class="flex items-center">
+                            <i class="fas fa-check-circle text-emerald-300 mr-3"></i>
+                            <span>Mutual growth</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="lg:w-1/3">
+                    <div class="bg-white/10 backdrop-blur-sm rounded-xl p-6">
+                        <h4 class="font-bold mb-4">Start the Conversation</h4>
+                        <form class="space-y-3">
+                            <input type="text" 
+                                   placeholder="Organization Name" 
+                                   class="w-full px-4 py-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-white">
+                            <input type="email" 
+                                   placeholder="Contact Email" 
+                                   class="w-full px-4 py-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-white">
+                            <button type="submit" class="w-full btn bg-white text-purple-600 hover:bg-gray-100">
+                                <i class="fas fa-envelope mr-2"></i>
+                                Contact Partnership Team
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Testimonials -->
+    <div class="bg-gray-50 py-12">
+        <div class="container mx-auto px-4">
+            <div class="text-center mb-12">
+                <h3 class="text-3xl font-bold text-gray-800 mb-4">Partner Testimonials</h3>
+                <p class="text-gray-600 max-w-2xl mx-auto">
+                    Hear from organizations that have partnered with us to create meaningful environmental impact.
+                </p>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                {% for testimonial in testimonials %}
+                <div class="bg-white rounded-2xl shadow-lg p-6">
+                    <div class="flex items-center mb-4">
+                        <div class="w-12 h-12 rounded-full overflow-hidden mr-4">
+                            {% if testimonial.logo %}
+                            <img src="{{ testimonial.logo.url }}" 
+                                 alt="{{ testimonial.organization }}" 
+                                 class="w-full h-full object-cover">
+                            {% else %}
+                            <div class="w-full h-full bg-gradient-to-r from-purple-400 to-indigo-500 flex items-center justify-center">
+                                <i class="fas fa-building text-white"></i>
+                            </div>
+                            {% endif %}
+                        </div>
+                        <div>
+                            <h4 class="font-bold text-gray-800">{{ testimonial.organization }}</h4>
+                            <p class="text-sm text-gray-600">{{ testimonial.role }}</p>
+                        </div>
+                    </div>
+                    <p class="text-gray-600 text-sm mb-4 italic">"{{ testimonial.quote|truncatewords:30 }}"</p>
+                    <div class="flex items-center text-sm text-purple-600">
+                        <i class="fas fa-project-diagram mr-2"></i>
+                        <span>{{ testimonial.project_count }} joint projects</span>
+                    </div>
+                </div>
+                {% empty %}
+                <div class="col-span-3 text-center py-8">
+                    <i class="fas fa-comments text-3xl text-gray-300 mb-4"></i>
+                    <p class="text-gray-600">No testimonials available</p>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Partnership interactions
+    document.addEventListener('DOMContentLoaded', function() {
+        // Sector filter
+        const sectorFilters = document.querySelectorAll('.sector-filter');
+        sectorFilters.forEach(filter => {
+            filter.addEventListener('click', function() {
+                // Remove active class from all filters
+                sectorFilters.forEach(f => f.classList.remove('active'));
+                // Add active class to clicked filter
+                this.classList.add('active');
+                
+                const sector = this.getAttribute('data-sector');
+                console.log('Filtering by sector:', sector);
+                // In a real app, this would filter partners by sector
+            });
+        });
+        
+        // Partner card hover effects
+        const partnerCards = document.querySelectorAll('.partner-card');
+        partnerCards.forEach(card => {
+            card.addEventListener('mouseenter', function() {
+                const tierBadge = this.querySelector('.partner-tier');
+                if (tierBadge.classList.contains('bg-purple-100')) {
+                    this.style.boxShadow = '0 20px 40px rgba(139, 92, 246, 0.15)';
+                } else if (tierBadge.classList.contains('bg-amber-100')) {
+                    this.style.boxShadow = '0 20px 40px rgba(245, 158, 11, 0.15)';
+                } else {
+                    this.style.boxShadow = '0 20px 40px rgba(16, 185, 129, 0.15)';
+                }
+            });
+            
+            card.addEventListener('mouseleave', function() {
+                this.style.boxShadow = '';
+            });
+        });
+        
+        // Map point animations
+        const mapPoints = document.querySelectorAll('.map-point');
+        mapPoints.forEach((point, index) => {
+            // Stagger animations
+            point.style.animationDelay = `${index * 0.5}s`;
+        });
+        
+        // Partnership inquiry form
+        const partnershipForm = document.querySelector('form');
+        if (partnershipForm) {
+            partnershipForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                const orgName = this.querySelector('input[placeholder="Organization Name"]').value;
+                const email = this.querySelector('input[placeholder="Contact Email"]').value;
+                
+                console.log('Partnership inquiry:', { orgName, email });
+                alert('Thank you for your interest in partnership! Our team will contact you soon.');
+                this.reset();
+            });
+        }
+    });
+</script>
+{% endblock %}

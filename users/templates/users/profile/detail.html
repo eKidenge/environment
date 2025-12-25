@@ -1,0 +1,671 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ profile.user.get_full_name }} - Profile - EcoHub{% endblock %}
+
+{% block extra_css %}
+<style>
+    .profile-header {
+        background: linear-gradient(135deg, #10b981 0%, #0d9488 100%);
+    }
+    
+    .stat-card {
+        transition: all 0.3s ease;
+        background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+    }
+    
+    .stat-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 10px 25px -5px rgba(16, 185, 129, 0.15);
+    }
+    
+    .badge-item {
+        transition: all 0.3s ease;
+    }
+    
+    .badge-item:hover {
+        transform: scale(1.05);
+    }
+    
+    .progress-ring {
+        transform: rotate(-90deg);
+    }
+    
+    .progress-ring-circle {
+        stroke-dasharray: 283;
+        stroke-dashoffset: 283;
+        transition: stroke-dashoffset 1s ease;
+    }
+    
+    .tab-active {
+        border-bottom: 3px solid #10b981;
+        color: #10b981;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gray-50">
+    <!-- Profile Header -->
+    <div class="profile-header text-white">
+        <div class="container mx-auto px-4 py-12">
+            <div class="flex flex-col md:flex-row items-start md:items-center justify-between">
+                <div class="flex items-start space-x-6 mb-6 md:mb-0">
+                    <!-- Avatar -->
+                    <div class="relative">
+                        <div class="w-32 h-32 rounded-2xl bg-white/20 backdrop-blur-sm border-4 border-white/30 flex items-center justify-center">
+                            {% if profile.avatar %}
+                                <img src="{{ profile.avatar.url }}" alt="{{ profile.user.get_full_name }}" class="w-full h-full rounded-2xl object-cover">
+                            {% else %}
+                                <div class="text-4xl font-bold">{{ profile.user.get_full_name|first|upper }}</div>
+                            {% endif %}
+                        </div>
+                        {% if profile.verified %}
+                        <div class="absolute -bottom-2 -right-2 w-10 h-10 bg-emerald-500 rounded-full border-4 border-white flex items-center justify-center">
+                            <i class="fas fa-check text-white text-sm"></i>
+                        </div>
+                        {% endif %}
+                    </div>
+                    
+                    <!-- User Info -->
+                    <div>
+                        <h1 class="text-3xl font-bold mb-2">{{ profile.user.get_full_name }}</h1>
+                        <div class="flex items-center space-x-4 mb-3">
+                            <span class="px-3 py-1 bg-white/20 backdrop-blur-sm rounded-full text-sm">
+                                @{{ profile.user.username }}
+                            </span>
+                            <div class="flex items-center">
+                                <i class="fas fa-map-marker-alt mr-2"></i>
+                                <span>{{ profile.location|default:"Location not set" }}</span>
+                            </div>
+                        </div>
+                        
+                        <!-- Tags -->
+                        <div class="flex flex-wrap gap-2 mb-4">
+                            {% for tag in profile.tags.all %}
+                            <span class="px-3 py-1 bg-white/20 backdrop-blur-sm rounded-full text-sm">
+                                {{ tag.name }}
+                            </span>
+                            {% endfor %}
+                        </div>
+                        
+                        <!-- Join Date -->
+                        <p class="text-white/80">
+                            <i class="far fa-calendar-alt mr-2"></i>
+                            Member since {{ profile.user.date_joined|date:"F Y" }}
+                        </p>
+                    </div>
+                </div>
+                
+                <!-- Actions -->
+                <div class="flex space-x-3">
+                    <a href="{% url 'users:profile:edit' %}" class="btn bg-white text-emerald-700 hover:bg-gray-100">
+                        <i class="fas fa-edit mr-2"></i>
+                        Edit Profile
+                    </a>
+                    <button class="btn bg-white/20 backdrop-blur-sm hover:bg-white/30">
+                        <i class="fas fa-share-alt mr-2"></i>
+                        Share
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="container mx-auto px-4 py-8 -mt-12">
+        <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
+            <!-- Left Sidebar -->
+            <div class="lg:col-span-1 space-y-6">
+                <!-- Stats Card -->
+                <div class="bg-white rounded-2xl shadow-lg p-6">
+                    <h3 class="font-bold text-gray-800 mb-4">Profile Stats</h3>
+                    <div class="space-y-4">
+                        <div class="flex justify-between items-center">
+                            <span class="text-gray-600">Impact Score</span>
+                            <span class="font-bold text-emerald-600">1,245</span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-gray-600">Rank</span>
+                            <span class="font-bold text-gray-800">#124</span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-gray-600">Level</span>
+                            <span class="font-bold text-emerald-600">Eco Champion</span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-gray-600">Streak</span>
+                            <span class="font-bold text-amber-600">24 days 🔥</span>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-6 pt-6 border-t border-gray-200">
+                        <div class="flex justify-between text-sm mb-2">
+                            <span class="text-gray-600">Profile Completeness</span>
+                            <span class="font-bold">{{ profile.completeness }}%</span>
+                        </div>
+                        <div class="h-2 bg-gray-200 rounded-full overflow-hidden">
+                            <div class="h-full bg-emerald-500 rounded-full" style="width: {{ profile.completeness }}%"></div>
+                        </div>
+                        <a href="{% url 'users:profile:edit' %}" class="mt-3 block text-center text-sm text-emerald-600 hover:text-emerald-700">
+                            Complete your profile
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Badges -->
+                <div class="bg-white rounded-2xl shadow-lg p-6">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="font-bold text-gray-800">Badges Earned</h3>
+                        <span class="text-sm text-emerald-600">{{ profile.badges.count }}</span>
+                    </div>
+                    <div class="grid grid-cols-3 gap-3">
+                        {% for badge in profile.badges.all|slice:":6" %}
+                        <div class="badge-item text-center p-2">
+                            <div class="w-12 h-12 mx-auto mb-2 {{ badge.color_class }} rounded-full flex items-center justify-center">
+                                <i class="{{ badge.icon }} text-white"></i>
+                            </div>
+                            <p class="text-xs text-gray-600">{{ badge.name }}</p>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% if profile.badges.count > 6 %}
+                    <a href="#" class="mt-4 block text-center text-sm text-emerald-600 hover:text-emerald-700">
+                        View all badges
+                    </a>
+                    {% endif %}
+                </div>
+
+                <!-- Contact Info -->
+                <div class="bg-white rounded-2xl shadow-lg p-6">
+                    <h3 class="font-bold text-gray-800 mb-4">Contact Information</h3>
+                    <div class="space-y-3">
+                        {% if profile.email_public %}
+                        <div class="flex items-center text-gray-600">
+                            <i class="fas fa-envelope mr-3 text-emerald-500"></i>
+                            <a href="mailto:{{ profile.user.email }}" class="hover:text-emerald-600">{{ profile.user.email }}</a>
+                        </div>
+                        {% endif %}
+                        
+                        {% if profile.website %}
+                        <div class="flex items-center text-gray-600">
+                            <i class="fas fa-globe mr-3 text-emerald-500"></i>
+                            <a href="{{ profile.website }}" target="_blank" class="hover:text-emerald-600 truncate">{{ profile.website }}</a>
+                        </div>
+                        {% endif %}
+                        
+                        {% if profile.linkedin %}
+                        <div class="flex items-center text-gray-600">
+                            <i class="fab fa-linkedin mr-3 text-emerald-500"></i>
+                            <a href="{{ profile.linkedin }}" target="_blank" class="hover:text-emerald-600">LinkedIn Profile</a>
+                        </div>
+                        {% endif %}
+                        
+                        {% if profile.twitter %}
+                        <div class="flex items-center text-gray-600">
+                            <i class="fab fa-twitter mr-3 text-emerald-500"></i>
+                            <a href="{{ profile.twitter }}" target="_blank" class="hover:text-emerald-600">@{{ profile.twitter_handle }}</a>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Main Content Area -->
+            <div class="lg:col-span-3">
+                <!-- Tabs -->
+                <div class="bg-white rounded-2xl shadow-lg mb-6">
+                    <div class="border-b border-gray-200">
+                        <nav class="flex space-x-8 px-6">
+                            <button class="tab-button py-4 font-medium text-gray-500 hover:text-emerald-600 tab-active" data-tab="overview">
+                                <i class="fas fa-chart-line mr-2"></i>
+                                Overview
+                            </button>
+                            <button class="tab-button py-4 font-medium text-gray-500 hover:text-emerald-600" data-tab="activity">
+                                <i class="fas fa-history mr-2"></i>
+                                Activity
+                            </button>
+                            <button class="tab-button py-4 font-medium text-gray-500 hover:text-emerald-600" data-tab="contributions">
+                                <i class="fas fa-hands-helping mr-2"></i>
+                                Contributions
+                            </button>
+                            <button class="tab-button py-4 font-medium text-gray-500 hover:text-emerald-600" data-tab="projects">
+                                <i class="fas fa-project-diagram mr-2"></i>
+                                Projects
+                            </button>
+                        </nav>
+                    </div>
+                </div>
+
+                <!-- Tab Content -->
+                <div id="tab-content">
+                    <!-- Overview Tab -->
+                    <div id="overview-tab" class="tab-panel active">
+                        <!-- Bio -->
+                        <div class="bg-white rounded-2xl shadow-lg p-6 mb-6">
+                            <h3 class="font-bold text-gray-800 mb-4">About Me</h3>
+                            <div class="text-gray-600 leading-relaxed">
+                                {% if profile.bio %}
+                                    {{ profile.bio|linebreaks }}
+                                {% else %}
+                                    <p class="text-gray-400 italic">No bio provided yet.</p>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <!-- Skills & Expertise -->
+                        <div class="bg-white rounded-2xl shadow-lg p-6 mb-6">
+                            <div class="flex justify-between items-center mb-6">
+                                <h3 class="font-bold text-gray-800">Skills & Expertise</h3>
+                                <button class="text-sm text-emerald-600 hover:text-emerald-700">
+                                    <i class="fas fa-plus mr-1"></i>
+                                    Add Skill
+                                </button>
+                            </div>
+                            <div class="flex flex-wrap gap-3">
+                                {% for skill in profile.skills.all %}
+                                <div class="px-4 py-2 bg-emerald-50 text-emerald-700 rounded-full flex items-center">
+                                    <span>{{ skill.name }}</span>
+                                    <span class="ml-2 text-emerald-500 text-sm">{{ skill.level }}%</span>
+                                    <button class="ml-2 text-emerald-400 hover:text-emerald-600">
+                                        <i class="fas fa-times text-xs"></i>
+                                    </button>
+                                </div>
+                                {% empty %}
+                                <p class="text-gray-400 italic">No skills added yet.</p>
+                                {% endfor %}
+                            </div>
+                        </div>
+
+                        <!-- Impact Metrics -->
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+                            <div class="stat-card rounded-2xl p-6 border border-gray-200">
+                                <div class="flex items-center justify-between mb-4">
+                                    <h4 class="font-bold text-gray-800">Carbon Saved</h4>
+                                    <i class="fas fa-cloud text-2xl text-emerald-500"></i>
+                                </div>
+                                <div class="text-3xl font-bold text-emerald-600 mb-2">2.4T</div>
+                                <p class="text-sm text-gray-600">Equivalent to 52 trees planted</p>
+                            </div>
+                            
+                            <div class="stat-card rounded-2xl p-6 border border-gray-200">
+                                <div class="flex items-center justify-between mb-4">
+                                    <h4 class="font-bold text-gray-800">Volunteer Hours</h4>
+                                    <i class="fas fa-hands-helping text-2xl text-purple-500"></i>
+                                </div>
+                                <div class="text-3xl font-bold text-purple-600 mb-2">156</div>
+                                <p class="text-sm text-gray-600">Top 15% contributor</p>
+                            </div>
+                            
+                            <div class="stat-card rounded-2xl p-6 border border-gray-200">
+                                <div class="flex items-center justify-between mb-4">
+                                    <h4 class="font-bold text-gray-800">Programs Completed</h4>
+                                    <i class="fas fa-graduation-cap text-2xl text-blue-500"></i>
+                                </div>
+                                <div class="text-3xl font-bold text-blue-600 mb-2">8</div>
+                                <p class="text-sm text-gray-600">3 certifications earned</p>
+                            </div>
+                        </div>
+
+                        <!-- Recent Achievements -->
+                        <div class="bg-white rounded-2xl shadow-lg p-6">
+                            <h3 class="font-bold text-gray-800 mb-6">Recent Achievements</h3>
+                            <div class="space-y-4">
+                                {% for achievement in recent_achievements %}
+                                <div class="flex items-center p-4 border border-gray-200 rounded-lg hover:border-emerald-200 transition-colors">
+                                    <div class="w-12 h-12 flex-shrink-0 {{ achievement.bg_color }} rounded-lg flex items-center justify-center mr-4">
+                                        <i class="{{ achievement.icon }} {{ achievement.icon_color }} text-xl"></i>
+                                    </div>
+                                    <div class="flex-1">
+                                        <h4 class="font-semibold text-gray-800">{{ achievement.title }}</h4>
+                                        <p class="text-sm text-gray-600">{{ achievement.description }}</p>
+                                        <p class="text-xs text-gray-500 mt-1">{{ achievement.date|date:"F j, Y" }}</p>
+                                    </div>
+                                    <div class="text-right">
+                                        <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium {{ achievement.points_color }}">
+                                            <i class="fas fa-bolt mr-1"></i>
+                                            +{{ achievement.points }} pts
+                                        </span>
+                                    </div>
+                                </div>
+                                {% empty %}
+                                <p class="text-gray-400 italic text-center py-8">No achievements yet.</p>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Activity Tab -->
+                    <div id="activity-tab" class="tab-panel hidden">
+                        <div class="bg-white rounded-2xl shadow-lg p-6">
+                            <div class="flex justify-between items-center mb-6">
+                                <h3 class="font-bold text-gray-800">Recent Activity</h3>
+                                <div class="flex space-x-2">
+                                    <select class="border border-gray-300 rounded-lg px-3 py-2 text-sm">
+                                        <option>All Activities</option>
+                                        <option>Programs</option>
+                                        <option>Volunteer</option>
+                                        <option>Research</option>
+                                    </select>
+                                    <select class="border border-gray-300 rounded-lg px-3 py-2 text-sm">
+                                        <option>Last 30 days</option>
+                                        <option>Last 3 months</option>
+                                        <option>Last year</option>
+                                        <option>All time</option>
+                                    </select>
+                                </div>
+                            </div>
+                            
+                            <div class="space-y-6">
+                                {% for activity in activities %}
+                                <div class="flex items-start border-l-4 {{ activity.border_color }} pl-4 py-2">
+                                    <div class="flex-shrink-0 w-10 h-10 {{ activity.bg_color }} rounded-full flex items-center justify-center mr-4">
+                                        <i class="{{ activity.icon }} {{ activity.icon_color }}"></i>
+                                    </div>
+                                    <div class="flex-1">
+                                        <p class="text-gray-800">
+                                            {{ activity.description|safe }}
+                                        </p>
+                                        <p class="text-sm text-gray-500 mt-1">
+                                            <i class="far fa-clock mr-1"></i>
+                                            {{ activity.timestamp|timesince }} ago
+                                        </p>
+                                    </div>
+                                    {% if activity.points %}
+                                    <div class="text-right">
+                                        <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-emerald-100 text-emerald-800">
+                                            <i class="fas fa-bolt mr-1"></i>
+                                            +{{ activity.points }}
+                                        </span>
+                                    </div>
+                                    {% endif %}
+                                </div>
+                                {% empty %}
+                                <div class="text-center py-12">
+                                    <i class="fas fa-history text-4xl text-gray-300 mb-4"></i>
+                                    <h4 class="text-lg font-medium text-gray-600 mb-2">No Activity Yet</h4>
+                                    <p class="text-gray-500 mb-6">Start participating in programs and activities to see your history here.</p>
+                                    <a href="{% url 'programs:list' %}" class="btn btn-primary">
+                                        <i class="fas fa-rocket mr-2"></i>
+                                        Get Started
+                                    </a>
+                                </div>
+                                {% endfor %}
+                            </div>
+                            
+                            {% if activities.has_other_pages %}
+                            <div class="mt-8 pt-6 border-t border-gray-200">
+                                <div class="flex justify-center">
+                                    <nav class="flex items-center space-x-2">
+                                        {% if activities.has_previous %}
+                                        <a href="?page={{ activities.previous_page_number }}" class="px-3 py-2 border border-gray-300 rounded-lg text-sm hover:bg-gray-50">
+                                            <i class="fas fa-chevron-left"></i>
+                                        </a>
+                                        {% endif %}
+                                        
+                                        {% for num in activities.paginator.page_range %}
+                                            {% if activities.number == num %}
+                                            <span class="px-3 py-2 bg-emerald-600 text-white rounded-lg text-sm">{{ num }}</span>
+                                            {% else %}
+                                            <a href="?page={{ num }}" class="px-3 py-2 border border-gray-300 rounded-lg text-sm hover:bg-gray-50">{{ num }}</a>
+                                            {% endif %}
+                                        {% endfor %}
+                                        
+                                        {% if activities.has_next %}
+                                        <a href="?page={{ activities.next_page_number }}" class="px-3 py-2 border border-gray-300 rounded-lg text-sm hover:bg-gray-50">
+                                            <i class="fas fa-chevron-right"></i>
+                                        </a>
+                                        {% endif %}
+                                    </nav>
+                                </div>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <!-- Contributions Tab -->
+                    <div id="contributions-tab" class="tab-panel hidden">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                            <div class="bg-white rounded-2xl shadow-lg p-6">
+                                <h3 class="font-bold text-gray-800 mb-6">Volunteer Contributions</h3>
+                                <div class="space-y-4">
+                                    {% for contribution in volunteer_contributions %}
+                                    <div class="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
+                                        <div>
+                                            <h4 class="font-semibold text-gray-800">{{ contribution.title }}</h4>
+                                            <p class="text-sm text-gray-600">{{ contribution.organization }}</p>
+                                            <p class="text-xs text-gray-500 mt-1">
+                                                <i class="far fa-calendar mr-1"></i>
+                                                {{ contribution.date|date:"M Y" }}
+                                            </p>
+                                        </div>
+                                        <div class="text-right">
+                                            <div class="text-lg font-bold text-emerald-600">{{ contribution.hours }}h</div>
+                                            <span class="text-sm text-gray-600">hours</span>
+                                        </div>
+                                    </div>
+                                    {% empty %}
+                                    <p class="text-gray-400 italic text-center py-8">No volunteer contributions yet.</p>
+                                    {% endfor %}
+                                </div>
+                                <a href="{% url 'volunteer:opportunities:list' %}" class="mt-6 block text-center text-emerald-600 hover:text-emerald-700 font-medium">
+                                    Find Volunteer Opportunities
+                                </a>
+                            </div>
+                            
+                            <div class="bg-white rounded-2xl shadow-lg p-6">
+                                <h3 class="font-bold text-gray-800 mb-6">Research Contributions</h3>
+                                <div class="space-y-4">
+                                    {% for contribution in research_contributions %}
+                                    <div class="p-4 border border-gray-200 rounded-lg">
+                                        <h4 class="font-semibold text-gray-800 mb-2">{{ contribution.title }}</h4>
+                                        <p class="text-sm text-gray-600 mb-3">{{ contribution.description|truncatewords:30 }}</p>
+                                        <div class="flex items-center justify-between">
+                                            <span class="text-xs px-2 py-1 bg-blue-100 text-blue-800 rounded">
+                                                {{ contribution.type }}
+                                            </span>
+                                            <span class="text-sm text-gray-500">{{ contribution.date|date:"M Y" }}</span>
+                                        </div>
+                                    </div>
+                                    {% empty %}
+                                    <p class="text-gray-400 italic text-center py-8">No research contributions yet.</p>
+                                    {% endfor %}
+                                </div>
+                                <a href="{% url 'research:projects:list' %}" class="mt-6 block text-center text-emerald-600 hover:text-emerald-700 font-medium">
+                                    Explore Research Projects
+                                </a>
+                            </div>
+                        </div>
+                        
+                        <!-- Impact Timeline -->
+                        <div class="bg-white rounded-2xl shadow-lg p-6">
+                            <h3 class="font-bold text-gray-800 mb-6">Impact Timeline</h3>
+                            <div class="relative">
+                                <!-- Timeline line -->
+                                <div class="absolute left-8 top-0 bottom-0 w-0.5 bg-emerald-200"></div>
+                                
+                                <!-- Timeline items -->
+                                <div class="space-y-8 relative">
+                                    {% for event in timeline_events %}
+                                    <div class="flex items-start">
+                                        <div class="absolute left-6 w-4 h-4 bg-emerald-500 rounded-full border-4 border-white"></div>
+                                        <div class="ml-12 flex-1">
+                                            <div class="bg-gray-50 rounded-lg p-4">
+                                                <div class="flex items-center justify-between mb-2">
+                                                    <h4 class="font-semibold text-gray-800">{{ event.title }}</h4>
+                                                    <span class="text-sm text-gray-500">{{ event.date|date:"F j, Y" }}</span>
+                                                </div>
+                                                <p class="text-gray-600 text-sm">{{ event.description }}</p>
+                                                {% if event.impact %}
+                                                <div class="mt-3 flex items-center text-sm text-emerald-600">
+                                                    <i class="fas fa-bolt mr-1"></i>
+                                                    <span>{{ event.impact }}</span>
+                                                </div>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                    </div>
+                                    {% empty %}
+                                    <div class="text-center py-12">
+                                        <i class="fas fa-seedling text-4xl text-gray-300 mb-4"></i>
+                                        <h4 class="text-lg font-medium text-gray-600 mb-2">Start Your Impact Journey</h4>
+                                        <p class="text-gray-500">Your contributions will appear here as you make a difference.</p>
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Projects Tab -->
+                    <div id="projects-tab" class="tab-panel hidden">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                            <!-- Active Projects -->
+                            <div class="bg-white rounded-2xl shadow-lg p-6">
+                                <div class="flex justify-between items-center mb-6">
+                                    <h3 class="font-bold text-gray-800">Active Projects</h3>
+                                    <span class="text-sm text-emerald-600">{{ active_projects.count }}</span>
+                                </div>
+                                <div class="space-y-4">
+                                    {% for project in active_projects %}
+                                    <div class="border border-gray-200 rounded-lg p-4 hover:border-emerald-200 transition-colors">
+                                        <div class="flex items-start justify-between mb-3">
+                                            <div>
+                                                <h4 class="font-semibold text-gray-800">{{ project.title }}</h4>
+                                                <p class="text-sm text-gray-600">{{ project.category }}</p>
+                                            </div>
+                                            <span class="px-2 py-1 text-xs rounded {{ project.status_class }}">
+                                                {{ project.status }}
+                                            </span>
+                                        </div>
+                                        <div class="mb-3">
+                                            <div class="flex justify-between text-sm text-gray-600 mb-1">
+                                                <span>Progress</span>
+                                                <span>{{ project.progress }}%</span>
+                                            </div>
+                                            <div class="h-2 bg-gray-200 rounded-full overflow-hidden">
+                                                <div class="h-full {{ project.progress_color }} rounded-full" style="width: {{ project.progress }}%"></div>
+                                            </div>
+                                        </div>
+                                        <div class="flex items-center justify-between text-sm text-gray-500">
+                                            <div class="flex items-center">
+                                                <i class="fas fa-users mr-1"></i>
+                                                <span>{{ project.members.count }} members</span>
+                                            </div>
+                                            <span>Due: {{ project.due_date|date:"M d" }}</span>
+                                        </div>
+                                    </div>
+                                    {% empty %}
+                                    <p class="text-gray-400 italic text-center py-8">No active projects.</p>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            
+                            <!-- Completed Projects -->
+                            <div class="bg-white rounded-2xl shadow-lg p-6">
+                                <div class="flex justify-between items-center mb-6">
+                                    <h3 class="font-bold text-gray-800">Completed Projects</h3>
+                                    <span class="text-sm text-emerald-600">{{ completed_projects.count }}</span>
+                                </div>
+                                <div class="space-y-4">
+                                    {% for project in completed_projects %}
+                                    <div class="border border-gray-200 rounded-lg p-4">
+                                        <div class="flex items-start justify-between mb-3">
+                                            <div>
+                                                <h4 class="font-semibold text-gray-800">{{ project.title }}</h4>
+                                                <p class="text-sm text-gray-600">{{ project.category }}</p>
+                                            </div>
+                                            <i class="fas fa-check-circle text-emerald-500 text-lg"></i>
+                                        </div>
+                                        <p class="text-sm text-gray-600 mb-3">{{ project.description|truncatewords:20 }}</p>
+                                        <div class="flex items-center justify-between text-sm text-gray-500">
+                                            <span>Completed: {{ project.completed_date|date:"M Y" }}</span>
+                                            <span class="text-emerald-600 font-medium">{{ project.impact }} impact</span>
+                                        </div>
+                                    </div>
+                                    {% empty %}
+                                    <p class="text-gray-400 italic text-center py-8">No completed projects.</p>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Project Skills -->
+                        <div class="bg-white rounded-2xl shadow-lg p-6">
+                            <h3 class="font-bold text-gray-800 mb-6">Project Skills Breakdown</h3>
+                            <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
+                                {% for skill in project_skills %}
+                                <div class="text-center">
+                                    <div class="relative inline-block mb-3">
+                                        <svg class="w-20 h-20 progress-ring" viewBox="0 0 100 100">
+                                            <circle class="text-gray-200" stroke-width="8" stroke="currentColor" fill="transparent" r="45" cx="50" cy="50"/>
+                                            <circle class="progress-ring-circle {{ skill.color }}" stroke-width="8" stroke-linecap="round" stroke="currentColor" fill="transparent" r="45" cx="50" cy="50" style="stroke-dashoffset: {{ skill.dashoffset }}"/>
+                                        </svg>
+                                        <div class="absolute inset-0 flex items-center justify-center">
+                                            <i class="{{ skill.icon }} text-xl {{ skill.icon_color }}"></i>
+                                        </div>
+                                    </div>
+                                    <h4 class="font-semibold text-gray-800 mb-1">{{ skill.name }}</h4>
+                                    <p class="text-sm text-gray-600">{{ skill.projects }} projects</p>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Tab switching functionality
+    document.addEventListener('DOMContentLoaded', function() {
+        const tabs = document.querySelectorAll('.tab-button');
+        const panels = document.querySelectorAll('.tab-panel');
+        
+        tabs.forEach(tab => {
+            tab.addEventListener('click', function() {
+                const target = this.getAttribute('data-tab');
+                
+                // Update active tab
+                tabs.forEach(t => {
+                    t.classList.remove('tab-active');
+                    t.classList.add('text-gray-500');
+                    t.classList.remove('text-emerald-600');
+                });
+                this.classList.add('tab-active');
+                this.classList.remove('text-gray-500');
+                this.classList.add('text-emerald-600');
+                
+                // Show target panel
+                panels.forEach(panel => {
+                    panel.classList.remove('active');
+                    panel.classList.add('hidden');
+                });
+                document.getElementById(`${target}-tab`).classList.remove('hidden');
+                document.getElementById(`${target}-tab`).classList.add('active');
+            });
+        });
+        
+        // Initialize progress rings
+        const rings = document.querySelectorAll('.progress-ring-circle');
+        rings.forEach(ring => {
+            const parent = ring.parentElement.parentElement;
+            const text = parent.querySelector('h4').textContent;
+            const skillData = {
+                'Research': 75,
+                'Conservation': 60,
+                'Education': 90,
+                'Technology': 45
+            };
+            
+            const value = skillData[text] || 50;
+            const circumference = 2 * Math.PI * 45;
+            const offset = circumference - (value / 100) * circumference;
+            ring.style.strokeDasharray = circumference;
+            ring.style.strokeDashoffset = offset;
+        });
+    });
+</script>
+{% endblock %}
