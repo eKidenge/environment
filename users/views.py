@@ -29,19 +29,34 @@ class UserViewSet(viewsets.ModelViewSet):
     ordering_fields = ['date_joined', 'last_login', 'contribution_score', 'username']
     ordering = ['-date_joined']
     
+    #def get_permissions(self):
+       # """
+       # Instantiates and returns the list of permissions that this view requires.
+        #"""
+        #if self.action == 'create':
+           # permission_classes = [permissions.AllowAny]
+        #elif self.action in ['update', 'partial_update', 'destroy']:
+           # permission_classes = [IsAuthenticated]
+        #elif self.action in ['list', 'retrieve']:
+          #  permission_classes = [IsAuthenticated]
+        #else:
+           # permission_classes = [IsAdminUser]
+        #return [permission() for permission in permission_classes]
+
     def get_permissions(self):
-        """
+    """
         Instantiates and returns the list of permissions that this view requires.
-        """
-        if self.action == 'create':
-            permission_classes = [permissions.AllowAny]
-        elif self.action in ['update', 'partial_update', 'destroy']:
-            permission_classes = [IsAuthenticated]
-        elif self.action in ['list', 'retrieve']:
-            permission_classes = [IsAuthenticated]
-        else:
-            permission_classes = [IsAdminUser]
-        return [permission() for permission in permission_classes]
+    """
+            if self.action == 'create':
+                permission_classes = [permissions.AllowAny]
+            elif self.action in ['update', 'partial_update', 'destroy']:
+                permission_classes = [IsAuthenticated]
+            elif self.action in ['list', 'retrieve']:
+                permission_classes = [IsAuthenticated]
+            else:
+                permission_classes = [IsAdminUser]
+            # Make sure we return the correct permission classes
+            return [permission() for permission in permission_classes]
     
     def get_serializer_class(self):
         if self.action == 'create':
@@ -51,6 +66,12 @@ class UserViewSet(viewsets.ModelViewSet):
         elif self.action == 'profile':
             return UserProfileSerializer
         return UserSerializer
+        
+    def create(self, request, *args, **kwargs):
+        # Temporarily allow any permission for debugging
+        self.permission_classes = [permissions.AllowAny]
+        # Call parent create method
+        return super().create(request, *args, **kwargs)
     
     @action(detail=False, methods=['get'], permission_classes=[IsAuthenticated])
     def profile(self, request):
