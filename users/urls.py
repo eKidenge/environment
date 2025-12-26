@@ -9,12 +9,16 @@ from .views import UserViewSet, UserActivityLogViewSet, UserVerificationViewSet
 from django.views.generic import TemplateView
 
 router = DefaultRouter()
-router.register(r'users', UserViewSet, basename='user')  # ADD basename='user' HERE
+router.register(r'users', UserViewSet, basename='user')
 router.register(r'activity-logs', UserActivityLogViewSet, basename='activitylog')
 router.register(r'verifications', UserVerificationViewSet, basename='verification')
 
 urlpatterns = [
     path('', include(router.urls)),
+    
+    # Explicitly add create endpoint for registration
+    path('users/create/', UserViewSet.as_view({'post': 'create'}), name='user-create'),
+    
     path('token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
     path('token/verify/', TokenVerifyView.as_view(), name='token_verify'),
