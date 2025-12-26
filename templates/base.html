@@ -435,7 +435,7 @@
         .navbar-container {
             display: flex;
             align-items: center;
-            justify-content: space-between;
+            justify-content: flex-start; /* ← CHANGED FROM space-between TO flex-start */
             height: 100%;
             max-width: var(--container-7xl);
             margin: 0 auto;
@@ -501,6 +501,7 @@
             margin: 0;
             padding: 0;
             height: 100%;
+            margin-left: auto; /* ← ADD THIS LINE */
         }
 
         .nav-item {
