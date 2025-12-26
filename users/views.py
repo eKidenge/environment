@@ -1,12 +1,19 @@
 from rest_framework import viewsets, status, permissions, filters
-from rest_framework.decorators import action
+from rest_framework.decorators import action, api_view, permission_classes
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
+from rest_framework.views import APIView
+from rest_framework_simplejwt.tokens import RefreshToken
 from django_filters.rest_framework import DjangoFilterBackend
 from django.db.models import Count, Q, Sum
 from django.utils import timezone
+from django.shortcuts import render, redirect
+from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.decorators import login_required
+from django.contrib import messages
 from datetime import timedelta
 import logging
+import json
 
 from .models import CustomUser, UserActivityLog, UserVerification
 from .serializers import (
@@ -99,7 +106,7 @@ class UserViewSet(viewsets.ModelViewSet):
         
         print("❌ Serializer errors:", serializer.errors)
         print("=== REGISTRATION VALIDATION FAILED ===")
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        return Response(serializer.errors, status=status.HTP_400_BAD_REQUEST)
     
     @action(detail=False, methods=['get'], permission_classes=[IsAuthenticated])
     def profile(self, request):
@@ -290,18 +297,14 @@ class UserVerificationViewSet(viewsets.ModelViewSet):
 
 
 # ===== LOGIN API VIEW =====
-from rest_framework.views import APIView
-from rest_framework_simplejwt.tokens import RefreshToken
-from django.contrib.auth import authenticate
-
 class LoginAPIView(APIView):
     """
-    API endpoint for user login
+    API endpoint for user login (for mobile apps, etc.)
     """
     permission_classes = [permissions.AllowAny]
     
     def post(self, request):
-        print("=== LOGIN ATTEMPT ===")
+        print("=== API LOGIN ATTEMPT ===")
         print("Login data:", request.data)
         
         username = request.data.get('username')
@@ -333,13 +336,13 @@ class LoginAPIView(APIView):
             # Log login activity
             UserActivityLog.objects.create(
                 user=user,
-                activity_type='login',
+                activity_type='api_login',
                 ip_address=self.get_client_ip(request),
                 user_agent=request.META.get('HTTP_USER_AGENT', ''),
-                details={'method': 'web_login'}
+                details={'method': 'api_login'}
             )
             
-            print(f"✅ Login successful for user: {user.username}")
+            print(f"✅ API Login successful for user: {user.username}")
             
             return Response({
                 'message': 'Login successful',
@@ -357,7 +360,7 @@ class LoginAPIView(APIView):
                 }
             })
         
-        print(f"❌ Login failed for username: {username}")
+        print(f"❌ API Login failed for username: {username}")
         return Response(
             {'error': 'Invalid username or password'},
             status=status.HTTP_401_UNAUTHORIZED
@@ -370,3 +373,170 @@ class LoginAPIView(APIView):
         else:
             ip = request.META.get('REMOTE_ADDR')
         return ip
+
+
+# ===== TEMPLATE-BASED VIEWS =====
+def login_view(request):
+    """
+    Template-based login view
+    """
+    if request.user.is_authenticated:
+        return redirect('dashboard')
+    
+    if request.method == 'POST':
+        username = request.POST.get('username')
+        password = request.POST.get('password')
+        
+        user = authenticate(request, username=username, password=password)
+        
+        if user is not None:
+            login(request, user)
+            
+            # Log login activity
+            UserActivityLog.objects.create(
+                user=user,
+                activity_type='web_login',
+                ip_address=get_client_ip(request),
+                user_agent=request.META.get('HTTP_USER_AGENT', ''),
+                details={'method': 'web_login'}
+            )
+            
+            messages.success(request, 'Login successful!')
+            
+            # Redirect to dashboard template
+            return redirect('dashboard')
+        else:
+            messages.error(request, 'Invalid username or password')
+    
+    return render(request, 'users/login.html')
+
+@login_required
+def dashboard(request):
+    """
+    User dashboard view
+    """
+    user = request.user
+    
+    # Get user statistics
+    recent_activities = UserActivityLog.objects.filter(user=user).order_by('-timestamp')[:10]
+    
+    context = {
+        'user': user,
+        'recent_activities': recent_activities,
+        'verification_status': user.verification_status,
+        'is_verified': user.verification_status == 'verified',
+    }
+    
+    return render(request, 'users/dashboard/home.html', context)
+
+@login_required
+def profile_view(request):
+    """
+    User profile view (template-based)
+    """
+    if request.method == 'POST':
+        # Handle profile update
+        user = request.user
+        user.first_name = request.POST.get('first_name', user.first_name)
+        user.last_name = request.POST.get('last_name', user.last_name)
+        user.email = request.POST.get('email', user.email)
+        user.phone = request.POST.get('phone', user.phone)
+        user.country = request.POST.get('country', user.country)
+        user.city = request.POST.get('city', user.city)
+        user.save()
+        
+        # Log activity
+        UserActivityLog.objects.create(
+            user=user,
+            activity_type='profile_update',
+            ip_address=get_client_ip(request),
+            user_agent=request.META.get('HTTP_USER_AGENT', ''),
+            details={'updated_fields': list(request.POST.keys())}
+        )
+        
+        messages.success(request, 'Profile updated successfully!')
+        return redirect('profile')
+    
+    return render(request, 'users/profile.html', {'user': request.user})
+
+def logout_view(request):
+    """
+    Logout view
+    """
+    if request.user.is_authenticated:
+        # Log logout activity
+        UserActivityLog.objects.create(
+            user=request.user,
+            activity_type='logout',
+            ip_address=get_client_ip(request),
+            user_agent=request.META.get('HTTP_USER_AGENT', ''),
+            details={'method': 'web_logout'}
+        )
+    
+    logout(request)
+    messages.success(request, 'You have been logged out successfully.')
+    return redirect('login')
+
+def get_client_ip(request):
+    """
+    Helper function to get client IP address
+    """
+    x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
+    if x_forwarded_for:
+        ip = x_forwarded_for.split(',')[0]
+    else:
+        ip = request.META.get('REMOTE_ADDR')
+    return ip
+
+
+# ===== API VIEW FOR DASHBOARD DATA =====
+class DashboardAPIView(APIView):
+    """
+    API endpoint for dashboard data
+    """
+    permission_classes = [IsAuthenticated]
+    
+    def get(self, request):
+        user = request.user
+        
+        # Get user statistics
+        today = timezone.now().date()
+        last_30_days = today - timedelta(days=30)
+        
+        # Recent activities
+        recent_activities = UserActivityLog.objects.filter(
+            user=user
+        ).order_by('-timestamp')[:10].values(
+            'activity_type', 'timestamp', 'details'
+        )
+        
+        # Activity count by type in last 30 days
+        activity_stats = UserActivityLog.objects.filter(
+            user=user,
+            timestamp__gte=last_30_days
+        ).values('activity_type').annotate(
+            count=Count('id')
+        ).order_by('-count')
+        
+        data = {
+            'user': {
+                'id': user.id,
+                'username': user.username,
+                'email': user.email,
+                'first_name': user.first_name,
+                'last_name': user.last_name,
+                'user_type': user.user_type,
+                'verification_status': user.verification_status,
+                'contribution_score': user.contribution_score,
+                'date_joined': user.date_joined,
+                'last_login': user.last_login,
+            },
+            'stats': {
+                'total_activities': UserActivityLog.objects.filter(user=user).count(),
+                'recent_activities': list(recent_activities),
+                'activity_stats': list(activity_stats),
+                'is_verified': user.verification_status == 'verified',
+            }
+        }
+        
+        return Response(data)
