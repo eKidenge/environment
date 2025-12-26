@@ -29,8 +29,20 @@ class UserViewSet(viewsets.ModelViewSet):
     ordering_fields = ['date_joined', 'last_login', 'contribution_score', 'username']
     ordering = ['-date_joined']
     
-    # TEMPORARY FIX: Allow anyone to create users
-    permission_classes = [permissions.AllowAny]
+    def get_permissions(self):
+        """
+        Instantiates and returns the list of permissions that this view requires.
+        """
+        if self.action == 'create':
+            permission_classes = [permissions.AllowAny]
+        elif self.action in ['update', 'partial_update', 'destroy']:
+            permission_classes = [IsAuthenticated]
+        elif self.action in ['list', 'retrieve']:
+            permission_classes = [IsAuthenticated]
+        else:
+            permission_classes = [IsAdminUser]
+        
+        return [permission() for permission in permission_classes]
     
     def get_serializer_class(self):
         if self.action == 'create':
@@ -45,34 +57,49 @@ class UserViewSet(viewsets.ModelViewSet):
         """
         Create a new user (registration)
         """
-        serializer = self.get_serializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
+        print("=== REGISTRATION STARTED ===")
+        print("Request data:", request.data)
         
-        try:
-            user = serializer.save()
-            
-            # Log registration activity
-            UserActivityLog.objects.create(
-                user=user,
-                activity_type='registration',
-                ip_address=self.get_client_ip(request),
-                user_agent=request.META.get('HTTP_USER_AGENT', ''),
-                details={'source': 'web_registration'}
-            )
-            
-            # Return success response
-            headers = self.get_success_headers(serializer.data)
-            return Response(
-                serializer.data,
-                status=status.HTTP_201_CREATED,
-                headers=headers
-            )
-        except Exception as e:
-            logger.error(f"Registration error: {str(e)}")
-            return Response(
-                {'detail': 'Registration failed. Please try again.'},
-                status=status.HTTP_400_BAD_REQUEST
-            )
+        serializer = self.get_serializer(data=request.data)
+        
+        if serializer.is_valid():
+            print("Serializer is valid")
+            try:
+                user = serializer.save()
+                print(f"✅ User created: {user.username} (ID: {user.id})")
+                print(f"Email: {user.email}, Name: {user.first_name} {user.last_name}")
+                
+                # Log registration activity
+                UserActivityLog.objects.create(
+                    user=user,
+                    activity_type='registration',
+                    ip_address=self.get_client_ip(request),
+                    user_agent=request.META.get('HTTP_USER_AGENT', ''),
+                    details={'source': 'web_registration'}
+                )
+                print("✅ Activity log created")
+                
+                # Return success response
+                headers = self.get_success_headers(serializer.data)
+                print("=== REGISTRATION COMPLETED SUCCESSFULLY ===")
+                return Response(
+                    serializer.data,
+                    status=status.HTTP_201_CREATED,
+                    headers=headers
+                )
+                
+            except Exception as e:
+                print(f"❌ Error creating user: {str(e)}")
+                logger.error(f"Registration error: {str(e)}")
+                print("=== REGISTRATION FAILED ===")
+                return Response(
+                    {'detail': 'Registration failed. Please try again.'},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+        
+        print("❌ Serializer errors:", serializer.errors)
+        print("=== REGISTRATION VALIDATION FAILED ===")
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
     @action(detail=False, methods=['get'], permission_classes=[IsAuthenticated])
     def profile(self, request):
