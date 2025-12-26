@@ -2447,8 +2447,20 @@ section {
     -moz-osx-font-smoothing: grayscale;
     text-rendering: optimizeLegibility;
 }
+    /* Reduce spacing between sections */
+.hero-section,
+.mission-vision,
+.team-section,
+.stats-section,
+.cta-section {
+    padding: 4rem 0 !important;  /* Adjust this value as needed */
+}
 
-
+/* If you want the hero to still be larger */
+.hero-section {
+    padding: 5rem 0 !important;
+}
+    
 /* ==========================================================================
    END OF STYLESHEET
    Total Lines: 5287
