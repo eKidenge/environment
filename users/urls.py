@@ -9,7 +9,7 @@ from .views import UserViewSet, UserActivityLogViewSet, UserVerificationViewSet
 from django.views.generic import TemplateView
 
 router = DefaultRouter()
-router.register(r'users', UserViewSet)
+router.register(r'users', UserViewSet, basename='user')  # ADD basename='user' HERE
 router.register(r'activity-logs', UserActivityLogViewSet, basename='activitylog')
 router.register(r'verifications', UserVerificationViewSet, basename='verification')
 
