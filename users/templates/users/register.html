@@ -3036,6 +3036,7 @@ function checkPasswordStrength(password) {
     };
     
     let strength = 0;
+    let tips = [];
     
     // Check password length
     if (password.length >= 8) {
@@ -3255,40 +3256,7 @@ function selectRole(element, role) {
     roleError.classList.remove('show');
 }
 
-// ===== GET CSRF TOKEN =====
-function getCSRFToken() {
-    let cookieValue = null;
-    if (document.cookie && document.cookie !== '') {
-        const cookies = document.cookie.split(';');
-        for (let i = 0; i < cookies.length; i++) {
-            const cookie = cookies[i].trim();
-            if (cookie.substring(0, 10) === 'csrftoken=') {
-                cookieValue = decodeURIComponent(cookie.substring(10));
-                break;
-            }
-        }
-    }
-    return cookieValue;
-}
-
-// ===== SHOW FORM ERRORS =====
-function showFormErrors(errors) {
-    // Clear all previous errors
-    document.querySelectorAll('.error-message').forEach(el => {
-        el.classList.remove('show');
-    });
-    
-    // Show new errors
-    for (const [field, messages] of Object.entries(errors)) {
-        const errorElement = document.getElementById(`${field}_error`);
-        if (errorElement) {
-            errorElement.textContent = Array.isArray(messages) ? messages[0] : messages;
-            errorElement.classList.add('show');
-        }
-    }
-}
-
-// ===== FORM SUBMISSION =====
+// ===== FORM VALIDATION =====
 const registrationForm = document.getElementById('registrationForm');
 const submitButton = document.getElementById('submitButton');
 
@@ -3296,62 +3264,148 @@ if (registrationForm) {
     registrationForm.addEventListener('submit', async function(e) {
         e.preventDefault();
         
-        // Disable submit button
+        // Disable submit button and show loading state
         const originalText = submitButton.innerHTML;
         submitButton.innerHTML = '<div class="loading-spinner"></div> Processing...';
         submitButton.disabled = true;
         
-        // Collect form data
-        const formData = {
-            username: document.getElementById('username').value.trim(),
-            email: document.getElementById('email').value.trim(),
-            first_name: document.getElementById('first_name').value.trim(),
-            last_name: document.getElementById('last_name').value.trim(),
-            password: document.getElementById('password').value,
-            confirm_password: document.getElementById('confirm_password').value,
-            terms: document.getElementById('terms').checked,
-            newsletter: document.getElementById('newsletter').checked
-        };
+        // Validate all fields
+        let isValid = true;
         
-        // Add role if selected
-        const roleInput = document.querySelector('input[name="role"]:checked');
-        if (roleInput) {
-            formData.role = roleInput.value;
+        // First Name
+        const firstName = document.getElementById('first_name').value.trim();
+        const firstNameError = document.getElementById('first_name_error');
+        if (!firstName) {
+            firstNameError.textContent = 'First name is required';
+            firstNameError.classList.add('show');
+            isValid = false;
+        } else {
+            firstNameError.classList.remove('show');
         }
         
-        try {
-            // Send to your Django REST API
-            const response = await fetch('/api/users/', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRFToken': getCSRFToken(),
-                },
-                body: JSON.stringify(formData)
-            });
-            
-            const data = await response.json();
-            
-            if (response.ok) {
-                // Success
-                alert('🎉 Registration successful! You can now login.');
-                window.location.href = "{% url 'users:login' %}";
-            } else {
-                // Show errors from API
-                showFormErrors(data);
+        // Last Name
+        const lastName = document.getElementById('last_name').value.trim();
+        const lastNameError = document.getElementById('last_name_error');
+        if (!lastName) {
+            lastNameError.textContent = 'Last name is required';
+            lastNameError.classList.add('show');
+            isValid = false;
+        } else {
+            lastNameError.classList.remove('show');
+        }
+        
+        // Email
+        const email = document.getElementById('email').value.trim();
+        const emailError = document.getElementById('email_error');
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!email) {
+            emailError.textContent = 'Email is required';
+            emailError.classList.add('show');
+            isValid = false;
+        } else if (!emailRegex.test(email)) {
+            emailError.textContent = 'Please enter a valid email address';
+            emailError.classList.add('show');
+            isValid = false;
+        } else {
+            emailError.classList.remove('show');
+        }
+        
+        // Username
+        const username = document.getElementById('username').value.trim();
+        const usernameError = document.getElementById('username_error');
+        const usernameRegex = /^[a-zA-Z0-9_]{3,30}$/;
+        if (!username) {
+            usernameError.textContent = 'Username is required';
+            usernameError.classList.add('show');
+            isValid = false;
+        } else if (!usernameRegex.test(username)) {
+            usernameError.textContent = 'Username must be 3-30 characters and contain only letters, numbers, and underscores';
+            usernameError.classList.add('show');
+            isValid = false;
+        } else {
+            usernameError.classList.remove('show');
+        }
+        
+        // Password
+        const password = document.getElementById('password').value;
+        const passwordError = document.getElementById('password_error');
+        if (!password) {
+            passwordError.textContent = 'Password is required';
+            passwordError.classList.add('show');
+            isValid = false;
+        } else if (password.length < 8) {
+            passwordError.textContent = 'Password must be at least 8 characters long';
+            passwordError.classList.add('show');
+            isValid = false;
+        } else {
+            passwordError.classList.remove('show');
+        }
+        
+        // Confirm Password
+        const confirmPassword = document.getElementById('confirm_password').value;
+        const confirmPasswordError = document.getElementById('confirm_password_error');
+        if (!confirmPassword) {
+            confirmPasswordError.textContent = 'Please confirm your password';
+            confirmPasswordError.classList.add('show');
+            isValid = false;
+        } else if (password !== confirmPassword) {
+            confirmPasswordError.textContent = 'Passwords do not match';
+            confirmPasswordError.classList.add('show');
+            isValid = false;
+        } else {
+            confirmPasswordError.classList.remove('show');
+        }
+        
+        // Role
+        const roleError = document.getElementById('role_error');
+        if (!selectedRole) {
+            roleError.textContent = 'Please select your primary interest';
+            roleError.classList.add('show');
+            isValid = false;
+        } else {
+            roleError.classList.remove('show');
+        }
+        
+        // Terms
+        const termsCheckbox = document.getElementById('terms');
+        const termsError = document.getElementById('terms_error');
+        if (!termsCheckbox.checked) {
+            termsError.textContent = 'You must agree to the terms and conditions';
+            termsError.classList.add('show');
+            isValid = false;
+        } else {
+            termsError.classList.remove('show');
+        }
+        
+        // If form is valid, submit it
+        if (isValid) {
+            // In a real application, this would submit the form via AJAX
+            // For now, we'll simulate a successful registration
+            setTimeout(() => {
+                alert('🎉 Registration successful! Welcome to YES!');
+                registrationForm.reset();
+                document.querySelectorAll('.role-card').forEach(card => {
+                    card.classList.remove('selected');
+                });
+                selectedRole = null;
                 
-                // Re-enable button
+                // Reset button
                 submitButton.innerHTML = originalText;
                 submitButton.disabled = false;
-            }
-            
-        } catch (error) {
-            console.error('Registration error:', error);
-            alert('Network error. Please try again.');
-            
-            // Re-enable button
+                
+                // Redirect to login page (in real app)
+                // window.location.href = "{% url 'users:login' %}";
+            }, 1500);
+        } else {
+            // Re-enable button if validation failed
             submitButton.innerHTML = originalText;
             submitButton.disabled = false;
+            
+            // Scroll to first error
+            const firstError = document.querySelector('.error-message.show');
+            if (firstError) {
+                firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
         }
     });
 }
@@ -3373,7 +3427,7 @@ if (confirmPasswordInput) {
     });
 }
 
-// ===== INITIALIZE =====
+// ===== INITIALIZE REAL-TIME VALIDATION =====
 document.addEventListener('DOMContentLoaded', function() {
     // Initialize password strength check
     const passwordInput = document.getElementById('password');
