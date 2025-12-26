@@ -1698,7 +1698,7 @@ input[type="radio"]:checked::after {
                 </div>
 
                 <!-- Login Form -->
-                <form method="post" class="space-y-6" id="loginForm">
+                <form method="post" action="{% url 'users:login' %}" class="space-y-6" id="loginForm">
                     {% csrf_token %}
                     
                     <div>
@@ -1834,116 +1834,23 @@ function togglePasswordVisibility(inputId) {
     }
 }
 
-// ===== GET CSRF TOKEN =====
-function getCSRFToken() {
-    let cookieValue = null;
-    if (document.cookie && document.cookie !== '') {
-        const cookies = document.cookie.split(';');
-        for (let i = 0; i < cookies.length; i++) {
-            const cookie = cookies[i].trim();
-            if (cookie.substring(0, 10) === 'csrftoken=') {
-                cookieValue = decodeURIComponent(cookie.substring(10));
-                break;
-            }
-        }
-    }
-    return cookieValue;
-}
-
 // ===== LOGIN FORM SUBMISSION =====
 const loginForm = document.getElementById('loginForm');
 const loginButton = document.getElementById('loginButton');
 
 if (loginForm) {
-    loginForm.addEventListener('submit', async function(e) {
-        e.preventDefault();
-        console.log('Login form submitted');
-        
-        // Clear previous messages
-        document.getElementById('loginError').classList.add('hidden');
-        document.getElementById('loginSuccess').classList.add('hidden');
-        document.getElementById('username_error').classList.add('hidden');
-        document.getElementById('password_error').classList.add('hidden');
-        
-        // Disable button and show loading
+    loginForm.addEventListener('submit', function(e) {
+        // Show loading state
         const originalText = loginButton.innerHTML;
         loginButton.innerHTML = '<div class="loading-spinner inline-block mr-2"></div> Signing In...';
         loginButton.disabled = true;
         
-        // Get form data
-        const formData = {
-            username: document.getElementById('username').value.trim(),
-            password: document.getElementById('password').value,
-            remember: document.getElementById('remember').checked
-        };
+        // Clear previous messages
+        document.getElementById('loginError').classList.add('hidden');
+        document.getElementById('loginSuccess').classList.add('hidden');
         
-        console.log('Login data:', formData);
-        
-        // Basic validation
-        if (!formData.username) {
-            showError('username_error', 'Username or email is required');
-            resetButton();
-            return;
-        }
-        
-        if (!formData.password) {
-            showError('password_error', 'Password is required');
-            resetButton();
-            return;
-        }
-        
-        try {
-            // Send login request to API
-            const response = await fetch('/api/users/login-api/', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRFToken': getCSRFToken(),
-                },
-                body: JSON.stringify(formData)
-            });
-            
-            console.log('Login response status:', response.status);
-            
-            const data = await response.json();
-            console.log('Login response data:', data);
-            
-            if (response.ok) {
-                // Login successful
-                console.log('✅ Login successful for:', data.user.username);
-                
-                // Store tokens in localStorage
-                if (data.tokens) {
-                    localStorage.setItem('access_token', data.tokens.access);
-                    localStorage.setItem('refresh_token', data.tokens.refresh);
-                    localStorage.setItem('user', JSON.stringify(data.user));
-                    
-                    // Set remember me
-                    if (formData.remember) {
-                        localStorage.setItem('remember_me', 'true');
-                    }
-                }
-                
-                // Show success message
-                document.getElementById('loginSuccess').classList.remove('hidden');
-                
-                // Redirect to dashboard or home page after 2 seconds
-                setTimeout(() => {
-                    window.location.href = "{% url 'core:home' %}";
-                }, 2000);
-                
-            } else {
-                // Login failed
-                console.error('❌ Login failed:', data);
-                showLoginError(data.error || 'Invalid username or password');
-                resetButton();
-            }
-            
-        } catch (error) {
-            console.error('Login error:', error);
-            showLoginError('Network error. Please check your connection.');
-            resetButton();
-        }
+        // The form will submit normally to Django view
+        // The Django view will handle authentication and redirect to dashboard
     });
 }
 
@@ -1961,29 +1868,14 @@ function showLoginError(message) {
     errorDiv.classList.remove('hidden');
 }
 
-function resetButton() {
-    loginButton.innerHTML = '<span class="absolute left-0 inset-y-0 flex items-center pl-3"><i class="fas fa-sign-in-alt text-white"></i></span>Sign In<i class="fas fa-arrow-right ml-2 group-hover:translate-x-1 transition-transform"></i>';
-    loginButton.disabled = false;
-}
-
-// ===== CHECK IF USER IS ALREADY LOGGED IN =====
-function checkAuthStatus() {
-    const accessToken = localStorage.getItem('access_token');
-    const userData = localStorage.getItem('user');
-    
-    if (accessToken && userData) {
-        // User is already logged in, redirect to home
-        console.log('User is already logged in, redirecting...');
-        window.location.href = "{% url 'core:home' %}";
-    }
-}
-
 // ===== INITIALIZE =====
 document.addEventListener('DOMContentLoaded', function() {
     console.log('Login page loaded');
     
-    // Check if user is already logged in
-    checkAuthStatus();
+    // Check for error messages from Django
+    {% if error %}
+        showLoginError('{{ error }}');
+    {% endif %}
     
     // Add focus styles to form inputs
     const formInputs = document.querySelectorAll('.form-input');
@@ -1996,17 +1888,30 @@ document.addEventListener('DOMContentLoaded', function() {
             this.parentElement.classList.remove('ring-2', 'ring-emerald-500');
         });
     });
-    
-    // Check for remembered username
-    if (localStorage.getItem('remember_me') === 'true') {
-        const user = JSON.parse(localStorage.getItem('user') || '{}');
-        if (user.username) {
-            document.getElementById('username').value = user.username;
-            document.getElementById('remember').checked = true;
-        }
-    }
 });
 </script>
+
+<style>
+    @keyframes blob {
+        0% { transform: translate(0px, 0px) scale(1); }
+        33% { transform: translate(30px, -50px) scale(1.1); }
+        66% { transform: translate(-20px, 20px) scale(0.9); }
+        100% { transform: translate(0px, 0px) scale(1); }
+    }
+    
+    .animate-blob {
+        animation: blob 7s infinite;
+    }
+    
+    .animation-delay-2000 {
+        animation-delay: 2s;
+    }
+    
+    .animation-delay-4000 {
+        animation-delay: 4s;
+    }
+</style>
+
 
 <style>
     @keyframes blob {
