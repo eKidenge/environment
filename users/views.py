@@ -290,9 +290,12 @@ class UserVerificationViewSet(viewsets.ModelViewSet):
 
 
 # ===== LOGIN API VIEW =====
-from rest_framework.views import APIView
+from django.shortcuts import redirect
+from django.contrib.auth import authenticate, login as auth_login
 from rest_framework_simplejwt.tokens import RefreshToken
-from django.contrib.auth import authenticate
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework import status, permissions
 
 class LoginAPIView(APIView):
     """
@@ -326,6 +329,9 @@ class LoginAPIView(APIView):
             # Generate JWT tokens
             refresh = RefreshToken.for_user(user)
             
+            # Perform Django login to establish session (NEW LINE)
+            auth_login(request, user)
+            
             # Update user's last login
             user.last_login = timezone.now()
             user.save()
@@ -341,21 +347,25 @@ class LoginAPIView(APIView):
             
             print(f"✅ Login successful for user: {user.username}")
             
-            return Response({
-                'message': 'Login successful',
-                'user': {
-                    'id': user.id,
-                    'username': user.username,
-                    'email': user.email,
-                    'first_name': user.first_name,
-                    'last_name': user.last_name,
-                    'user_type': user.user_type,
-                },
-                'tokens': {
-                    'refresh': str(refresh),
-                    'access': str(refresh.access_token),
-                }
-            })
+            # Redirect to dashboard template (CHANGED THIS SECTION)
+            return redirect('dashboard_home')
+            
+            # Remove the old Response return:
+            # return Response({
+            #     'message': 'Login successful',
+            #     'user': {
+            #         'id': user.id,
+            #         'username': user.username,
+            #         'email': user.email,
+            #         'first_name': user.first_name,
+            #         'last_name': user.last_name,
+            #         'user_type': user.user_type,
+            #     },
+            #     'tokens': {
+            #         'refresh': str(refresh),
+            #         'access': str(refresh.access_token),
+            #     }
+            # })
         
         print(f"❌ Login failed for username: {username}")
         return Response(
@@ -369,4 +379,4 @@ class LoginAPIView(APIView):
             ip = x_forwarded_for.split(',')[0]
         else:
             ip = request.META.get('REMOTE_ADDR')
-        return ip   
+        return ip
