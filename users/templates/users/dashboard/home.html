@@ -50,6 +50,14 @@
     overflow-x: hidden;
 }
 
+/* HIDE BASE.HTML LOGIN/SIGNUP BUTTONS */
+.dashboard-container nav a[href*="login"],
+.dashboard-container nav a[href*="signup"],
+.dashboard-container .login-btn,
+.dashboard-container .signup-btn {
+    display: none !important;
+}
+
 .dashboard-background {
     position: fixed;
     top: 0;
@@ -87,6 +95,12 @@
     box-shadow: var(--shadow-hard);
     overflow: hidden;
     z-index: 10;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 70vh;
+    text-align: center;
 }
 
 .dashboard-header::before {
@@ -116,7 +130,30 @@
 .header-content {
     position: relative;
     z-index: 2;
-    padding: 3rem 0;
+    padding: 3rem 1rem;
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+/* CENTERED GRID LAYOUT */
+.header-content > .grid {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    gap: 2rem;
+}
+
+@media (min-width: 1024px) {
+    .header-content > .grid {
+        flex-direction: row;
+        justify-content: center;
+        align-items: flex-start;
+    }
 }
 
 /* User Welcome Section */
@@ -133,6 +170,16 @@
         inset 0 1px 0 rgba(255, 255, 255, 0.1),
         0 20px 40px rgba(0, 0, 0, 0.1);
     overflow: hidden;
+    max-width: 900px;
+    width: 100%;
+    margin: 0 auto;
+    text-align: center;
+}
+
+@media (min-width: 1024px) {
+    .user-welcome {
+        text-align: left;
+    }
 }
 
 .user-welcome::before {
@@ -146,6 +193,23 @@
         transparent, 
         rgba(255, 255, 255, 0.3), 
         transparent);
+}
+
+/* CENTERED FLEX CONTAINER */
+.user-welcome > .flex {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 2rem;
+}
+
+@media (min-width: 1024px) {
+    .user-welcome > .flex {
+        flex-direction: row;
+        text-align: left;
+        align-items: center;
+    }
 }
 
 /* User Avatar */
@@ -163,6 +227,7 @@
     position: relative;
     overflow: hidden;
     transition: var(--transition-bounce);
+    flex-shrink: 0;
 }
 
 .user-avatar-large:hover {
@@ -196,9 +261,19 @@
     }
 }
 
-/* Welcome Text */
+/* CENTERED Welcome Text */
 .welcome-text {
     position: relative;
+    flex: 1;
+    max-width: 800px;
+    margin: 0 auto;
+    text-align: center;
+}
+
+@media (min-width: 1024px) {
+    .welcome-text {
+        text-align: left;
+    }
 }
 
 .welcome-text h1 {
@@ -246,15 +321,23 @@
     transform: scaleX(1);
 }
 
-/* Welcome Description */
+/* CENTERED Welcome Description */
 .welcome-description {
     font-size: 1.25rem;
     line-height: 1.6;
     color: rgba(255, 255, 255, 0.85);
     max-width: 600px;
-    margin-bottom: 2rem;
+    margin: 0 auto 2rem;
     position: relative;
-    padding-left: 1.5rem;
+    padding-left: 0;
+    text-align: center;
+}
+
+@media (min-width: 1024px) {
+    .welcome-description {
+        text-align: left;
+        padding-left: 1.5rem;
+    }
 }
 
 .welcome-description::before {
@@ -264,6 +347,13 @@
     top: 0;
     font-size: 1.2rem;
     animation: sparkle 2s ease-in-out infinite;
+    display: none;
+}
+
+@media (min-width: 1024px) {
+    .welcome-description::before {
+        display: block;
+    }
 }
 
 @keyframes sparkle {
@@ -277,7 +367,7 @@
     }
 }
 
-/* User Stats Bar */
+/* CENTERED User Stats Bar */
 .user-stats-bar {
     display: flex;
     gap: 2rem;
@@ -286,6 +376,8 @@
     border-radius: 1rem;
     border: 1px solid rgba(255, 255, 255, 0.1);
     backdrop-filter: blur(10px);
+    flex-wrap: wrap;
+    justify-content: center;
 }
 
 .stat-item {
@@ -327,6 +419,8 @@
     box-shadow: var(--shadow-medium);
     transition: var(--transition-smooth);
     overflow: hidden;
+    max-width: 300px;
+    margin: 0 auto;
 }
 
 .achievement-badge:hover {
@@ -389,11 +483,15 @@
     }
 }
 
-/* Stats Grid Enhancement */
+/* CENTERED Stats Grid */
 .stats-grid {
     display: grid;
     gap: 1.5rem;
     margin-top: 3rem;
+    width: 100%;
+    max-width: 1200px;
+    margin-left: auto;
+    margin-right: auto;
 }
 
 .stat-card-premium {
@@ -609,6 +707,7 @@
 .content-container {
     max-width: 1400px;
     margin: 0 auto;
+    padding: 0 1rem;
 }
 
 /* Glass Card Enhancement */
@@ -1896,6 +1995,14 @@
                 }, 500);
             });
         }
+        
+        // Hide any login/signup buttons from base.html
+        const loginSignupButtons = document.querySelectorAll('a[href*="login"], a[href*="signup"]');
+        loginSignupButtons.forEach(button => {
+            if (button.closest('nav') || button.closest('header')) {
+                button.style.display = 'none';
+            }
+        });
     });
 </script>
 {% endblock %}
