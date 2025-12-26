@@ -348,7 +348,7 @@ class LoginAPIView(APIView):
             print(f"✅ Login successful for user: {user.username}")
             
             # Redirect to dashboard template (CHANGED THIS SECTION)
-            return redirect('dashboard_home')
+            return redirect('users:dashboard_home')
             
             # Remove the old Response return:
             # return Response({
