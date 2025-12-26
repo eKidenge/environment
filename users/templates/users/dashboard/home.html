@@ -1339,12 +1339,15 @@
     <header class="dashboard-header">
         <div class="container mx-auto px-4">
             <div class="header-content">
-                <!-- Logout Button -->
+                <!-- Logout Button - UPDATED TO USE FORM -->
                 <div class="logout-container">
-                    <a href="{% url 'users:logout' %}" class="logout-btn">
+                    <a href="#" onclick="event.preventDefault(); document.getElementById('logout-form').submit();" class="logout-btn">
                         <i class="fas fa-sign-out-alt"></i>
                         <span>Logout</span>
                     </a>
+                    <form id="logout-form" action="{% url 'users:logout' %}" method="post" style="display: none;">
+                        {% csrf_token %}
+                    </form>
                 </div>
                 
                 <!-- User Welcome Section -->
@@ -1878,6 +1881,21 @@
         document.querySelectorAll('.stat-card-premium, .activity-item-premium, .impact-card-premium').forEach(card => {
             observer.observe(card);
         });
+        
+        // Add logout button loading state
+        const logoutBtn = document.querySelector('.logout-btn');
+        if (logoutBtn) {
+            logoutBtn.addEventListener('click', function(e) {
+                const originalText = this.innerHTML;
+                this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> <span>Logging out...</span>';
+                this.disabled = true;
+                
+                // Submit the form after a short delay to show loading state
+                setTimeout(() => {
+                    document.getElementById('logout-form').submit();
+                }, 500);
+            });
+        }
     });
 </script>
 {% endblock %}
