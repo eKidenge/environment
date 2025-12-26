@@ -288,7 +288,12 @@ class UserVerificationViewSet(viewsets.ModelViewSet):
         
         return Response({'status': 'Verification rejected'})
 
-# UPDATED TO HANDLE LOGINS
+
+# ===== LOGIN API VIEW =====
+from rest_framework.views import APIView
+from rest_framework_simplejwt.tokens import RefreshToken
+from django.contrib.auth import authenticate
+
 class LoginAPIView(APIView):
     """
     API endpoint for user login
