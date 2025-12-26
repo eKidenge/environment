@@ -2613,6 +2613,38 @@ section {
     color: rgba(255,255,255,0.9) !important;
     line-height: 1.6 !important;
 }
+    /* ==========================================================================
+   LAST STYLING ADDED
+   ========================================================================== */
+    /* FIX STATS GRID LAYOUT */
+.stats-grid {
+    display: flex !important;
+    flex-wrap: nowrap !important;
+    justify-content: space-between !important;
+    gap: 1rem !important;
+}
+
+.stat-item {
+    flex: 1 !important;
+    min-width: 0 !important; /* Prevents overflow */
+}
+
+/* Responsive adjustments */
+@media (max-width: 1023px) {
+    .stats-grid {
+        flex-wrap: wrap !important;
+    }
+    
+    .stat-item {
+        flex: 0 0 calc(50% - 1rem) !important;
+    }
+}
+
+@media (max-width: 479px) {
+    .stat-item {
+        flex: 0 0 100% !important;
+    }
+}
 /* ==========================================================================
    END OF STYLESHEET
    Total Lines: 5287
