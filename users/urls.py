@@ -7,6 +7,7 @@ from rest_framework_simplejwt.views import (
 )
 from .views import UserViewSet, UserActivityLogViewSet, UserVerificationViewSet, LoginAPIView
 from django.views.generic import TemplateView
+from django.contrib.auth.views import LogoutView  # ADD THIS IMPORT
 
 router = DefaultRouter()
 router.register(r'users', UserViewSet, basename='user')
@@ -27,7 +28,10 @@ urlpatterns = [
     path('login/', TemplateView.as_view(template_name='users/login.html'), name='login'),
     path('login-api/', LoginAPIView.as_view(), name='login_api'),
     
-    # ADD THIS LINE: Dashboard URL
+    # ADD THIS: Logout URL
+    path('logout/', LogoutView.as_view(next_page='users:login'), name='logout'),
+    
+    # ADD THIS: Dashboard URL
     path('dashboard/home/', TemplateView.as_view(template_name='users/dashboard/home.html'), name='dashboard_home'),
 ]
 
