@@ -5,7 +5,7 @@ from rest_framework_simplejwt.views import (
     TokenRefreshView,
     TokenVerifyView,
 )
-from .views import UserViewSet, UserActivityLogViewSet, UserVerificationViewSet, LoginAPIView  # ADD LoginAPIView HERE
+from .views import UserViewSet, UserActivityLogViewSet, UserVerificationViewSet, LoginAPIView
 from django.views.generic import TemplateView
 
 router = DefaultRouter()
@@ -25,7 +25,10 @@ urlpatterns = [
     
     # Add login page
     path('login/', TemplateView.as_view(template_name='users/login.html'), name='login'),
-    path('login-api/', LoginAPIView.as_view(), name='login_api'),  # This line is correct
+    path('login-api/', LoginAPIView.as_view(), name='login_api'),
+    
+    # ADD THIS LINE: Dashboard URL
+    path('dashboard/home/', TemplateView.as_view(template_name='users/dashboard/home.html'), name='dashboard_home'),
 ]
 
 # Add app_name for namespace support
