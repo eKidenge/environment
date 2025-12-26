@@ -5,102 +5,482 @@
 
 {% block extra_css %}
 <style>
+    /* ============================================
+       DASHBOARD ENHANCED PROFESSIONAL STYLING
+       Version: 3.1.0 | Eco Dashboard System
+    ============================================= */
+    
+    :root {
+        --dashboard-primary: linear-gradient(135deg, #059669 0%, #047857 100%);
+        --dashboard-secondary: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+        --dashboard-accent: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+        --dashboard-warning: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+        --dashboard-success: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        
+        --glass-bg: rgba(255, 255, 255, 0.1);
+        --glass-border: rgba(255, 255, 255, 0.2);
+        --shadow-elevated: 0 20px 60px rgba(0, 0, 0, 0.08), 0 0 0 1px rgba(255, 255, 255, 0.1);
+    }
+    
+    .dashboard-container {
+        position: relative;
+        overflow-x: hidden;
+    }
+    
+    /* Enhanced Header */
+    .dashboard-header {
+        position: relative;
+        overflow: hidden;
+        background: linear-gradient(135deg, 
+            rgba(5, 150, 105, 0.95) 0%, 
+            rgba(4, 120, 87, 0.95) 100%);
+        backdrop-filter: blur(10px);
+    }
+    
+    .dashboard-header::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: 
+            radial-gradient(circle at 20% 30%, rgba(255, 255, 255, 0.1) 0%, transparent 50%),
+            radial-gradient(circle at 80% 70%, rgba(255, 255, 255, 0.05) 0%, transparent 50%);
+        animation: pulse-glow 8s ease-in-out infinite alternate;
+    }
+    
+    @keyframes pulse-glow {
+        0% { opacity: 0.3; }
+        100% { opacity: 0.7; }
+    }
+    
+    /* Glass Card Effects */
+    .glass-card {
+        background: linear-gradient(135deg, 
+            rgba(255, 255, 255, 0.95) 0%, 
+            rgba(248, 250, 252, 0.95) 100%);
+        backdrop-filter: blur(20px);
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        box-shadow: 
+            var(--shadow-elevated),
+            0 8px 32px rgba(31, 38, 135, 0.05);
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    
+    .glass-card:hover {
+        transform: translateY(-8px);
+        box-shadow: 
+            0 30px 80px rgba(0, 0, 0, 0.12),
+            0 0 0 1px rgba(255, 255, 255, 0.2),
+            inset 0 1px 0 rgba(255, 255, 255, 0.4);
+    }
+    
+    .glass-card-header {
+        background: linear-gradient(90deg, 
+            rgba(255, 255, 255, 0.1) 0%, 
+            rgba(255, 255, 255, 0.05) 100%);
+        backdrop-filter: blur(10px);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    
+    /* Stats Cards */
     .stat-card {
-        transition: all 0.3s ease;
-        background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+        position: relative;
+        background: linear-gradient(145deg, 
+            rgba(255, 255, 255, 0.95) 0%, 
+            rgba(248, 250, 252, 0.95) 100%);
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        box-shadow: var(--shadow-elevated);
+        overflow: hidden;
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    
+    .stat-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: var(--dashboard-primary);
+        transform: scaleX(0);
+        transform-origin: left;
+        transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    
+    .stat-card:hover::before {
+        transform: scaleX(1);
     }
     
     .stat-card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 20px 40px rgba(16, 185, 129, 0.15);
+        transform: translateY(-6px);
+        box-shadow: 
+            0 25px 70px rgba(5, 150, 105, 0.15),
+            0 0 0 1px rgba(255, 255, 255, 0.2);
     }
     
-    .progress-ring {
+    /* Progress Bars */
+    .progress-container {
+        background: linear-gradient(90deg, 
+            rgba(229, 231, 235, 0.8) 0%, 
+            rgba(209, 213, 219, 0.8) 100%);
+        backdrop-filter: blur(4px);
+        border: 1px solid rgba(255, 255, 255, 0.3);
+    }
+    
+    .progress-fill {
+        background: linear-gradient(90deg, 
+            rgba(16, 185, 129, 0.9) 0%, 
+            rgba(5, 150, 105, 0.9) 100%);
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .progress-fill::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, 
+            transparent, 
+            rgba(255, 255, 255, 0.4), 
+            transparent);
+        animation: shimmer 2s infinite;
+    }
+    
+    @keyframes shimmer {
+        100% {
+            left: 100%;
+        }
+    }
+    
+    /* Circular Progress */
+    .circular-progress {
         transform: rotate(-90deg);
     }
     
-    .progress-ring-circle {
-        stroke-dasharray: 283;
-        stroke-dashoffset: 283;
-        transition: stroke-dashoffset 1s ease;
+    .circular-progress-bg {
+        stroke: rgba(229, 231, 235, 0.3);
+    }
+    
+    .circular-progress-fill {
+        stroke: url(#progress-gradient);
+        stroke-linecap: round;
+        transition: stroke-dashoffset 1.5s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    
+    /* Quick Action Buttons */
+    .quick-action-btn {
+        position: relative;
+        background: linear-gradient(135deg, 
+            rgba(255, 255, 255, 0.9) 0%, 
+            rgba(248, 250, 252, 0.9) 100%);
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        overflow: hidden;
+    }
+    
+    .quick-action-btn::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: linear-gradient(135deg, 
+            rgba(5, 150, 105, 0) 0%, 
+            rgba(5, 150, 105, 0.05) 100%);
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+    
+    .quick-action-btn:hover::before {
+        opacity: 1;
+    }
+    
+    .quick-action-btn:hover {
+        transform: translateY(-4px);
+        box-shadow: 
+            0 15px 40px rgba(5, 150, 105, 0.12),
+            0 0 0 1px rgba(255, 255, 255, 0.2);
+        border-color: rgba(5, 150, 105, 0.2);
+    }
+    
+    /* Activity Items */
+    .activity-item {
+        background: linear-gradient(90deg, 
+            rgba(255, 255, 255, 0) 0%, 
+            rgba(248, 250, 252, 0.9) 100%);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        transition: all 0.3s ease;
+        position: relative;
+    }
+    
+    .activity-item::before {
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        width: 4px;
+        background: var(--dashboard-primary);
+        transform: scaleY(0);
+        transform-origin: top;
+        transition: transform 0.3s ease;
+    }
+    
+    .activity-item:hover::before {
+        transform: scaleY(1);
+    }
+    
+    .activity-item:hover {
+        background: linear-gradient(90deg, 
+            rgba(255, 255, 255, 0.1) 0%, 
+            rgba(248, 250, 252, 0.95) 100%);
+        border-color: rgba(5, 150, 105, 0.2);
+        transform: translateX(4px);
+    }
+    
+    /* Event Cards */
+    .event-card {
+        background: linear-gradient(135deg, 
+            rgba(255, 255, 255, 0.9) 0%, 
+            rgba(248, 250, 252, 0.9) 100%);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .event-card::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 1px;
+        background: linear-gradient(90deg, 
+            transparent, 
+            rgba(5, 150, 105, 0.5), 
+            transparent);
+    }
+    
+    /* Profile Badge */
+    .profile-badge {
+        background: linear-gradient(135deg, 
+            rgba(16, 185, 129, 0.9) 0%, 
+            rgba(5, 150, 105, 0.9) 100%);
+        border: 3px solid rgba(255, 255, 255, 0.3);
+        box-shadow: 
+            0 10px 30px rgba(16, 185, 129, 0.3),
+            inset 0 1px 0 rgba(255, 255, 255, 0.2);
+    }
+    
+    /* Impact Visualization Cards */
+    .impact-card {
+        background: linear-gradient(145deg, 
+            rgba(255, 255, 255, 0.95) 0%, 
+            rgba(248, 250, 252, 0.95) 100%);
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .impact-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: linear-gradient(135deg, 
+            rgba(5, 150, 105, 0.02) 0%, 
+            rgba(5, 150, 105, 0.01) 100%);
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+    
+    .impact-card:hover::before {
+        opacity: 1;
+    }
+    
+    /* Floating Elements */
+    .floating-element {
+        animation: float 6s ease-in-out infinite;
+    }
+    
+    @keyframes float {
+        0%, 100% {
+            transform: translateY(0px);
+        }
+        50% {
+            transform: translateY(-20px);
+        }
+    }
+    
+    /* Gradient Text */
+    .gradient-text {
+        background: linear-gradient(135deg, 
+            rgba(5, 150, 105, 0.9) 0%, 
+            rgba(4, 120, 87, 0.9) 100%);
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+    }
+    
+    /* Responsive Design */
+    @media (max-width: 768px) {
+        .dashboard-header {
+            border-radius: 0 0 2rem 2rem;
+        }
+        
+        .glass-card {
+            margin: 0.5rem;
+        }
     }
 </style>
 {% endblock %}
 
 {% block content %}
-<div class="min-h-screen bg-gray-50">
-    <!-- Dashboard Header -->
-    <div class="bg-gradient-to-r from-emerald-500 to-teal-600 text-white">
-        <div class="container mx-auto px-4 py-8">
-            <div class="flex flex-col md:flex-row justify-between items-start md:items-center space-y-4 md:space-y-0">
-                <div>
-                    <h1 class="text-3xl font-bold mb-2">Welcome back, {{ user.get_full_name|default:user.username }}!</h1>
-                    <p class="text-emerald-100">Track your environmental impact and continue your sustainability journey</p>
-                </div>
-                <div class="flex items-center space-x-4">
-                    <div class="text-right">
-                        <p class="text-sm text-emerald-100">Member since</p>
-                        <p class="font-semibold">{{ user.date_joined|date:"F j, Y" }}</p>
+<div class="dashboard-container">
+    <!-- Enhanced Dashboard Header -->
+    <div class="dashboard-header text-white">
+        <div class="container mx-auto px-4 py-12">
+            <!-- User Welcome Section -->
+            <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-8 mb-12">
+                <div class="flex-1">
+                    <div class="flex items-center gap-4 mb-6">
+                        <div class="w-16 h-16 profile-badge rounded-full flex items-center justify-center text-white text-2xl font-bold shadow-lg">
+                            {{ user.username|first|upper }}
+                        </div>
+                        <div>
+                            <h1 class="text-4xl font-bold mb-2">Welcome back, <span class="text-emerald-100">{{ user.get_full_name|default:user.username }}</span>!</h1>
+                            <p class="text-lg text-emerald-100/80 max-w-2xl">
+                                Your environmental leadership is creating waves of change. 
+                                <span class="font-semibold text-emerald-50">Keep up the amazing work!</span>
+                            </p>
+                        </div>
                     </div>
-                    <div class="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center border-4 border-white/30">
-                        <i class="fas fa-leaf text-2xl"></i>
+                    
+                    <div class="flex items-center gap-6 text-sm">
+                        <div class="flex items-center gap-2">
+                            <i class="fas fa-calendar-star text-emerald-200"></i>
+                            <span>Member since {{ user.date_joined|date:"F j, Y" }}</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <i class="fas fa-clock text-emerald-200"></i>
+                            <span>Last active: {{ user.last_login|timesince }} ago</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <i class="fas fa-user-check text-emerald-200"></i>
+                            <span>{{ user.get_user_type_display }}</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="glass-card rounded-2xl p-6 min-w-[280px]">
+                    <div class="text-center">
+                        <div class="inline-flex items-center justify-center w-20 h-20 rounded-full bg-gradient-to-br from-emerald-500 to-teal-600 mb-4 shadow-lg">
+                            <i class="fas fa-crown text-3xl text-yellow-300"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-gray-900 mb-2">Eco Champion</h3>
+                        <p class="text-sm text-gray-600 mb-4">Top 10% Contributor</p>
+                        <div class="flex items-center justify-center gap-2">
+                            <div class="w-full bg-gray-200 rounded-full h-2">
+                                <div class="bg-gradient-to-r from-emerald-500 to-teal-600 h-2 rounded-full" style="width: 85%"></div>
+                            </div>
+                            <span class="text-sm font-semibold text-gray-700">85%</span>
+                        </div>
                     </div>
                 </div>
             </div>
-            
-            <!-- Quick Stats -->
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mt-8">
-                <div class="bg-white/10 backdrop-blur-sm rounded-xl p-4">
-                    <div class="flex items-center justify-between">
-                        <div>
-                            <p class="text-sm text-emerald-100">Impact Score</p>
-                            <p class="text-2xl font-bold">1,245</p>
+
+            <!-- Enhanced Stats Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <!-- Impact Score -->
+                <div class="stat-card rounded-2xl p-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="flex items-center gap-3">
+                            <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-yellow-500 to-amber-600 flex items-center justify-center shadow-lg">
+                                <i class="fas fa-bolt text-xl text-white"></i>
+                            </div>
+                            <div>
+                                <p class="text-sm font-medium text-gray-500">Impact Score</p>
+                                <p class="text-3xl font-bold text-gray-900">1,245</p>
+                            </div>
                         </div>
-                        <i class="fas fa-bolt text-xl text-yellow-300"></i>
                     </div>
-                    <div class="mt-2 text-xs text-emerald-100">
-                        <i class="fas fa-arrow-up mr-1"></i>
-                        12% from last month
+                    <div class="flex items-center text-sm">
+                        <span class="text-emerald-600 font-semibold flex items-center">
+                            <i class="fas fa-arrow-up mr-1"></i>
+                            12.5% growth
+                        </span>
+                        <span class="text-gray-500 ml-auto">This month</span>
                     </div>
                 </div>
-                
-                <div class="bg-white/10 backdrop-blur-sm rounded-xl p-4">
-                    <div class="flex items-center justify-between">
-                        <div>
-                            <p class="text-sm text-emerald-100">Active Programs</p>
-                            <p class="text-2xl font-bold">3</p>
+
+                <!-- Active Programs -->
+                <div class="stat-card rounded-2xl p-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="flex items-center gap-3">
+                            <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center shadow-lg">
+                                <i class="fas fa-graduation-cap text-xl text-white"></i>
+                            </div>
+                            <div>
+                                <p class="text-sm font-medium text-gray-500">Active Programs</p>
+                                <p class="text-3xl font-bold text-gray-900">3</p>
+                            </div>
                         </div>
-                        <i class="fas fa-graduation-cap text-xl text-blue-300"></i>
                     </div>
-                    <div class="mt-2 text-xs text-emerald-100">
-                        2 nearing completion
+                    <div class="flex items-center text-sm">
+                        <span class="text-blue-600 font-semibold flex items-center">
+                            <i class="fas fa-check-circle mr-1"></i>
+                            2 nearing completion
+                        </span>
                     </div>
                 </div>
-                
-                <div class="bg-white/10 backdrop-blur-sm rounded-xl p-4">
-                    <div class="flex items-center justify-between">
-                        <div>
-                            <p class="text-sm text-emerald-100">Volunteer Hours</p>
-                            <p class="text-2xl font-bold">156</p>
+
+                <!-- Volunteer Hours -->
+                <div class="stat-card rounded-2xl p-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="flex items-center gap-3">
+                            <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-purple-500 to-pink-600 flex items-center justify-center shadow-lg">
+                                <i class="fas fa-hands-helping text-xl text-white"></i>
+                            </div>
+                            <div>
+                                <p class="text-sm font-medium text-gray-500">Volunteer Hours</p>
+                                <p class="text-3xl font-bold text-gray-900">156</p>
+                            </div>
                         </div>
-                        <i class="fas fa-hands-helping text-xl text-purple-300"></i>
                     </div>
-                    <div class="mt-2 text-xs text-emerald-100">
-                        <i class="fas fa-star mr-1"></i>
-                        Top 15% contributor
+                    <div class="flex items-center text-sm">
+                        <span class="text-purple-600 font-semibold flex items-center">
+                            <i class="fas fa-trophy mr-1"></i>
+                            Top 15% contributor
+                        </span>
                     </div>
                 </div>
-                
-                <div class="bg-white/10 backdrop-blur-sm rounded-xl p-4">
-                    <div class="flex items-center justify-between">
-                        <div>
-                            <p class="text-sm text-emerald-100">Carbon Saved</p>
-                            <p class="text-2xl font-bold">2.4T</p>
+
+                <!-- Carbon Saved -->
+                <div class="stat-card rounded-2xl p-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="flex items-center gap-3">
+                            <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-emerald-500 to-green-600 flex items-center justify-center shadow-lg">
+                                <i class="fas fa-cloud text-xl text-white"></i>
+                            </div>
+                            <div>
+                                <p class="text-sm font-medium text-gray-500">Carbon Saved</p>
+                                <p class="text-3xl font-bold text-gray-900">2.4T</p>
+                            </div>
                         </div>
-                        <i class="fas fa-cloud text-xl text-green-300"></i>
                     </div>
-                    <div class="mt-2 text-xs text-emerald-100">
-                        Equivalent to 52 trees
+                    <div class="flex items-center text-sm">
+                        <span class="text-green-600 font-semibold">
+                            Equivalent to 52 trees
+                        </span>
                     </div>
                 </div>
             </div>
@@ -108,251 +488,513 @@
     </div>
 
     <!-- Main Dashboard Content -->
-    <div class="container mx-auto px-4 py-8 -mt-6">
+    <div class="container mx-auto px-4 py-8 -mt-12">
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            <!-- Left Column -->
+            <!-- Left Column (2/3 width) -->
             <div class="lg:col-span-2 space-y-8">
                 <!-- Progress Overview -->
-                <div class="bg-white rounded-2xl shadow-lg p-6">
-                    <div class="flex justify-between items-center mb-6">
-                        <h2 class="text-xl font-bold text-gray-800">Learning Progress</h2>
-                        <a href="{% url 'programs:list' %}" class="text-emerald-600 hover:text-emerald-700 font-medium">
-                            View All
-                        </a>
+                <div class="glass-card rounded-2xl overflow-hidden">
+                    <div class="glass-card-header px-6 py-4 border-b border-gray-100">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <h2 class="text-xl font-bold text-gray-900">Learning Progress</h2>
+                                <p class="text-sm text-gray-600 mt-1">Track your course completion and achievements</p>
+                            </div>
+                            <a href="#" class="inline-flex items-center gap-2 text-emerald-600 hover:text-emerald-700 font-semibold transition-colors">
+                                View All <i class="fas fa-arrow-right text-sm"></i>
+                            </a>
+                        </div>
                     </div>
                     
-                    <div class="space-y-6">
-                        {% for program in active_programs %}
-                        <div class="border border-gray-200 rounded-xl p-4 hover:border-emerald-200 transition-colors">
-                            <div class="flex items-center justify-between mb-3">
+                    <div class="p-6 space-y-6">
+                        <!-- Sample Program 1 -->
+                        <div class="activity-item rounded-xl p-5">
+                            <div class="flex items-center justify-between mb-4">
                                 <div>
-                                    <h3 class="font-semibold text-gray-800">{{ program.title }}</h3>
-                                    <p class="text-sm text-gray-600">{{ program.category }}</p>
+                                    <h3 class="font-bold text-gray-900 text-lg">Advanced Climate Science</h3>
+                                    <div class="flex items-center gap-3 mt-2">
+                                        <span class="inline-flex items-center gap-1 text-sm text-gray-600">
+                                            <i class="fas fa-book-open"></i>
+                                            8/12 modules
+                                        </span>
+                                        <span class="inline-flex items-center gap-1 text-sm text-gray-600">
+                                            <i class="fas fa-clock"></i>
+                                            15h remaining
+                                        </span>
+                                    </div>
                                 </div>
-                                <span class="px-3 py-1 bg-emerald-100 text-emerald-800 rounded-full text-sm font-medium">
-                                    {{ program.progress }}% Complete
+                                <span class="px-4 py-1.5 bg-gradient-to-r from-emerald-500 to-teal-600 text-white rounded-full text-sm font-semibold shadow-md">
+                                    67% Complete
                                 </span>
                             </div>
                             
-                            <div class="mb-3">
-                                <div class="flex justify-between text-sm text-gray-600 mb-1">
-                                    <span>Progress</span>
-                                    <span>{{ program.progress }}%</span>
+                            <div class="space-y-2">
+                                <div class="flex justify-between text-sm">
+                                    <span class="text-gray-600">Progress</span>
+                                    <span class="font-semibold text-gray-900">67%</span>
                                 </div>
-                                <div class="h-2 bg-gray-200 rounded-full overflow-hidden">
-                                    <div class="h-full bg-gradient-to-r from-emerald-400 to-emerald-600 rounded-full" 
-                                         style="width: {{ program.progress }}%"></div>
+                                <div class="progress-container h-3 rounded-full overflow-hidden">
+                                    <div class="progress-fill h-full rounded-full" style="width: 67%"></div>
                                 </div>
                             </div>
                             
-                            <div class="flex items-center justify-between text-sm">
-                                <div class="flex items-center space-x-4">
-                                    <span class="text-gray-600">
-                                        <i class="fas fa-book-open mr-1"></i>
-                                        {{ program.modules_completed }}/{{ program.total_modules }} modules
+                            <div class="flex items-center justify-between mt-4">
+                                <div class="flex items-center gap-4 text-sm text-gray-600">
+                                    <span class="inline-flex items-center gap-1">
+                                        <i class="fas fa-certificate"></i>
+                                        Certificate Available
                                     </span>
-                                    <span class="text-gray-600">
-                                        <i class="fas fa-clock mr-1"></i>
-                                        {{ program.time_remaining }} hours left
+                                    <span class="inline-flex items-center gap-1">
+                                        <i class="fas fa-star"></i>
+                                        4.8 Rating
                                     </span>
                                 </div>
-                                <button class="btn btn-sm btn-primary">
-                                    Continue
+                                <button class="px-6 py-2.5 bg-gradient-to-r from-emerald-500 to-teal-600 text-white font-semibold rounded-lg shadow-md hover:shadow-lg transition-all hover:scale-105">
+                                    Continue Learning
                                 </button>
                             </div>
                         </div>
-                        {% endfor %}
+
+                        <!-- Sample Program 2 -->
+                        <div class="activity-item rounded-xl p-5">
+                            <div class="flex items-center justify-between mb-4">
+                                <div>
+                                    <h3 class="font-bold text-gray-900 text-lg">Sustainable Agriculture</h3>
+                                    <div class="flex items-center gap-3 mt-2">
+                                        <span class="inline-flex items-center gap-1 text-sm text-gray-600">
+                                            <i class="fas fa-book-open"></i>
+                                            10/15 modules
+                                        </span>
+                                        <span class="inline-flex items-center gap-1 text-sm text-gray-600">
+                                            <i class="fas fa-clock"></i>
+                                            8h remaining
+                                        </span>
+                                    </div>
+                                </div>
+                                <span class="px-4 py-1.5 bg-gradient-to-r from-blue-500 to-indigo-600 text-white rounded-full text-sm font-semibold shadow-md">
+                                    83% Complete
+                                </span>
+                            </div>
+                            
+                            <div class="space-y-2">
+                                <div class="flex justify-between text-sm">
+                                    <span class="text-gray-600">Progress</span>
+                                    <span class="font-semibold text-gray-900">83%</span>
+                                </div>
+                                <div class="progress-container h-3 rounded-full overflow-hidden">
+                                    <div class="progress-fill h-full rounded-full" style="width: 83%"></div>
+                                </div>
+                            </div>
+                            
+                            <div class="flex items-center justify-between mt-4">
+                                <div class="flex items-center gap-4 text-sm text-gray-600">
+                                    <span class="inline-flex items-center gap-1">
+                                        <i class="fas fa-medal"></i>
+                                        Advanced Level
+                                    </span>
+                                    <span class="inline-flex items-center gap-1">
+                                        <i class="fas fa-users"></i>
+                                        245 Learners
+                                    </span>
+                                </div>
+                                <button class="px-6 py-2.5 bg-gradient-to-r from-blue-500 to-indigo-600 text-white font-semibold rounded-lg shadow-md hover:shadow-lg transition-all hover:scale-105">
+                                    Continue Learning
+                                </button>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
                 <!-- Recent Activity -->
-                <div class="bg-white rounded-2xl shadow-lg p-6">
-                    <h2 class="text-xl font-bold text-gray-800 mb-6">Recent Activity</h2>
-                    
-                    <div class="space-y-4">
-                        {% for activity in recent_activities %}
-                        <div class="flex items-start space-x-4 p-3 hover:bg-gray-50 rounded-lg transition-colors">
-                            <div class="flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center 
-                                {% if activity.type == 'achievement' %}bg-yellow-100 text-yellow-600
-                                {% elif activity.type == 'learning' %}bg-blue-100 text-blue-600
-                                {% elif activity.type == 'volunteer' %}bg-purple-100 text-purple-600
-                                {% else %}bg-emerald-100 text-emerald-600{% endif %}">
-                                <i class="{{ activity.icon }}"></i>
+                <div class="glass-card rounded-2xl overflow-hidden">
+                    <div class="glass-card-header px-6 py-4 border-b border-gray-100">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <h2 class="text-xl font-bold text-gray-900">Recent Activity</h2>
+                                <p class="text-sm text-gray-600 mt-1">Your latest achievements and contributions</p>
                             </div>
-                            <div class="flex-1">
-                                <p class="text-gray-800">{{ activity.description }}</p>
-                                <p class="text-sm text-gray-500">{{ activity.timestamp|timesince }} ago</p>
-                            </div>
-                            {% if activity.points %}
-                            <div class="flex-shrink-0">
-                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-100 text-emerald-800">
-                                    <i class="fas fa-bolt mr-1"></i>
-                                    +{{ activity.points }} pts
-                                </span>
-                            </div>
-                            {% endif %}
+                            <span class="text-sm font-semibold text-emerald-600">24 Activities Today</span>
                         </div>
-                        {% endfor %}
+                    </div>
+                    
+                    <div class="p-6 space-y-4">
+                        <!-- Activity 1 -->
+                        <div class="activity-item rounded-xl p-4">
+                            <div class="flex items-start gap-4">
+                                <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-yellow-500 to-amber-600 flex items-center justify-center flex-shrink-0 shadow-md">
+                                    <i class="fas fa-trophy text-xl text-white"></i>
+                                </div>
+                                <div class="flex-1">
+                                    <h4 class="font-semibold text-gray-900 mb-1">Achievement Unlocked: Climate Warrior</h4>
+                                    <p class="text-gray-600 text-sm mb-2">Completed 50 hours of climate change education</p>
+                                    <div class="flex items-center justify-between">
+                                        <span class="text-xs text-gray-500">2 hours ago</span>
+                                        <span class="inline-flex items-center gap-1 px-3 py-1 bg-gradient-to-r from-yellow-500 to-amber-600 text-white text-sm font-semibold rounded-full">
+                                            <i class="fas fa-bolt"></i>
+                                            +500 pts
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Activity 2 -->
+                        <div class="activity-item rounded-xl p-4">
+                            <div class="flex items-start gap-4">
+                                <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center flex-shrink-0 shadow-md">
+                                    <i class="fas fa-comments text-xl text-white"></i>
+                                </div>
+                                <div class="flex-1">
+                                    <h4 class="font-semibold text-gray-900 mb-1">Mentorship Session Completed</h4>
+                                    <p class="text-gray-600 text-sm mb-2">Guided 3 new members in sustainable practices</p>
+                                    <div class="flex items-center justify-between">
+                                        <span class="text-xs text-gray-500">5 hours ago</span>
+                                        <span class="inline-flex items-center gap-1 px-3 py-1 bg-gradient-to-r from-blue-500 to-indigo-600 text-white text-sm font-semibold rounded-full">
+                                            <i class="fas fa-bolt"></i>
+                                            +250 pts
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Activity 3 -->
+                        <div class="activity-item rounded-xl p-4">
+                            <div class="flex items-start gap-4">
+                                <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-purple-500 to-pink-600 flex items-center justify-center flex-shrink-0 shadow-md">
+                                    <i class="fas fa-hands-helping text-xl text-white"></i>
+                                </div>
+                                <div class="flex-1">
+                                    <h4 class="font-semibold text-gray-900 mb-1">Volunteer Project Submitted</h4>
+                                    <p class="text-gray-600 text-sm mb-2">Community clean-up initiative: Coastal Protection Program</p>
+                                    <div class="flex items-center justify-between">
+                                        <span class="text-xs text-gray-500">1 day ago</span>
+                                        <span class="inline-flex items-center gap-1 px-3 py-1 bg-gradient-to-r from-purple-500 to-pink-600 text-white text-sm font-semibold rounded-full">
+                                            <i class="fas fa-bolt"></i>
+                                            +750 pts
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Right Column -->
+            <!-- Right Column (1/3 width) -->
             <div class="space-y-8">
                 <!-- Profile Summary -->
-                <div class="bg-white rounded-2xl shadow-lg p-6">
-                    <div class="text-center mb-6">
-                        <div class="relative inline-block">
-                            <div class="w-24 h-24 mx-auto bg-gradient-to-br from-emerald-400 to-teal-500 rounded-full flex items-center justify-center text-white text-3xl font-bold mb-4">
-                                {{ user.username|first|upper }}
-                            </div>
-                            <div class="absolute bottom-4 right-0 w-8 h-8 bg-emerald-500 rounded-full border-4 border-white flex items-center justify-center">
-                                <i class="fas fa-check text-white text-xs"></i>
-                            </div>
-                        </div>
-                        <h3 class="text-lg font-bold text-gray-800">{{ user.get_full_name|default:user.username }}</h3>
-                        <p class="text-gray-600">Environmental Enthusiast</p>
+                <div class="glass-card rounded-2xl overflow-hidden">
+                    <div class="glass-card-header px-6 py-4 border-b border-gray-100">
+                        <h3 class="text-lg font-bold text-gray-900">Profile Overview</h3>
                     </div>
                     
-                    <div class="space-y-4">
-                        <div class="flex justify-between items-center">
-                            <span class="text-gray-600">Member Level</span>
-                            <span class="font-semibold text-emerald-600">Eco Champion</span>
+                    <div class="p-6">
+                        <div class="text-center mb-6">
+                            <div class="relative inline-block mb-4">
+                                <div class="w-32 h-32 mx-auto bg-gradient-to-br from-emerald-400 to-teal-600 rounded-full flex items-center justify-center text-white text-4xl font-bold shadow-2xl">
+                                    {{ user.username|first|upper }}
+                                </div>
+                                <div class="absolute -bottom-2 right-4 w-12 h-12 profile-badge rounded-full flex items-center justify-center shadow-xl">
+                                    <i class="fas fa-check text-white"></i>
+                                </div>
+                            </div>
+                            <h3 class="text-xl font-bold text-gray-900 mb-1">{{ user.get_full_name|default:user.username }}</h3>
+                            <p class="text-gray-600 mb-4">Environmental Scientist & Advocate</p>
+                            
+                            <div class="flex justify-center gap-2 mb-6">
+                                <span class="px-3 py-1 bg-gradient-to-r from-emerald-500 to-teal-600 text-white text-sm font-semibold rounded-full">
+                                    Verified
+                                </span>
+                                <span class="px-3 py-1 bg-gradient-to-r from-blue-500 to-indigo-600 text-white text-sm font-semibold rounded-full">
+                                    Premium
+                                </span>
+                            </div>
                         </div>
-                        <div class="flex justify-between items-center">
-                            <span class="text-gray-600">Badges Earned</span>
-                            <span class="font-semibold">12</span>
+                        
+                        <div class="space-y-4">
+                            <div class="flex justify-between items-center p-3 bg-gray-50 rounded-xl">
+                                <span class="text-gray-700 font-medium">Member Level</span>
+                                <span class="font-bold text-emerald-600">Eco Champion</span>
+                            </div>
+                            <div class="flex justify-between items-center p-3 bg-gray-50 rounded-xl">
+                                <span class="text-gray-700 font-medium">Badges Earned</span>
+                                <span class="font-bold text-purple-600">12</span>
+                            </div>
+                            <div class="flex justify-between items-center p-3 bg-gray-50 rounded-xl">
+                                <span class="text-gray-700 font-medium">Current Streak</span>
+                                <span class="font-bold text-amber-600">24 days 🔥</span>
+                            </div>
+                            <div class="flex justify-between items-center p-3 bg-gray-50 rounded-xl">
+                                <span class="text-gray-700 font-medium">Completion Rate</span>
+                                <span class="font-bold text-blue-600">92%</span>
+                            </div>
                         </div>
-                        <div class="flex justify-between items-center">
-                            <span class="text-gray-600">Streak</span>
-                            <span class="font-semibold">24 days 🔥</span>
+                        
+                        <div class="mt-8 space-y-3">
+                            <a href="#" class="w-full block text-center px-6 py-3.5 bg-gradient-to-r from-gray-900 to-gray-800 text-white font-semibold rounded-xl shadow-md hover:shadow-lg transition-all">
+                                <i class="fas fa-edit mr-2"></i>
+                                Edit Profile
+                            </a>
+                            <a href="#" class="w-full block text-center px-6 py-3.5 border-2 border-gray-300 text-gray-700 font-semibold rounded-xl hover:border-emerald-500 hover:text-emerald-600 transition-colors">
+                                <i class="fas fa-chart-line mr-2"></i>
+                                View Analytics
+                            </a>
                         </div>
-                    </div>
-                    
-                    <div class="mt-6">
-                        <a href="{% url 'users:profile:edit' %}" class="w-full btn btn-outline mb-3">
-                            <i class="fas fa-edit mr-2"></i>
-                            Edit Profile
-                        </a>
-                        <a href="{% url 'users:profile:detail' %}" class="w-full btn btn-primary">
-                            <i class="fas fa-eye mr-2"></i>
-                            View Full Profile
-                        </a>
                     </div>
                 </div>
 
                 <!-- Quick Actions -->
-                <div class="bg-white rounded-2xl shadow-lg p-6">
-                    <h3 class="text-lg font-bold text-gray-800 mb-4">Quick Actions</h3>
+                <div class="glass-card rounded-2xl overflow-hidden">
+                    <div class="glass-card-header px-6 py-4 border-b border-gray-100">
+                        <h3 class="text-lg font-bold text-gray-900">Quick Actions</h3>
+                    </div>
                     
-                    <div class="grid grid-cols-2 gap-3">
-                        <a href="{% url 'mentorship:sessions:list' %}" class="quick-action-btn">
-                            <i class="fas fa-comments text-blue-500"></i>
-                            <span>Mentorship</span>
-                        </a>
-                        <a href="{% url 'volunteer:opportunities:list' %}" class="quick-action-btn">
-                            <i class="fas fa-hands-helping text-purple-500"></i>
-                            <span>Volunteer</span>
-                        </a>
-                        <a href="{% url 'research:datasets:list' %}" class="quick-action-btn">
-                            <i class="fas fa-database text-emerald-500"></i>
-                            <span>Research Data</span>
-                        </a>
-                        <a href="{% url 'blog:list' %}" class="quick-action-btn">
-                            <i class="fas fa-blog text-orange-500"></i>
-                            <span>Blog</span>
-                        </a>
-                        <a href="{% url 'users:dashboard:activity' %}" class="quick-action-btn">
-                            <i class="fas fa-chart-line text-teal-500"></i>
-                            <span>Analytics</span>
-                        </a>
-                        <a href="#" class="quick-action-btn">
-                            <i class="fas fa-certificate text-yellow-500"></i>
-                            <span>Certificates</span>
-                        </a>
+                    <div class="p-6">
+                        <div class="grid grid-cols-2 gap-4">
+                            <a href="#" class="quick-action-btn rounded-xl p-4 text-center">
+                                <div class="w-12 h-12 mx-auto mb-3 rounded-lg bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center shadow-md">
+                                    <i class="fas fa-comments text-xl text-white"></i>
+                                </div>
+                                <span class="font-semibold text-gray-900">Mentorship</span>
+                                <p class="text-xs text-gray-600 mt-1">Connect with experts</p>
+                            </a>
+                            
+                            <a href="#" class="quick-action-btn rounded-xl p-4 text-center">
+                                <div class="w-12 h-12 mx-auto mb-3 rounded-lg bg-gradient-to-br from-purple-500 to-pink-600 flex items-center justify-center shadow-md">
+                                    <i class="fas fa-hands-helping text-xl text-white"></i>
+                                </div>
+                                <span class="font-semibold text-gray-900">Volunteer</span>
+                                <p class="text-xs text-gray-600 mt-1">Join initiatives</p>
+                            </a>
+                            
+                            <a href="#" class="quick-action-btn rounded-xl p-4 text-center">
+                                <div class="w-12 h-12 mx-auto mb-3 rounded-lg bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center shadow-md">
+                                    <i class="fas fa-database text-xl text-white"></i>
+                                </div>
+                                <span class="font-semibold text-gray-900">Research</span>
+                                <p class="text-xs text-gray-600 mt-1">Access data</p>
+                            </a>
+                            
+                            <a href="#" class="quick-action-btn rounded-xl p-4 text-center">
+                                <div class="w-12 h-12 mx-auto mb-3 rounded-lg bg-gradient-to-br from-amber-500 to-orange-600 flex items-center justify-center shadow-md">
+                                    <i class="fas fa-blog text-xl text-white"></i>
+                                </div>
+                                <span class="font-semibold text-gray-900">Blog</span>
+                                <p class="text-xs text-gray-600 mt-1">Share insights</p>
+                            </a>
+                            
+                            <a href="#" class="quick-action-btn rounded-xl p-4 text-center">
+                                <div class="w-12 h-12 mx-auto mb-3 rounded-lg bg-gradient-to-br from-teal-500 to-cyan-600 flex items-center justify-center shadow-md">
+                                    <i class="fas fa-chart-line text-xl text-white"></i>
+                                </div>
+                                <span class="font-semibold text-gray-900">Analytics</span>
+                                <p class="text-xs text-gray-600 mt-1">Track progress</p>
+                            </a>
+                            
+                            <a href="#" class="quick-action-btn rounded-xl p-4 text-center">
+                                <div class="w-12 h-12 mx-auto mb-3 rounded-lg bg-gradient-to-br from-yellow-500 to-amber-600 flex items-center justify-center shadow-md">
+                                    <i class="fas fa-certificate text-xl text-white"></i>
+                                </div>
+                                <span class="font-semibold text-gray-900">Certificates</span>
+                                <p class="text-xs text-gray-600 mt-1">View achievements</p>
+                            </a>
+                        </div>
                     </div>
                 </div>
 
                 <!-- Upcoming Events -->
-                <div class="bg-white rounded-2xl shadow-lg p-6">
-                    <div class="flex justify-between items-center mb-4">
-                        <h3 class="text-lg font-bold text-gray-800">Upcoming Events</h3>
-                        <span class="text-sm text-emerald-600">{{ upcoming_events|length }} upcoming</span>
+                <div class="glass-card rounded-2xl overflow-hidden">
+                    <div class="glass-card-header px-6 py-4 border-b border-gray-100">
+                        <div class="flex items-center justify-between">
+                            <h3 class="text-lg font-bold text-gray-900">Upcoming Events</h3>
+                            <span class="text-sm font-semibold text-emerald-600">3 upcoming</span>
+                        </div>
                     </div>
                     
-                    <div class="space-y-4">
-                        {% for event in upcoming_events %}
-                        <div class="border border-gray-200 rounded-lg p-3">
-                            <div class="flex items-start justify-between mb-2">
+                    <div class="p-6 space-y-4">
+                        <!-- Event 1 -->
+                        <div class="event-card rounded-xl p-4">
+                            <div class="flex items-start justify-between mb-3">
                                 <div>
-                                    <h4 class="font-medium text-gray-800">{{ event.title }}</h4>
-                                    <p class="text-xs text-gray-500">{{ event.date|date:"M d, Y" }} • {{ event.time }}</p>
+                                    <h4 class="font-bold text-gray-900 mb-1">Climate Action Summit</h4>
+                                    <div class="flex items-center gap-3 text-sm">
+                                        <span class="text-gray-600 flex items-center gap-1">
+                                            <i class="fas fa-calendar"></i>
+                                            Dec 28, 2025
+                                        </span>
+                                        <span class="text-gray-600 flex items-center gap-1">
+                                            <i class="fas fa-clock"></i>
+                                            2:00 PM EST
+                                        </span>
+                                    </div>
                                 </div>
-                                {% if event.type == 'webinar' %}
-                                <span class="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded">Webinar</span>
-                                {% elif event.type == 'workshop' %}
-                                <span class="px-2 py-1 bg-emerald-100 text-emerald-800 text-xs rounded">Workshop</span>
-                                {% endif %}
+                                <span class="px-3 py-1 bg-gradient-to-r from-emerald-500 to-teal-600 text-white text-xs font-semibold rounded-full">
+                                    Workshop
+                                </span>
                             </div>
-                            <div class="flex items-center text-sm text-gray-600">
-                                <i class="fas fa-users mr-1"></i>
-                                <span>{{ event.participants }} attending</span>
+                            <div class="flex items-center justify-between">
+                                <span class="text-sm text-gray-600 flex items-center gap-1">
+                                    <i class="fas fa-users"></i>
+                                    245 attending
+                                </span>
+                                <button class="px-4 py-1.5 bg-gray-900 text-white text-sm font-semibold rounded-lg hover:bg-black transition-colors">
+                                    Join
+                                </button>
                             </div>
                         </div>
-                        {% endfor %}
+
+                        <!-- Event 2 -->
+                        <div class="event-card rounded-xl p-4">
+                            <div class="flex items-start justify-between mb-3">
+                                <div>
+                                    <h4 class="font-bold text-gray-900 mb-1">Sustainable Tech Expo</h4>
+                                    <div class="flex items-center gap-3 text-sm">
+                                        <span class="text-gray-600 flex items-center gap-1">
+                                            <i class="fas fa-calendar"></i>
+                                            Jan 15, 2026
+                                        </span>
+                                        <span class="text-gray-600 flex items-center gap-1">
+                                            <i class="fas fa-clock"></i>
+                                            10:00 AM EST
+                                        </span>
+                                    </div>
+                                </div>
+                                <span class="px-3 py-1 bg-gradient-to-r from-blue-500 to-indigo-600 text-white text-xs font-semibold rounded-full">
+                                    Webinar
+                                </span>
+                            </div>
+                            <div class="flex items-center justify-between">
+                                <span class="text-sm text-gray-600 flex items-center gap-1">
+                                    <i class="fas fa-users"></i>
+                                    189 attending
+                                </span>
+                                <button class="px-4 py-1.5 bg-gray-900 text-white text-sm font-semibold rounded-lg hover:bg-black transition-colors">
+                                    Join
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Event 3 -->
+                        <div class="event-card rounded-xl p-4">
+                            <div class="flex items-start justify-between mb-3">
+                                <div>
+                                    <h4 class="font-bold text-gray-900 mb-1">Community Clean-up</h4>
+                                    <div class="flex items-center gap-3 text-sm">
+                                        <span class="text-gray-600 flex items-center gap-1">
+                                            <i class="fas fa-calendar"></i>
+                                            Jan 5, 2026
+                                        </span>
+                                        <span class="text-gray-600 flex items-center gap-1">
+                                            <i class="fas fa-clock"></i>
+                                            9:00 AM EST
+                                        </span>
+                                    </div>
+                                </div>
+                                <span class="px-3 py-1 bg-gradient-to-r from-purple-500 to-pink-600 text-white text-xs font-semibold rounded-full">
+                                    Volunteer
+                                </span>
+                            </div>
+                            <div class="flex items-center justify-between">
+                                <span class="text-sm text-gray-600 flex items-center gap-1">
+                                    <i class="fas fa-users"></i>
+                                    78 attending
+                                </span>
+                                <button class="px-4 py-1.5 bg-gradient-to-r from-emerald-500 to-teal-600 text-white text-sm font-semibold rounded-lg hover:shadow-md transition-all">
+                                    Register
+                                </button>
+                            </div>
+                        </div>
                     </div>
-                    
-                    <a href="{% url 'programs:events:list' %}" class="mt-4 block text-center text-emerald-600 hover:text-emerald-700 font-medium">
-                        View All Events
-                    </a>
                 </div>
             </div>
         </div>
 
-        <!-- Impact Visualization -->
-        <div class="mt-8 bg-white rounded-2xl shadow-lg p-6">
-            <h2 class="text-xl font-bold text-gray-800 mb-6">Your Environmental Impact</h2>
+        <!-- Impact Visualization Section -->
+        <div class="glass-card rounded-2xl overflow-hidden mt-8">
+            <div class="glass-card-header px-6 py-4 border-b border-gray-100">
+                <h2 class="text-xl font-bold text-gray-900">Environmental Impact Analytics</h2>
+                <p class="text-sm text-gray-600 mt-1">Visual representation of your sustainability contributions</p>
+            </div>
             
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                <div class="text-center p-4">
-                    <div class="relative inline-block mb-4">
-                        <svg class="w-20 h-20 progress-ring" viewBox="0 0 100 100">
-                            <circle class="text-gray-200" stroke-width="8" stroke="currentColor" fill="transparent" r="45" cx="50" cy="50"/>
-                            <circle class="progress-ring-circle text-emerald-500" stroke-width="8" stroke-linecap="round" stroke="currentColor" fill="transparent" r="45" cx="50" cy="50" style="stroke-dashoffset: {{ 283|multiply:0.75 }}"/>
+            <div class="p-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                    <!-- Carbon Reduction -->
+                    <div class="impact-card rounded-2xl p-6 text-center">
+                        <svg width="120" height="120" class="mx-auto mb-4">
+                            <defs>
+                                <linearGradient id="progress-gradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                                    <stop offset="0%" stop-color="#10b981" />
+                                    <stop offset="100%" stop-color="#059669" />
+                                </linearGradient>
+                            </defs>
+                            <circle cx="60" cy="60" r="50" stroke-width="8" class="circular-progress-bg" fill="transparent"/>
+                            <circle cx="60" cy="60" r="50" stroke-width="8" class="circular-progress-fill" fill="transparent"
+                                    stroke-dasharray="314"
+                                    stroke-dashoffset="78.5"/> <!-- 75% complete -->
                         </svg>
-                        <div class="absolute inset-0 flex items-center justify-center">
-                            <span class="text-2xl font-bold text-gray-800">75%</span>
+                        <div class="text-3xl font-bold text-gray-900 mb-2">75%</div>
+                        <h4 class="font-semibold text-gray-800 mb-2">Carbon Reduction</h4>
+                        <p class="text-sm text-gray-600">Towards annual goal</p>
+                        <div class="mt-4 text-sm text-emerald-600 font-semibold">
+                            <i class="fas fa-arrow-up mr-1"></i>
+                            15% from last quarter
                         </div>
                     </div>
-                    <h4 class="font-semibold text-gray-800 mb-1">Carbon Reduction</h4>
-                    <p class="text-sm text-gray-600">Towards annual goal</p>
+                    
+                    <!-- Water Saved -->
+                    <div class="impact-card rounded-2xl p-6 text-center">
+                        <div class="w-24 h-24 mx-auto mb-4 flex items-center justify-center rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 shadow-xl">
+                            <i class="fas fa-tint text-4xl text-white"></i>
+                        </div>
+                        <div class="text-3xl font-bold text-gray-900 mb-2">5,240L</div>
+                        <h4 class="font-semibold text-gray-800 mb-2">Water Saved</h4>
+                        <p class="text-sm text-gray-600">This month's conservation</p>
+                        <div class="mt-4 text-sm text-blue-600 font-semibold">
+                            <i class="fas fa-tint mr-1"></i>
+                            240L daily average
+                        </div>
+                    </div>
+                    
+                    <!-- Waste Diverted -->
+                    <div class="impact-card rounded-2xl p-6 text-center">
+                        <div class="w-24 h-24 mx-auto mb-4 flex items-center justify-center rounded-full bg-gradient-to-br from-purple-500 to-pink-600 shadow-xl">
+                            <i class="fas fa-recycle text-4xl text-white"></i>
+                        </div>
+                        <div class="text-3xl font-bold text-gray-900 mb-2">42kg</div>
+                        <h4 class="font-semibold text-gray-800 mb-2">Waste Diverted</h4>
+                        <p class="text-sm text-gray-600">From landfill this month</p>
+                        <div class="mt-4 text-sm text-purple-600 font-semibold">
+                            <i class="fas fa-leaf mr-1"></i>
+                            Recycled & composted
+                        </div>
+                    </div>
+                    
+                    <!-- Trees Equivalent -->
+                    <div class="impact-card rounded-2xl p-6 text-center">
+                        <div class="w-24 h-24 mx-auto mb-4 flex items-center justify-center rounded-full bg-gradient-to-br from-yellow-500 to-amber-600 shadow-xl">
+                            <i class="fas fa-seedling text-4xl text-white"></i>
+                        </div>
+                        <div class="text-3xl font-bold text-gray-900 mb-2">52</div>
+                        <h4 class="font-semibold text-gray-800 mb-2">Trees Equivalent</h4>
+                        <p class="text-sm text-gray-600">Carbon offset achieved</p>
+                        <div class="mt-4 text-sm text-amber-600 font-semibold">
+                            <i class="fas fa-tree mr-1"></i>
+                            Mature forest impact
+                        </div>
+                    </div>
                 </div>
                 
-                <div class="text-center p-4">
-                    <div class="w-20 h-20 mx-auto mb-4 flex items-center justify-center rounded-full bg-blue-100">
-                        <i class="fas fa-tint text-3xl text-blue-500"></i>
+                <div class="mt-8 pt-6 border-t border-gray-100">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <h4 class="font-bold text-gray-900">Impact Timeline</h4>
+                            <p class="text-sm text-gray-600">Your sustainability journey over the past 12 months</p>
+                        </div>
+                        <button class="px-5 py-2.5 bg-gradient-to-r from-gray-900 to-gray-800 text-white font-semibold rounded-xl hover:shadow-lg transition-all">
+                            View Full Report
+                        </button>
                     </div>
-                    <h4 class="font-semibold text-gray-800 mb-1">Water Saved</h4>
-                    <p class="text-2xl font-bold text-blue-600">5,240L</p>
-                    <p class="text-sm text-gray-600">This month</p>
-                </div>
-                
-                <div class="text-center p-4">
-                    <div class="w-20 h-20 mx-auto mb-4 flex items-center justify-center rounded-full bg-purple-100">
-                        <i class="fas fa-recycle text-3xl text-purple-500"></i>
-                    </div>
-                    <h4 class="font-semibold text-gray-800 mb-1">Waste Diverted</h4>
-                    <p class="text-2xl font-bold text-purple-600">42kg</p>
-                    <p class="text-sm text-gray-600">From landfill</p>
-                </div>
-                
-                <div class="text-center p-4">
-                    <div class="w-20 h-20 mx-auto mb-4 flex items-center justify-center rounded-full bg-yellow-100">
-                        <i class="fas fa-seedling text-3xl text-yellow-600"></i>
-                    </div>
-                    <h4 class="font-semibold text-gray-800 mb-1">Trees Equivalent</h4>
-                    <p class="text-2xl font-bold text-yellow-600">52</p>
-                    <p class="text-sm text-gray-600">Carbon offset</p>
                 </div>
             </div>
         </div>
@@ -360,15 +1002,74 @@
 </div>
 
 <script>
-    // Initialize progress rings
+    // Initialize progress circles
     document.addEventListener('DOMContentLoaded', function() {
-        const rings = document.querySelectorAll('.progress-ring-circle');
-        rings.forEach(ring => {
-            const value = parseInt(ring.parentElement.nextElementSibling.querySelector('span').textContent);
-            const circumference = 2 * Math.PI * 45;
-            const offset = circumference - (value / 100) * circumference;
-            ring.style.strokeDashoffset = offset;
-            ring.style.strokeDasharray = circumference;
+        // Create gradient for circular progress
+        const svgNS = "http://www.w3.org/2000/svg";
+        const defs = document.createElementNS(svgNS, "defs");
+        const gradient = document.createElementNS(svgNS, "linearGradient");
+        gradient.setAttribute("id", "progress-gradient");
+        gradient.setAttribute("x1", "0%");
+        gradient.setAttribute("y1", "0%");
+        gradient.setAttribute("x2", "100%");
+        gradient.setAttribute("y2", "0%");
+        
+        const stop1 = document.createElementNS(svgNS, "stop");
+        stop1.setAttribute("offset", "0%");
+        stop1.setAttribute("stop-color", "#10b981");
+        gradient.appendChild(stop1);
+        
+        const stop2 = document.createElementNS(svgNS, "stop");
+        stop2.setAttribute("offset", "100%");
+        stop2.setAttribute("stop-color", "#059669");
+        gradient.appendChild(stop2);
+        
+        defs.appendChild(gradient);
+        
+        // Add defs to all SVGs
+        document.querySelectorAll('svg').forEach(svg => {
+            if (!svg.querySelector('defs')) {
+                svg.insertBefore(defs.cloneNode(true), svg.firstChild);
+            }
+        });
+        
+        // Animate progress bars on scroll
+        const observerOptions = {
+            threshold: 0.2,
+            rootMargin: '0px 0px -50px 0px'
+        };
+        
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const progressFill = entry.target.querySelector('.progress-fill');
+                    const width = progressFill.style.width;
+                    progressFill.style.width = '0%';
+                    
+                    setTimeout(() => {
+                        progressFill.style.width = width;
+                        progressFill.style.transition = 'width 1.5s cubic-bezier(0.4, 0, 0.2, 1)';
+                    }, 300);
+                    
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, observerOptions);
+        
+        // Observe all progress containers
+        document.querySelectorAll('.progress-container').forEach(container => {
+            observer.observe(container);
+        });
+        
+        // Add hover effects to cards
+        document.querySelectorAll('.stat-card, .impact-card').forEach(card => {
+            card.addEventListener('mouseenter', function() {
+                this.style.transform = 'translateY(-8px)';
+            });
+            
+            card.addEventListener('mouseleave', function() {
+                this.style.transform = 'translateY(0)';
+            });
         });
     });
 </script>
