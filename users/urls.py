@@ -25,6 +25,7 @@ urlpatterns = [
     
     # Add login page
     path('login/', TemplateView.as_view(template_name='users/login.html'), name='login'),
+    path('login-api/', LoginAPIView.as_view(), name='login_api'),
 ]
 
 # Add app_name for namespace support
