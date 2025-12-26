@@ -1627,7 +1627,7 @@ input[type="radio"]:checked::after {
                             <i class="fas fa-leaf text-white text-2xl"></i>
                         </div>
                         <span class="text-3xl font-bold bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent">
-                            EcoHub
+                            YES
                         </span>
                     </a>
                     <h1 class="text-5xl font-bold text-gray-900 mb-6 leading-tight">
@@ -1697,28 +1697,6 @@ input[type="radio"]:checked::after {
                     <p class="text-gray-600">Enter your credentials to continue your environmental journey</p>
                 </div>
 
-                <!-- Social Login -->
-                <div class="mb-8">
-                    <div class="grid grid-cols-2 gap-4">
-                        <button class="btn-social bg-google hover:bg-google-dark">
-                            <i class="fab fa-google mr-3"></i>
-                            Google
-                        </button>
-                        <button class="btn-social bg-linkedin hover:bg-linkedin-dark">
-                            <i class="fab fa-linkedin-in mr-3"></i>
-                            LinkedIn
-                        </button>
-                    </div>
-                    <div class="relative my-8">
-                        <div class="absolute inset-0 flex items-center">
-                            <div class="w-full border-t border-gray-300"></div>
-                        </div>
-                        <div class="relative flex justify-center text-sm">
-                            <span class="px-4 bg-white text-gray-500">Or continue with email</span>
-                        </div>
-                    </div>
-                </div>
-
                 <!-- Login Form -->
                 <form method="post" class="space-y-6" id="loginForm">
                     {% csrf_token %}
@@ -1736,6 +1714,7 @@ input[type="radio"]:checked::after {
                                    class="form-input pl-10"
                                    placeholder="Enter your email or username">
                         </div>
+                        <div class="error-message mt-2 hidden" id="username_error"></div>
                     </div>
 
                     <div>
@@ -1756,6 +1735,7 @@ input[type="radio"]:checked::after {
                                 <i class="fas fa-eye text-gray-400 hover:text-emerald-600"></i>
                             </button>
                         </div>
+                        <div class="error-message mt-2 hidden" id="password_error"></div>
                     </div>
 
                     <!-- Remember & Forgot -->
@@ -1776,7 +1756,8 @@ input[type="radio"]:checked::after {
 
                     <!-- Submit Button -->
                     <button type="submit" 
-                            class="w-full btn-primary-lg group relative">
+                            class="w-full btn-primary-lg group relative"
+                            id="loginButton">
                         <span class="absolute left-0 inset-y-0 flex items-center pl-3">
                             <i class="fas fa-sign-in-alt text-white"></i>
                         </span>
@@ -1784,17 +1765,19 @@ input[type="radio"]:checked::after {
                         <i class="fas fa-arrow-right ml-2 group-hover:translate-x-1 transition-transform"></i>
                     </button>
 
-                    <!-- CAPTCHA -->
-                    <div class="bg-gray-50 p-4 rounded-lg border border-gray-200">
-                        <div class="flex items-center justify-between mb-2">
-                            <span class="text-sm font-medium text-gray-700">Security Check</span>
-                            <i class="fas fa-shield-alt text-emerald-500"></i>
+                    <!-- Error Messages -->
+                    <div class="hidden" id="loginError">
+                        <div class="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-lg">
+                            <strong class="font-bold">Login Failed:</strong>
+                            <span id="errorMessage"></span>
                         </div>
-                        <div class="flex items-center space-x-3">
-                            <input type="checkbox" id="captcha" required class="h-5 w-5">
-                            <label for="captcha" class="text-sm text-gray-600">
-                                I'm not a robot
-                            </label>
+                    </div>
+
+                    <!-- Success Messages -->
+                    <div class="hidden" id="loginSuccess">
+                        <div class="bg-emerald-50 border border-emerald-200 text-emerald-600 px-4 py-3 rounded-lg">
+                            <strong class="font-bold">Success!</strong>
+                            <span id="successMessage">Redirecting to dashboard...</span>
                         </div>
                     </div>
                 </form>
@@ -1826,9 +1809,9 @@ input[type="radio"]:checked::after {
                             Demo Credentials
                         </summary>
                         <div class="mt-2 space-y-2 text-sm">
-                            <p><strong>Username:</strong> demo_user</p>
-                            <p><strong>Password:</strong> demo1234</p>
-                            <p class="text-xs text-amber-600">For testing purposes only</p>
+                            <p><strong>Username:</strong> admin</p>
+                            <p><strong>Password:</strong> [Check your Django admin password]</p>
+                            <p class="text-xs text-amber-600">Use the credentials you created during registration</p>
                         </div>
                     </details>
                 </div>
@@ -1837,92 +1820,171 @@ input[type="radio"]:checked::after {
     </div>
 </div>
 
-<!-- Environmental Elements -->
-<div class="environmental-elements">
-    <div class="sun"></div>
-    <div class="cloud"></div>
-    <div class="cloud"></div>
-    
-    <!-- Leaves -->
-    <div class="leaf" style="left: 10%; animation-duration: 8s; animation-delay: 0s;"></div>
-    <div class="leaf" style="left: 30%; animation-duration: 10s; animation-delay: 2s;"></div>
-    <div class="leaf" style="left: 50%; animation-duration: 12s; animation-delay: 4s;"></div>
-    <div class="leaf" style="left: 70%; animation-duration: 9s; animation-delay: 1s;"></div>
-    <div class="leaf" style="left: 90%; animation-duration: 11s; animation-delay: 3s;"></div>
-    
-    <!-- Ripples -->
-    <div class="ripple" style="top: 40%; left: 20%; animation-delay: 0s;"></div>
-    <div class="ripple" style="top: 60%; left: 80%; animation-delay: 1.5s;"></div>
-    <div class="ripple" style="top: 80%; left: 40%; animation-delay: 3s;"></div>
-</div>
-
-<!-- Particles System -->
-<div class="particles" id="particles"></div>
-
 <script>
-    function togglePasswordVisibility(inputId) {
-        const input = document.getElementById(inputId);
-        const icon = input.nextElementSibling.querySelector('i');
-        if (input.type === 'password') {
-            input.type = 'text';
-            icon.classList.replace('fa-eye', 'fa-eye-slash');
-        } else {
-            input.type = 'password';
-            icon.classList.replace('fa-eye-slash', 'fa-eye');
+// ===== PASSWORD VISIBILITY =====
+function togglePasswordVisibility(inputId) {
+    const input = document.getElementById(inputId);
+    const icon = input.nextElementSibling.querySelector('i');
+    if (input.type === 'password') {
+        input.type = 'text';
+        icon.classList.replace('fa-eye', 'fa-eye-slash');
+    } else {
+        input.type = 'password';
+        icon.classList.replace('fa-eye-slash', 'fa-eye');
+    }
+}
+
+// ===== GET CSRF TOKEN =====
+function getCSRFToken() {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, 10) === 'csrftoken=') {
+                cookieValue = decodeURIComponent(cookie.substring(10));
+                break;
+            }
         }
     }
+    return cookieValue;
+}
 
-    // Form validation
-    document.getElementById('loginForm').addEventListener('submit', function(e) {
-        const captcha = document.getElementById('captcha');
-        if (!captcha.checked) {
-            e.preventDefault();
-            alert('Please complete the security check');
-            captcha.focus();
+// ===== LOGIN FORM SUBMISSION =====
+const loginForm = document.getElementById('loginForm');
+const loginButton = document.getElementById('loginButton');
+
+if (loginForm) {
+    loginForm.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        console.log('Login form submitted');
+        
+        // Clear previous messages
+        document.getElementById('loginError').classList.add('hidden');
+        document.getElementById('loginSuccess').classList.add('hidden');
+        document.getElementById('username_error').classList.add('hidden');
+        document.getElementById('password_error').classList.add('hidden');
+        
+        // Disable button and show loading
+        const originalText = loginButton.innerHTML;
+        loginButton.innerHTML = '<div class="loading-spinner inline-block mr-2"></div> Signing In...';
+        loginButton.disabled = true;
+        
+        // Get form data
+        const formData = {
+            username: document.getElementById('username').value.trim(),
+            password: document.getElementById('password').value,
+            remember: document.getElementById('remember').checked
+        };
+        
+        console.log('Login data:', formData);
+        
+        // Basic validation
+        if (!formData.username) {
+            showError('username_error', 'Username or email is required');
+            resetButton();
+            return;
+        }
+        
+        if (!formData.password) {
+            showError('password_error', 'Password is required');
+            resetButton();
+            return;
+        }
+        
+        try {
+            // Send login request to API
+            const response = await fetch('/api/users/login-api/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCSRFToken(),
+                },
+                body: JSON.stringify(formData)
+            });
+            
+            console.log('Login response status:', response.status);
+            
+            const data = await response.json();
+            console.log('Login response data:', data);
+            
+            if (response.ok) {
+                // Login successful
+                console.log('✅ Login successful for:', data.user.username);
+                
+                // Store tokens in localStorage
+                if (data.tokens) {
+                    localStorage.setItem('access_token', data.tokens.access);
+                    localStorage.setItem('refresh_token', data.tokens.refresh);
+                    localStorage.setItem('user', JSON.stringify(data.user));
+                    
+                    // Set remember me
+                    if (formData.remember) {
+                        localStorage.setItem('remember_me', 'true');
+                    }
+                }
+                
+                // Show success message
+                document.getElementById('loginSuccess').classList.remove('hidden');
+                
+                // Redirect to dashboard or home page after 2 seconds
+                setTimeout(() => {
+                    window.location.href = "{% url 'core:home' %}";
+                }, 2000);
+                
+            } else {
+                // Login failed
+                console.error('❌ Login failed:', data);
+                showLoginError(data.error || 'Invalid username or password');
+                resetButton();
+            }
+            
+        } catch (error) {
+            console.error('Login error:', error);
+            showLoginError('Network error. Please check your connection.');
+            resetButton();
         }
     });
+}
 
-    // Create particles
-    function createParticles() {
-        const particlesContainer = document.getElementById('particles');
-        for (let i = 0; i < 30; i++) {
-            const particle = document.createElement('div');
-            particle.className = 'particle';
-            
-            // Random properties
-            const size = Math.random() * 5 + 2;
-            const left = Math.random() * 100;
-            const duration = Math.random() * 10 + 10;
-            const delay = Math.random() * 5;
-            
-            particle.style.width = `${size}px`;
-            particle.style.height = `${size}px`;
-            particle.style.left = `${left}%`;
-            particle.style.animationDuration = `${duration}s`;
-            particle.style.animationDelay = `${delay}s`;
-            
-            particlesContainer.appendChild(particle);
-        }
+// ===== HELPER FUNCTIONS =====
+function showError(elementId, message) {
+    const element = document.getElementById(elementId);
+    element.textContent = message;
+    element.classList.remove('hidden');
+}
+
+function showLoginError(message) {
+    const errorDiv = document.getElementById('loginError');
+    const errorMessage = document.getElementById('errorMessage');
+    errorMessage.textContent = message;
+    errorDiv.classList.remove('hidden');
+}
+
+function resetButton() {
+    loginButton.innerHTML = '<span class="absolute left-0 inset-y-0 flex items-center pl-3"><i class="fas fa-sign-in-alt text-white"></i></span>Sign In<i class="fas fa-arrow-right ml-2 group-hover:translate-x-1 transition-transform"></i>';
+    loginButton.disabled = false;
+}
+
+// ===== CHECK IF USER IS ALREADY LOGGED IN =====
+function checkAuthStatus() {
+    const accessToken = localStorage.getItem('access_token');
+    const userData = localStorage.getItem('user');
+    
+    if (accessToken && userData) {
+        // User is already logged in, redirect to home
+        console.log('User is already logged in, redirecting...');
+        window.location.href = "{% url 'core:home' %}";
     }
+}
 
-    // Initialize animations
-    document.addEventListener('DOMContentLoaded', function() {
-        createParticles();
-        
-        // Add stagger animation to features
-        const features = document.querySelectorAll('.space-y-6 > div');
-        features.forEach((feature, index) => {
-            feature.classList.add('stagger-item');
-            feature.style.animationDelay = `${index * 0.1}s`;
-        });
-        
-        // Add hover effect to cards
-        const cards = document.querySelectorAll('.bg-white.rounded-xl');
-        cards.forEach(card => {
-            card.classList.add('hover-card');
-        });
-    });
-
+// ===== INITIALIZE =====
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('Login page loaded');
+    
+    // Check if user is already logged in
+    checkAuthStatus();
+    
     // Add focus styles to form inputs
     const formInputs = document.querySelectorAll('.form-input');
     formInputs.forEach(input => {
@@ -1934,7 +1996,18 @@ input[type="radio"]:checked::after {
             this.parentElement.classList.remove('ring-2', 'ring-emerald-500');
         });
     });
+    
+    // Check for remembered username
+    if (localStorage.getItem('remember_me') === 'true') {
+        const user = JSON.parse(localStorage.getItem('user') || '{}');
+        if (user.username) {
+            document.getElementById('username').value = user.username;
+            document.getElementById('remember').checked = true;
+        }
+    }
+});
 </script>
+{% endblock %}
 
 <style>
     @keyframes blob {
