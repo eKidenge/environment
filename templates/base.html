@@ -2482,6 +2482,43 @@
                 background: #000;
             }
         }
+        <!-- ADDED TO FIX THE NAVBAR ON 2:45AM -->
+        /* FIX NAVBAR VISIBILITY */
+.navbar-container {
+    justify-content: space-between !important;
+    gap: 10px !important;
+}
+
+.navbar-nav {
+    display: flex !important;
+    gap: 8px !important;
+    overflow: visible !important;
+}
+
+.nav-link {
+    padding: 8px 12px !important;
+    font-size: 14px !important;
+}
+
+.navbar-actions {
+    display: flex !important;
+    gap: 8px !important;
+}
+
+.navbar-actions .btn {
+    padding: 8px 16px !important;
+    font-size: 14px !important;
+}
+
+/* Ensure nothing is hidden */
+.navbar-nav,
+.navbar-actions,
+.nav-link,
+.btn {
+    opacity: 1 !important;
+    visibility: visible !important;
+    display: flex !important;
+}
     </style>
     
     <!-- Meta Tags -->
