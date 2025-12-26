@@ -3416,7 +3416,7 @@ if (registrationForm) {
         
         try {
             // Send to Django REST Framework API
-            const response = await fetch('/api/users/', {
+            const response = await fetch('/api/users/create/', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
