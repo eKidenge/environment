@@ -1698,7 +1698,7 @@ input[type="radio"]:checked::after {
                 </div>
 
                 <!-- Login Form -->
-                <form method="post" action="{% url 'users:login' %}" class="space-y-6" id="loginForm">
+                <form method="post" action="{% url 'users:login_api' %}" class="space-y-6" id="loginForm">
                     {% csrf_token %}
                     
                     <div>
