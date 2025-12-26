@@ -287,3 +287,81 @@ class UserVerificationViewSet(viewsets.ModelViewSet):
         user.save()
         
         return Response({'status': 'Verification rejected'})
+
+# UPDATED TO HANDLE LOGINS
+class LoginAPIView(APIView):
+    """
+    API endpoint for user login
+    """
+    permission_classes = [permissions.AllowAny]
+    
+    def post(self, request):
+        print("=== LOGIN ATTEMPT ===")
+        print("Login data:", request.data)
+        
+        username = request.data.get('username')
+        password = request.data.get('password')
+        
+        if not username or not password:
+            return Response(
+                {'error': 'Please provide both username and password'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        # Try to authenticate
+        user = authenticate(username=username, password=password)
+        
+        if user:
+            if not user.is_active:
+                return Response(
+                    {'error': 'Account is disabled. Please contact support.'},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+            
+            # Generate JWT tokens
+            refresh = RefreshToken.for_user(user)
+            
+            # Update user's last login
+            user.last_login = timezone.now()
+            user.save()
+            
+            # Log login activity
+            UserActivityLog.objects.create(
+                user=user,
+                activity_type='login',
+                ip_address=self.get_client_ip(request),
+                user_agent=request.META.get('HTTP_USER_AGENT', ''),
+                details={'method': 'web_login'}
+            )
+            
+            print(f"✅ Login successful for user: {user.username}")
+            
+            return Response({
+                'message': 'Login successful',
+                'user': {
+                    'id': user.id,
+                    'username': user.username,
+                    'email': user.email,
+                    'first_name': user.first_name,
+                    'last_name': user.last_name,
+                    'user_type': user.user_type,
+                },
+                'tokens': {
+                    'refresh': str(refresh),
+                    'access': str(refresh.access_token),
+                }
+            })
+        
+        print(f"❌ Login failed for username: {username}")
+        return Response(
+            {'error': 'Invalid username or password'},
+            status=status.HTTP_401_UNAUTHORIZED
+        )
+    
+    def get_client_ip(self, request):
+        x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
+        if x_forwarded_for:
+            ip = x_forwarded_for.split(',')[0]
+        else:
+            ip = request.META.get('REMOTE_ADDR')
+        return ip
