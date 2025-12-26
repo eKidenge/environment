@@ -3036,7 +3036,6 @@ function checkPasswordStrength(password) {
     };
     
     let strength = 0;
-    let tips = [];
     
     // Check password length
     if (password.length >= 8) {
@@ -3256,17 +3255,42 @@ function selectRole(element, role) {
     roleError.classList.remove('show');
 }
 
-// ===== FORM VALIDATION =====
+// ===== GET CSRF TOKEN =====
+function getCSRFToken() {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, 10) === 'csrftoken=') {
+                cookieValue = decodeURIComponent(cookie.substring(10));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+
+// ===== FORM VALIDATION AND SUBMISSION =====
 const registrationForm = document.getElementById('registrationForm');
 const submitButton = document.getElementById('submitButton');
 
 if (registrationForm) {
     registrationForm.addEventListener('submit', async function(e) {
         e.preventDefault();
+        console.log('Form submission started...');
+        
+        // Clear all previous error messages
+        document.querySelectorAll('.error-message').forEach(el => {
+            el.classList.remove('show');
+        });
+        document.querySelectorAll('.success-message').forEach(el => {
+            el.classList.remove('show');
+        });
         
         // Disable submit button and show loading state
         const originalText = submitButton.innerHTML;
-        submitButton.innerHTML = '<div class="loading-spinner"></div> Processing...';
+        submitButton.innerHTML = '<div class="loading-spinner"></div> Creating Account...';
         submitButton.disabled = true;
         
         // Validate all fields
@@ -3279,8 +3303,6 @@ if (registrationForm) {
             firstNameError.textContent = 'First name is required';
             firstNameError.classList.add('show');
             isValid = false;
-        } else {
-            firstNameError.classList.remove('show');
         }
         
         // Last Name
@@ -3290,8 +3312,6 @@ if (registrationForm) {
             lastNameError.textContent = 'Last name is required';
             lastNameError.classList.add('show');
             isValid = false;
-        } else {
-            lastNameError.classList.remove('show');
         }
         
         // Email
@@ -3306,8 +3326,6 @@ if (registrationForm) {
             emailError.textContent = 'Please enter a valid email address';
             emailError.classList.add('show');
             isValid = false;
-        } else {
-            emailError.classList.remove('show');
         }
         
         // Username
@@ -3322,8 +3340,6 @@ if (registrationForm) {
             usernameError.textContent = 'Username must be 3-30 characters and contain only letters, numbers, and underscores';
             usernameError.classList.add('show');
             isValid = false;
-        } else {
-            usernameError.classList.remove('show');
         }
         
         // Password
@@ -3337,8 +3353,6 @@ if (registrationForm) {
             passwordError.textContent = 'Password must be at least 8 characters long';
             passwordError.classList.add('show');
             isValid = false;
-        } else {
-            passwordError.classList.remove('show');
         }
         
         // Confirm Password
@@ -3352,8 +3366,6 @@ if (registrationForm) {
             confirmPasswordError.textContent = 'Passwords do not match';
             confirmPasswordError.classList.add('show');
             isValid = false;
-        } else {
-            confirmPasswordError.classList.remove('show');
         }
         
         // Role
@@ -3362,8 +3374,6 @@ if (registrationForm) {
             roleError.textContent = 'Please select your primary interest';
             roleError.classList.add('show');
             isValid = false;
-        } else {
-            roleError.classList.remove('show');
         }
         
         // Terms
@@ -3373,31 +3383,11 @@ if (registrationForm) {
             termsError.textContent = 'You must agree to the terms and conditions';
             termsError.classList.add('show');
             isValid = false;
-        } else {
-            termsError.classList.remove('show');
         }
         
-        // If form is valid, submit it
-        if (isValid) {
-            // In a real application, this would submit the form via AJAX
-            // For now, we'll simulate a successful registration
-            setTimeout(() => {
-                alert('🎉 Registration successful! Welcome to YES!');
-                registrationForm.reset();
-                document.querySelectorAll('.role-card').forEach(card => {
-                    card.classList.remove('selected');
-                });
-                selectedRole = null;
-                
-                // Reset button
-                submitButton.innerHTML = originalText;
-                submitButton.disabled = false;
-                
-                // Redirect to login page (in real app)
-                // window.location.href = "{% url 'users:login' %}";
-            }, 1500);
-        } else {
-            // Re-enable button if validation failed
+        // If form is NOT valid, stop here
+        if (!isValid) {
+            // Re-enable button
             submitButton.innerHTML = originalText;
             submitButton.disabled = false;
             
@@ -3406,8 +3396,122 @@ if (registrationForm) {
             if (firstError) {
                 firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
             }
+            return;
+        }
+        
+        // Prepare data for API submission
+        const formData = {
+            username: username,
+            email: email,
+            first_name: firstName,
+            last_name: lastName,
+            password: password,
+            confirm_password: confirmPassword,
+            role: selectedRole,
+            terms: termsCheckbox.checked,
+            newsletter: document.getElementById('newsletter').checked
+        };
+        
+        console.log('Sending data to API:', formData);
+        
+        try {
+            // Send to Django REST Framework API
+            const response = await fetch('/api/users/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCSRFToken(),
+                },
+                body: JSON.stringify(formData)
+            });
+            
+            console.log('API Response status:', response.status);
+            
+            const data = await response.json();
+            console.log('API Response data:', data);
+            
+            if (response.ok) {
+                // Success!
+                alert('🎉 Registration successful! Welcome to YES!');
+                
+                // Reset form
+                registrationForm.reset();
+                document.querySelectorAll('.role-card').forEach(card => {
+                    card.classList.remove('selected');
+                });
+                selectedRole = null;
+                
+                // Redirect to login page
+                window.location.href = "{% url 'users:login' %}";
+                
+            } else {
+                // Show errors from API
+                showApiErrors(data);
+                
+                // Re-enable button
+                submitButton.innerHTML = originalText;
+                submitButton.disabled = false;
+            }
+            
+        } catch (error) {
+            console.error('Registration error:', error);
+            alert('Network error. Please check your connection and try again.');
+            
+            // Re-enable button
+            submitButton.innerHTML = originalText;
+            submitButton.disabled = false;
         }
     });
+}
+
+// ===== SHOW API ERRORS =====
+function showApiErrors(errors) {
+    // Clear all previous errors
+    document.querySelectorAll('.error-message').forEach(el => {
+        el.classList.remove('show');
+    });
+    
+    // Map API field names to HTML field IDs
+    const fieldMapping = {
+        'username': 'username_error',
+        'email': 'email_error',
+        'first_name': 'first_name_error',
+        'last_name': 'last_name_error',
+        'password': 'password_error',
+        'confirm_password': 'confirm_password_error',
+        'role': 'role_error',
+        'terms': 'terms_error'
+    };
+    
+    // Show errors
+    for (const [field, messages] of Object.entries(errors)) {
+        const errorElementId = fieldMapping[field] || `${field}_error`;
+        const errorElement = document.getElementById(errorElementId);
+        
+        if (errorElement) {
+            errorElement.textContent = Array.isArray(messages) ? messages[0] : messages;
+            errorElement.classList.add('show');
+        } else {
+            // If no specific field, show as general error
+            const generalError = document.getElementById('general_error') || createGeneralErrorElement();
+            generalError.textContent = Array.isArray(messages) ? messages[0] : messages;
+            generalError.classList.add('show');
+        }
+    }
+}
+
+// ===== CREATE GENERAL ERROR ELEMENT =====
+function createGeneralErrorElement() {
+    const generalError = document.createElement('div');
+    generalError.id = 'general_error';
+    generalError.className = 'error-message bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-lg mb-4';
+    
+    const form = document.getElementById('registrationForm');
+    if (form) {
+        form.insertBefore(generalError, form.firstChild);
+    }
+    
+    return generalError;
 }
 
 // ===== PASSWORD CONFIRMATION CHECK =====
@@ -3429,6 +3533,8 @@ if (confirmPasswordInput) {
 
 // ===== INITIALIZE REAL-TIME VALIDATION =====
 document.addEventListener('DOMContentLoaded', function() {
+    console.log('Registration page loaded');
+    
     // Initialize password strength check
     const passwordInput = document.getElementById('password');
     if (passwordInput) {
