@@ -3474,6 +3474,41 @@ h3 { font-size: var(--text-2xl) !important; }
     margin-bottom: var(--space-4) !important;
     padding-bottom: var(--space-3) !important;
 }
+    /* === FIX TEXT WRAPPING ISSUE === */
+.contact-hero .lead {
+    max-width: 42rem !important;  /* Reduced from 48rem */
+    margin: 0 auto !important;
+    padding: var(--space-4) var(--space-8) !important;
+    text-align: center !important;
+    word-wrap: break-word !important;
+    overflow-wrap: break-word !important;
+    hyphens: auto !important;
+    line-height: 1.5 !important;
+}
+
+/* Make sure container is centered */
+.contact-hero .container {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    text-align: center !important;
+}
+
+/* Fix paragraph wrapping */
+.contact-hero .lead p {
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 auto !important;
+}
+
+/* Ensure text doesn't overflow */
+.contact-hero .text-center {
+    width: 100% !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+}
 
 /* ===== END OF CSS FILE ===== */
 </style>
