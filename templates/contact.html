@@ -3523,76 +3523,182 @@ p, .text-center, .lead {
     overflow-wrap: anywhere !important;
     hyphens: auto !important;
 }
-    /* === FIX DEPARTMENT CARDS LAYOUT === */
+    /* === PROFESSIONAL DEPARTMENT CARDS STYLING === */
+
+/* Grid layout - 4 cards side by side */
 .department-grid {
     display: grid !important;
-    grid-template-columns: repeat(4, 1fr) !important;  /* 4 columns side by side */
-    gap: var(--space-4) !important;
-    margin-top: var(--space-8) !important;
+    grid-template-columns: repeat(4, 1fr) !important;
+    gap: var(--space-6) !important;
+    margin-top: var(--space-10) !important;
 }
 
-/* Make sure cards don't break */
+/* Professional card design */
 .department-card {
-    min-width: 0 !important;  /* Prevent overflow */
-    width: 100% !important;
-    height: auto !important;
+    background: linear-gradient(145deg, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0.98)) !important;
+    backdrop-filter: blur(20px) !important;
+    border-radius: var(--radius-2xl) !important;
+    padding: var(--space-8) !important;
+    border: 1px solid rgba(255, 255, 255, 0.4) !important;
+    box-shadow: 
+        var(--shadow-lg),
+        inset 0 1px 0 0 rgba(255, 255, 255, 0.8) !important;
+    transition: all var(--transition-bounce) !important;
+    height: 100% !important;
     display: flex !important;
     flex-direction: column !important;
+    position: relative !important;
+    overflow: hidden !important;
 }
 
-/* Fix content inside cards */
+/* Card accent border */
+.department-card::before {
+    content: '' !important;
+    position: absolute !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    height: 4px !important;
+    background: linear-gradient(90deg, 
+        var(--primary-500), 
+        var(--secondary-500),
+        var(--primary-500)
+    ) !important;
+    border-radius: var(--radius-2xl) var(--radius-2xl) 0 0 !important;
+}
+
+/* Hover effect */
+.department-card:hover {
+    transform: translateY(-8px) scale(1.02) !important;
+    box-shadow: var(--shadow-2xl) !important;
+    border-color: rgba(16, 185, 129, 0.2) !important;
+}
+
+/* Card header */
 .department-header {
+    display: flex !important;
+    align-items: center !important;
+    gap: var(--space-6) !important;
+    margin-bottom: var(--space-8) !important;
+}
+
+/* Icon styling */
+.department-icon {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 64px !important;
+    height: 64px !important;
+    background: linear-gradient(135deg, var(--primary-50), var(--primary-100)) !important;
+    border-radius: var(--radius-xl) !important;
+    flex-shrink: 0 !important;
+    box-shadow: var(--shadow-md) !important;
+}
+
+.department-icon i {
+    color: var(--primary-600) !important;
+    font-size: var(--text-2xl) !important;
+}
+
+/* Professional heading styling */
+.department-info h4 {
+    font-size: var(--text-xl) !important;
+    font-weight: 700 !important;
+    color: var(--neutral-900) !important;
+    margin-bottom: var(--space-2) !important;
+    line-height: 1.3 !important;
+}
+
+/* Professional subtitle */
+.department-info p {
+    font-size: var(--text-sm) !important;
+    color: var(--neutral-500) !important;
+    font-weight: 600 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.05em !important;
+    line-height: 1.4 !important;
+}
+
+/* Contact list styling */
+.department-contacts-list {
+    list-style: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    flex-grow: 1 !important;
+}
+
+.department-contacts-list li {
+    display: flex !important;
+    align-items: center !important;
+    gap: var(--space-3) !important;
+    margin-bottom: var(--space-4) !important;
+    font-size: var(--text-base) !important;
+    padding: var(--space-2) var(--space-3) !important;
+    border-radius: var(--radius-lg) !important;
+    transition: all var(--transition-ease) !important;
+}
+
+.department-contacts-list li:hover {
+    background: var(--primary-50) !important;
+    transform: translateX(4px) !important;
+}
+
+/* Bold names */
+.department-contacts-list li:first-child span {
+    font-weight: 700 !important;
+    color: var(--neutral-900) !important;
+}
+
+/* Email and phone links */
+.department-contacts-list a {
+    color: var(--neutral-700) !important;
+    text-decoration: none !important;
+    transition: all var(--transition-ease) !important;
+    font-weight: 500 !important;
+}
+
+.department-contacts-list a:hover {
+    color: var(--primary-600) !important;
+    text-decoration: underline !important;
+    text-underline-offset: 2px !important;
+}
+
+/* Icons */
+.department-contacts-list i {
+    color: var(--primary-500) !important;
+    width: 20px !important;
+    text-align: center !important;
+    font-size: var(--text-lg) !important;
     flex-shrink: 0 !important;
 }
 
-.department-contacts-list {
-    flex-grow: 1 !important;
-    display: flex !important;
-    flex-direction: column !important;
-    justify-content: space-between !important;
-}
-
-/* For mobile: 2 columns */
-@media (max-width: 1024px) {
+/* Responsive */
+@media (max-width: 1200px) {
     .department-grid {
         grid-template-columns: repeat(2, 1fr) !important;
     }
 }
 
-/* For very small mobile: 1 column */
 @media (max-width: 640px) {
     .department-grid {
         grid-template-columns: 1fr !important;
     }
+    
+    .department-card {
+        padding: var(--space-6) !important;
+    }
+    
+    .department-header {
+        gap: var(--space-4) !important;
+        margin-bottom: var(--space-6) !important;
+    }
+    
+    .department-icon {
+        width: 56px !important;
+        height: 56px !important;
+    }
 }
-
-/* Ensure equal height */
-.department-card {
-    display: flex !important;
-    flex-direction: column !important;
-    height: 100% !important;
-}
-
-.department-info {
-    flex: 1 0 auto !important;
-}
-
-.department-contacts-list {
-    flex: 1 1 auto !important;
-}
-
-/* Fix text inside */
-.department-info h4 {
-    font-size: var(--text-lg) !important;
-    line-height: 1.3 !important;
-    margin-bottom: var(--space-2) !important;
-}
-
-.department-info p {
-    font-size: var(--text-sm) !important;
-    line-height: 1.4 !important;
-    margin-bottom: var(--space-4) !important;
-}
+    
 
 /* ===== END OF CSS FILE ===== */
 </style>
