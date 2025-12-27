@@ -212,6 +212,7 @@ urlpatterns = [
     # Continue with other URLs...
     path('volunteer/', TemplateView.as_view(template_name = 'volunteer/opportunities/list.html'), name = 'volunteer'),
     path('about/', TemplateView.as_view(template_name = 'core/about.html'), name = 'about'),
+    path('contact/', TemplateView.as_view(template_name='contact.html'), name='contact'),
     path('programs/', TemplateView.as_view(template_name='programs/list.html'), name='programs'),
     path('research/', TemplateView.as_view(template_name='research/publications/list.html'), name='research'),
     path('volunteer/', TemplateView.as_view(template_name='volunteer/list.html'), name='volunteer'),
