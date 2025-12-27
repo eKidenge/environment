@@ -3622,24 +3622,47 @@ html {
         background: #0f172a;
     }
 }
-   /* Center Featured Research Header */
-.featured-research-section .section-header {
+   /* Fix all alignment issues in content header */
+.content-header {
     text-align: center;
-}
-
-.featured-research-section .flex.flex-col.md\:flex-row {
-    flex-direction: column;
     align-items: center;
 }
 
-.featured-research-section .category-filters {
-    justify-content: center;
-}
-   /* Center "All Articles" in filter tabs */
-.content-controls .category-filters {
-    justify-content: center;
+.header-main {
+    width: 100%;
+    text-align: center;
 }
 
+.content-title {
+    text-align: center;
+}
+
+.content-subtitle {
+    text-align: center;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.content-controls {
+    justify-content: center;
+    width: 100%;
+}
+
+.content-controls .category-filters {
+    justify-content: center;
+    display: flex;
+}
+
+/* Center the sort dropdown too */
+.sort-controls {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+}
+
+.sort-select {
+    margin: 0 auto;
+}
 /* ==========================================================================
    END OF CSS FILE - ECOHUB SCIENTIFIC BLOG STYLES
    ========================================================================== */ 
