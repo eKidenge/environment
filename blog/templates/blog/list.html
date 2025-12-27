@@ -309,8 +309,12 @@ p {
 }
 
 .hero-title {
-    margin-bottom: 2rem;
-    line-height: 1.1;
+   margin-bottom: 2rem;
+   line-height: 1.1;
+   max-width: 72rem; /* Add this */
+   margin-left: auto;  /* Add this */
+   margin-right: auto; /* Add this */
+   text-align: center; /* Also add this for good measure */
 }
 
 .hero-title span {
@@ -339,7 +343,7 @@ p {
     font-size: clamp(1.125rem, 2.5vw, 1.5rem);
     color: var(--color-neutral-300);
     line-height: 1.6;
-    max-width: 48rem;
+    max-width: 64rem; /* Increased from 48rem to 64rem */
     margin: 0 auto 3rem;
     font-weight: 300;
 }
