@@ -3523,6 +3523,39 @@ p, .text-center, .lead {
     overflow-wrap: anywhere !important;
     hyphens: auto !important;
 }
+    /* === FIX DEPARTMENT CARDS LAYOUT ONLY === */
+.department-grid {
+    display: grid !important;
+    grid-template-columns: repeat(4, 1fr) !important;
+    gap: var(--space-6) !important;  /* Increased gap for better spacing */
+    margin-top: var(--space-8) !important;
+}
+
+/* Keep original card styles but fix layout */
+.department-card {
+    min-width: 0 !important;  /* Only this - don't override other styles */
+    width: 100% !important;
+    height: 100% !important;  /* Make cards equal height */
+}
+
+/* Responsive breakpoints - ONLY grid columns */
+@media (max-width: 1200px) {
+    .department-grid {
+        grid-template-columns: repeat(3, 1fr) !important;
+    }
+}
+
+@media (max-width: 992px) {
+    .department-grid {
+        grid-template-columns: repeat(2, 1fr) !important;
+    }
+}
+
+@media (max-width: 640px) {
+    .department-grid {
+        grid-template-columns: 1fr !important;
+    }
+}
 
 /* ===== END OF CSS FILE ===== */
 </style>
