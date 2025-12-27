@@ -14,7 +14,12 @@ class UserVerificationInline(admin.StackedInline):
     model = UserVerification
     fk_name = 'user'  # ADDED THIS LINE - specifies which foreign key to use
     extra = 0
-    readonly_fields = ('submitted_at', 'verified_at')
+    readonly_fields = (
+    'submitted_at',
+    'verified_at',
+    'document_front_preview',
+    'document_back_preview',
+)
     fieldsets = (
         ('Document Information', {
             'fields': ('document_type', 'document_front_preview', 'document_back_preview')
