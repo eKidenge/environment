@@ -647,6 +647,18 @@ def contact_form(request):
             {'error': 'Failed to send message. Please try again later.'},
             status=status.HTTP_500_INTERNAL_SERVER_ERROR
         )
+
+# core/views.py
+from django.shortcuts import render
+
+# Add this function alongside your API view
+def contact_page(request):
+    """Render the contact page template."""
+    return render(request, 'contact.html', {
+        'page_title': 'Contact Us',
+        'meta_description': 'Get in touch with Youth Environmental Scholars',
+    })
+
 def custom_404(request, exception):
     '''
     Custom 404 error handler
