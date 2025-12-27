@@ -558,21 +558,42 @@ def health_check(request):
     })
 
 
-# ADDED TO SERVE CONTACT US
+# core/views.py
+from django.shortcuts import render
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import AllowAny
+from rest_framework.response import Response
+from rest_framework import status
+from django.core.mail import send_mail
+from django.conf import settings
+from django.utils import timezone
+from .models import ContactSubmission, SiteConfiguration
+import logging
+
+logger = logging.getLogger(__name__)
+
+# ============== CONTACT PAGE FUNCTION ==============
+def contact_page(request):
+    """Render the contact page template."""
+    return render(request, 'contact.html', {
+        'page_title': 'Contact Us',
+        'meta_description': 'Get in touch with Youth Environmental Scholars',
+    })
+# ===================================================
+
+# ============== CONTACT FORM API ==============
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def contact_form(request):
     """
     Handle contact form submissions
     """
-    from django.core.mail import send_mail
-    from django.template.loader import render_to_string
-    
     name = request.data.get('name', '').strip()
     email = request.data.get('email', '').strip()
     subject = request.data.get('subject', '').strip()
     message = request.data.get('message', '').strip()
     category = request.data.get('category', 'general')
+    newsletter = request.data.get('newsletter', False)
     
     # Validation
     if not all([name, email, subject, message]):
@@ -587,24 +608,35 @@ def contact_form(request):
             status=status.HTTP_400_BAD_REQUEST
         )
     
-    # Save to database (you might want to create a ContactSubmission model)
-    # For now, just send email
-    
-    # Email to admin
-    admin_subject = f'Contact Form: {subject}'
-    admin_message = f"""
-    Name: {name}
-    Email: {email}
-    Category: {category}
-    
-    Message:
-    {message}
-    
-    ---
-    This message was sent from the contact form on YES website.
-    """
-    
+    # Save to database (ContactSubmission model)
     try:
+        # Save to database
+        submission = ContactSubmission.objects.create(
+            name=name,
+            email=email,
+            category=category,
+            subject=subject,
+            message=message,
+            subscribed_newsletter=newsletter,
+            ip_address=request.META.get('REMOTE_ADDR'),
+            user_agent=request.META.get('HTTP_USER_AGENT', '')
+        )
+        
+        # Email to admin
+        admin_subject = f'Contact Form: {subject}'
+        admin_message = f"""
+        Name: {name}
+        Email: {email}
+        Category: {category}
+        
+        Message:
+        {message}
+        
+        ---
+        This message was sent from the contact form on YES website.
+        Submission ID: {submission.id}
+        """
+        
         # Get admin email from site configuration
         config = SiteConfiguration.objects.first()
         admin_email = config.contact_email if config else settings.DEFAULT_FROM_EMAIL
@@ -648,17 +680,8 @@ def contact_form(request):
             {'error': 'Failed to send message. Please try again later.'},
             status=status.HTTP_500_INTERNAL_SERVER_ERROR
         )
+# ===================================================
 
-# core/views.py
-from django.shortcuts import render
-
-# Add this function alongside your API view
-def contact_page(request):
-    """Render the contact page template."""
-    return render(request, 'contact.html', {
-        'page_title': 'Contact Us',
-        'meta_description': 'Get in touch with Youth Environmental Scholars',
-    })
 def custom_404(request, exception):
     '''
     Custom 404 error handler
