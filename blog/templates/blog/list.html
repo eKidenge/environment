@@ -3700,6 +3700,53 @@ html {
     justify-content: center;
     flex-wrap: wrap;
 }
+   /* Fix sidebar widget alignment */
+.sidebar-widget {
+    text-align: center;
+}
+
+.widget-header {
+    justify-content: center;
+}
+
+.widget-title {
+    justify-content: center;
+}
+
+.widget-content {
+    text-align: center;
+}
+
+.category-list,
+.popular-posts,
+.tags-cloud {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.category-item,
+.popular-post {
+    width: 100%;
+    max-width: 300px;
+    justify-content: center;
+}
+
+/* Center "No categories available", "No trending posts yet", "No tags yet" messages */
+.no-categories,
+.no-posts {
+    text-align: center;
+    padding: 1.5rem 0;
+}
+
+.no-posts i {
+    display: block;
+    margin: 0 auto 0.75rem;
+}
+
+.tags-cloud p {
+    text-align: center;
+}
 /* ==========================================================================
    END OF CSS FILE - ECOHUB SCIENTIFIC BLOG STYLES
    ========================================================================== */ 
