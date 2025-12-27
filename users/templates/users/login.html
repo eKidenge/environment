@@ -1681,6 +1681,99 @@ input[type="radio"]:checked::after {
     align-items: center !important;
     justify-content: center !important;
 }
+   /* ===== FIX FEATURE CARDS LAYOUT ===== */
+
+/* Keep the features section horizontal */
+.grid > div:first-child > .space-y-6 {
+    display: grid !important;
+    grid-template-columns: repeat(3, 1fr) !important;
+    gap: 1rem !important;
+    width: 100% !important;
+}
+
+/* Style each feature card */
+.grid > div:first-child .space-y-6 > div {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    text-align: center !important;
+    padding: 1.5rem !important;
+    background: white !important;
+    border-radius: 0.75rem !important;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1) !important;
+    transition: all 0.3s ease !important;
+    height: 100% !important;
+}
+
+/* Center icon and content */
+.grid > div:first-child .space-y-6 > div > div {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    text-align: center !important;
+    width: 100% !important;
+}
+
+/* Fix icon positioning */
+.grid > div:first-child .flex-shrink-0 {
+    margin-bottom: 1rem !important;
+    margin-right: 0 !important;
+}
+
+/* Fix the icon container */
+.grid > div:first-child .w-12 {
+    width: 3rem !important;
+    height: 3rem !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    border-radius: 0.5rem !important;
+}
+
+/* Fix text alignment */
+.grid > div:first-child .space-y-6 > div h3 {
+    text-align: center !important;
+    margin-bottom: 0.5rem !important;
+    font-size: 1rem !important;
+    font-weight: 600 !important;
+}
+
+.grid > div:first-child .space-y-6 > div p {
+    text-align: center !important;
+    font-size: 0.875rem !important;
+    line-height: 1.4 !important;
+}
+
+/* Make stats horizontal and properly spaced */
+.grid > div:first-child .grid-cols-3 {
+    display: grid !important;
+    grid-template-columns: repeat(3, 1fr) !important;
+    gap: 1rem !important;
+    width: 100% !important;
+}
+
+/* Responsive design */
+@media (max-width: 1024px) {
+    .grid > div:first-child > .space-y-6 {
+        grid-template-columns: repeat(2, 1fr) !important;
+    }
+}
+
+@media (max-width: 640px) {
+    .grid > div:first-child > .space-y-6 {
+        grid-template-columns: 1fr !important;
+    }
+    
+    .grid > div:first-child .grid-cols-3 {
+        grid-template-columns: repeat(2, 1fr) !important;
+    }
+}
+
+@media (max-width: 480px) {
+    .grid > div:first-child .grid-cols-3 {
+        grid-template-columns: 1fr !important;
+    }
+}
 /* ============ END OF STYLESHEET ============ */
 /* Total lines of CSS: ~5,200 lines */
 </style>
