@@ -21,6 +21,8 @@ urlpatterns = [
     path('health/', health_check, name='health_check'),
     path('contact/', contact_form, name='contact'),
     path('home/', contact_form, name='home'),  # Add this line
+    path('contact/', contact_page, name='contact_page'),       # ← HTML page
+    path('api/contact/', contact_form, name='contact_api'),    # ← API endpoint
 ]
 
 app_name = 'core'
