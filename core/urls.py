@@ -4,7 +4,7 @@ from .views import (
     SiteConfigurationViewSet, TeamMemberViewSet,
     PartnerOrganizationViewSet, ImpactMetricViewSet,
     FAQViewSet, SitePageViewSet, NewsletterSubscriptionViewSet,
-    health_check, contact_form
+    health_check, contact_form, contact_page  # ← ADD THIS IMPORT
 )
 
 router = DefaultRouter()
