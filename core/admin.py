@@ -337,3 +337,45 @@ class NewsletterSubscriptionAdmin(admin.ModelAdmin):
         updated = queryset.update(is_active=False, unsubscribed_at=timezone.now())
         self.message_user(request, f'{updated} subscriptions unsubscribed.')
     unsubscribe_selected.short_description = "Unsubscribe selected"
+
+# ADDED TO SERVE CONTACT US
+# core/admin.py
+from django.contrib import admin
+from .models import ContactSubmission
+
+@admin.register(ContactSubmission)
+class ContactSubmissionAdmin(admin.ModelAdmin):
+    list_display = ('name', 'email', 'category', 'subject', 'created_at', 'is_responded')
+    list_filter = ('category', 'is_responded', 'created_at', 'subscribed_newsletter')
+    search_fields = ('name', 'email', 'subject', 'message')
+    readonly_fields = ('created_at', 'ip_address', 'user_agent')
+    fieldsets = (
+        ('Contact Information', {
+            'fields': ('name', 'email', 'category', 'subject')
+        }),
+        ('Message', {
+            'fields': ('message',)
+        }),
+        ('Preferences', {
+            'fields': ('subscribed_newsletter',)
+        }),
+        ('Meta Information', {
+            'fields': ('created_at', 'ip_address', 'user_agent'),
+            'classes': ('collapse',)
+        }),
+        ('Response Tracking', {
+            'fields': ('is_responded', 'responded_at', 'response_notes')
+        }),
+    )
+    
+    actions = ['mark_as_responded']
+    
+    def mark_as_responded(self, request, queryset):
+        updated = queryset.update(is_responded=True, responded_at=timezone.now())
+        self.message_user(request, f'{updated} submissions marked as responded.')
+    mark_as_responded.short_description = 'Mark selected submissions as responded'
+    
+    def get_readonly_fields(self, request, obj=None):
+        if obj and obj.is_responded:
+            return self.readonly_fields + ('is_responded', 'responded_at')
+        return self.readonly_fields
