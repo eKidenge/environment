@@ -416,3 +416,47 @@ class NewsletterSubscription(models.Model):
     
     def __str__(self):
         return self.email
+
+# ADDED TO SERVE CONTACT US
+# core/models.py
+from django.db import models
+from django.utils import timezone
+
+class ContactSubmission(models.Model):
+    CATEGORY_CHOICES = [
+        ('general', 'General Inquiry'),
+        ('programs', 'Program Information'),
+        ('partnership', 'Partnership Opportunities'),
+        ('volunteer', 'Volunteer Opportunities'),
+        ('media', 'Media Inquiry'),
+        ('research', 'Research Collaboration'),
+        ('donation', 'Donation Inquiry'),
+        ('technical', 'Technical Support'),
+    ]
+    
+    name = models.CharField(max_length=255)
+    email = models.EmailField()
+    category = models.CharField(max_length=50, choices=CATEGORY_CHOICES, default='general')
+    subject = models.CharField(max_length=255)
+    message = models.TextField()
+    subscribed_newsletter = models.BooleanField(default=False)
+    ip_address = models.GenericIPAddressField(null=True, blank=True)
+    user_agent = models.TextField(blank=True)
+    created_at = models.DateTimeField(default=timezone.now)
+    is_responded = models.BooleanField(default=False)
+    responded_at = models.DateTimeField(null=True, blank=True)
+    response_notes = models.TextField(blank=True)
+    
+    class Meta:
+        ordering = ['-created_at']
+        verbose_name = 'Contact Submission'
+        verbose_name_plural = 'Contact Submissions'
+    
+    def __str__(self):
+        return f"{self.name} - {self.subject} ({self.created_at.strftime('%Y-%m-%d')})"
+    
+    def mark_responded(self, notes=''):
+        self.is_responded = True
+        self.responded_at = timezone.now()
+        self.response_notes = notes
+        self.save()
