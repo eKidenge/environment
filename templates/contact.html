@@ -3509,6 +3509,20 @@ h3 { font-size: var(--text-2xl) !important; }
     flex-direction: column !important;
     align-items: center !important;
 }
+    /* Fix all text containers */
+.container {
+    max-width: 1200px !important;
+    margin: 0 auto !important;
+    padding: 0 var(--space-6) !important;
+}
+
+/* Fix paragraph text everywhere */
+p, .text-center, .lead {
+    max-width: 100% !important;
+    word-break: normal !important;
+    overflow-wrap: anywhere !important;
+    hyphens: auto !important;
+}
 
 /* ===== END OF CSS FILE ===== */
 </style>
