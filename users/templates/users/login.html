@@ -1609,7 +1609,78 @@ input[type="radio"]:checked::after {
         opacity: 0.5;
     }
 }
- 
+
+   /* ===== CENTER LEFT COLUMN ONLY ===== */
+
+/* Center the left column content */
+.grid > div:first-child {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    text-align: center !important;
+    justify-content: center !important;
+}
+
+/* Center the welcome text */
+.grid > div:first-child > div:first-child {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    text-align: center !important;
+}
+
+/* Center the features section */
+.grid > div:first-child > .space-y-6 {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+}
+
+/* Center each feature card */
+.grid > div:first-child .space-y-6 > div {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    text-align: center !important;
+    width: 100% !important;
+    max-width: 400px !important;
+}
+
+/* Center the icon and text inside feature cards */
+.grid > div:first-child .space-y-6 > div > div {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    text-align: center !important;
+    margin-left: 0 !important;
+}
+
+/* Center the icon wrapper */
+.grid > div:first-child .flex-shrink-0 {
+    margin-bottom: 1rem !important;
+    margin-right: 0 !important;
+}
+
+/* Remove left spacing in flex items */
+.grid > div:first-child .flex.items-start.space-x-4 {
+    justify-content: center !important;
+    text-align: center !important;
+}
+
+/* Center stats */
+.grid > div:first-child .grid-cols-3 {
+    display: flex !important;
+    justify-content: center !important;
+    gap: 1rem !important;
+}
+
+/* Center individual stat items */
+.grid > div:first-child .grid-cols-3 > div {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+}
 /* ============ END OF STYLESHEET ============ */
 /* Total lines of CSS: ~5,200 lines */
 </style>
