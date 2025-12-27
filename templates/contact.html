@@ -3523,6 +3523,76 @@ p, .text-center, .lead {
     overflow-wrap: anywhere !important;
     hyphens: auto !important;
 }
+    /* === FIX DEPARTMENT CARDS LAYOUT === */
+.department-grid {
+    display: grid !important;
+    grid-template-columns: repeat(4, 1fr) !important;  /* 4 columns side by side */
+    gap: var(--space-4) !important;
+    margin-top: var(--space-8) !important;
+}
+
+/* Make sure cards don't break */
+.department-card {
+    min-width: 0 !important;  /* Prevent overflow */
+    width: 100% !important;
+    height: auto !important;
+    display: flex !important;
+    flex-direction: column !important;
+}
+
+/* Fix content inside cards */
+.department-header {
+    flex-shrink: 0 !important;
+}
+
+.department-contacts-list {
+    flex-grow: 1 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: space-between !important;
+}
+
+/* For mobile: 2 columns */
+@media (max-width: 1024px) {
+    .department-grid {
+        grid-template-columns: repeat(2, 1fr) !important;
+    }
+}
+
+/* For very small mobile: 1 column */
+@media (max-width: 640px) {
+    .department-grid {
+        grid-template-columns: 1fr !important;
+    }
+}
+
+/* Ensure equal height */
+.department-card {
+    display: flex !important;
+    flex-direction: column !important;
+    height: 100% !important;
+}
+
+.department-info {
+    flex: 1 0 auto !important;
+}
+
+.department-contacts-list {
+    flex: 1 1 auto !important;
+}
+
+/* Fix text inside */
+.department-info h4 {
+    font-size: var(--text-lg) !important;
+    line-height: 1.3 !important;
+    margin-bottom: var(--space-2) !important;
+}
+
+.department-info p {
+    font-size: var(--text-sm) !important;
+    line-height: 1.4 !important;
+    margin-bottom: var(--space-4) !important;
+}
 
 /* ===== END OF CSS FILE ===== */
 </style>
